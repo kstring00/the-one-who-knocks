@@ -1,0 +1,1893 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Faithfulness System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#1B2A4A; --green:#2D5A3D; --gold:#B8954A;
+  --cream:#F7F3EA; --cream-raised:#FDFBF6; --ink:var(--navy);
+  --mist:#6B7280; --line:#D4CFC0; --line-soft:#E8E3D8;
+  --card:var(--cream-raised); --paper:var(--cream);
+  --green-bg:rgba(45,90,61,.1); --gold-bg:rgba(184,149,74,.12);
+  --danger:#8B3A3A; --danger-bg:rgba(139,58,58,.08);
+  --scroll-track:var(--cream); --scroll-thumb:#A39E93;
+}
+html.dark{
+  --cream:#141820; --cream-raised:#1C2230; --ink:#E8E4DC; --navy:#C8D0E0;
+  --mist:#9CA3AF; --line:#3A4050; --line-soft:#2A3040; --card:var(--cream-raised);
+  --paper:var(--cream); --green-bg:rgba(45,90,61,.25); --gold-bg:rgba(184,149,74,.15);
+  --scroll-track:#141820; --scroll-thumb:#5A6070;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--ink);
+  font:15px/1.55 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+*{scrollbar-width:thin;scrollbar-color:var(--scroll-thumb) var(--scroll-track)}
+.serif{font-family:"Cormorant Garamond",Georgia,serif}
+
+.top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
+  border-bottom:1px solid var(--line-soft);padding:12px 20px;background:var(--cream-raised);
+  position:sticky;top:0;z-index:40}
+.top-left{display:flex;align-items:center;gap:16px;flex:1;min-width:0;flex-wrap:wrap}
+.brand h1{font-family:"Cormorant Garamond",serif;font-size:22px;font-weight:700;margin:0;color:var(--navy);letter-spacing:.02em}
+.brand .tag{font-size:11px;color:var(--mist);margin-top:2px}
+.scripture-strip{font-size:11px;color:var(--mist);font-style:italic;max-width:420px;line-height:1.4;border-left:2px solid var(--gold);padding-left:10px}
+.view-toggle{display:flex;border:1px solid var(--line-soft);border-radius:8px;overflow:hidden;font-size:11px;font-weight:600}
+.view-toggle button{border:none;background:transparent;padding:7px 14px;cursor:pointer;color:var(--mist);transition:background .15s,color .15s;font-family:inherit}
+.view-toggle button.on{background:var(--navy);color:var(--cream-raised)}
+.view-toggle button:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+.navrow{display:flex;align-items:center;gap:8px}
+.navrow button{border:1.5px solid var(--navy);background:transparent;border-radius:6px;
+  width:34px;height:34px;font-size:16px;cursor:pointer;color:var(--navy);transition:background .15s}
+.navrow button:hover{background:var(--gold-bg)}
+#periodLabel{font-size:13px;color:var(--mist);min-width:180px;text-align:center}
+.topright{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#saveState{font-size:11px;color:var(--mist);min-width:72px;text-align:right}
+#saveState.dirty{color:var(--danger);font-weight:600}
+#saveState.saving{color:var(--gold)}
+.score{font-variant-numeric:tabular-nums;background:var(--paper);color:var(--navy);
+  padding:5px 12px;border:1px solid var(--line-soft);border-radius:8px;font-weight:600;font-size:11px;
+  font-family:"Cormorant Garamond",serif;position:relative}
+.score::after{content:"";position:absolute;bottom:2px;left:8px;right:8px;height:2px;background:var(--gold);
+  transform:scaleX(0);transform-origin:left;transition:transform .2s ease}
+.score.gold::after{transform:scaleX(1)}
+#saveBtn{border:1.5px solid var(--green);background:var(--green);color:#fff;border-radius:6px;
+  padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+#saveBtn:hover{filter:brightness(1.08)}
+.save-menu summary{list-style:none;cursor:pointer;font-size:11px;color:var(--mist);padding:4px 8px;border:1px solid var(--line);border-radius:4px}
+.save-menu summary::-webkit-details-marker{display:none}
+.save-menu button{margin-top:6px;border:1px solid var(--navy);background:transparent;padding:5px 12px;font-size:12px;cursor:pointer;border-radius:4px;color:var(--ink);display:block;width:100%;text-align:left}
+.save-menu .danger-full{margin-top:8px;border-color:var(--danger);color:var(--danger)}
+#themeToggle{border:1px solid var(--line);background:transparent;border-radius:6px;width:34px;height:34px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;color:var(--ink)}
+#themeToggle svg{width:18px;height:18px}
+
+.board{padding:16px 20px 32px;max-width:1400px;margin:0 auto}
+.board.loading{opacity:.45;pointer-events:none}
+.page-head{margin-bottom:16px;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px}
+.page-head h2{font-family:"Cormorant Garamond",serif;font-size:26px;font-weight:700;margin:0 0 2px;color:var(--navy)}
+.page-head p{margin:0;font-size:13px;color:var(--mist)}
+.page-head-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+.daily-toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:18px}
+.phase-tabs{display:flex;background:var(--line-soft);border-radius:10px;padding:3px;gap:2px}
+.phase-tab{border:none;background:transparent;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600;
+  cursor:pointer;color:var(--mist);font-family:inherit;transition:all .15s}
+.phase-tab.on{background:var(--cream-raised);color:var(--navy);box-shadow:0 1px 4px rgba(27,42,74,.08)}
+.phase-tab:hover:not(.on){color:var(--ink)}
+.simple-toggle{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--mist);cursor:pointer;user-select:none}
+.simple-toggle input{accent-color:var(--green);width:15px;height:15px}
+.why-btn{border:1px solid var(--line);background:var(--cream-raised);border-radius:8px;padding:7px 12px;
+  font-size:12px;cursor:pointer;color:var(--mist);font-family:inherit}
+.why-btn:hover{border-color:var(--gold);color:var(--navy)}
+
+.daily-layout{display:grid;grid-template-columns:1fr 260px;gap:24px;align-items:start}
+@media(max-width:1100px){.daily-layout{grid-template-columns:1fr}.sidebar{display:none}}
+
+.sidebar{position:sticky;top:88px;display:flex;flex-direction:column;gap:12px}
+.side-card{background:var(--card);border:1px solid var(--line-soft);border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(27,42,74,.04)}
+.side-head{padding:10px 14px;border-bottom:1px solid var(--line-soft)}
+.side-head h3{margin:0;font-family:"Cormorant Garamond",serif;font-size:15px;font-weight:600;color:var(--navy)}
+.side-body{padding:10px 14px 12px}
+.flow-step{display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:6px;cursor:pointer;font-size:11px;
+  color:var(--mist);border:none;background:none;width:100%;text-align:left;font-family:inherit}
+.flow-step:hover{background:var(--gold-bg);color:var(--ink)}
+.flow-step .tick{width:18px;height:18px;border-radius:50%;border:1px solid var(--line);display:flex;align-items:center;
+  justify-content:center;font-size:10px;flex:none;color:transparent}
+.flow-step.done .tick{background:var(--green);border-color:var(--green);color:#fff}
+.flow-step.done .tick::after{content:"✓"}
+.ff-mini{display:flex;flex-direction:column;gap:4px}
+.ff-mini-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--mist)}
+.ff-mini-row.done{color:var(--green);font-weight:500}
+.ff-mini-row .dot{width:8px;height:8px;border-radius:50%;border:1px solid var(--line);flex:none}
+.ff-mini-row.done .dot{background:var(--green);border-color:var(--green)}
+.ff-progress{font-size:13px;font-weight:600;color:var(--navy);margin-bottom:8px;font-variant-numeric:tabular-nums}
+.scripture-card{font-size:12px;font-style:italic;color:var(--mist);line-height:1.55;border-left:2px solid var(--gold);padding-left:10px}
+.scripture-card cite{display:block;font-size:10px;font-style:normal;color:var(--gold);margin-top:6px}
+
+.daily-section{display:none;margin-bottom:20px;scroll-margin-top:100px}
+#dailyBoard[data-phase="morning"] .daily-section[data-phases~="morning"],
+#dailyBoard[data-phase="day"] .daily-section[data-phases~="day"],
+#dailyBoard[data-phase="evening"] .daily-section[data-phases~="evening"]{display:block}
+#dailyBoard.simple-mode .phase-tabs{display:none}
+#dailyBoard.simple-mode .daily-section{display:none!important}
+#dailyBoard.simple-mode .daily-section[data-simple="1"]{display:block!important}
+#dailyBoard:not(.simple-mode) #sec-commit-simple{display:none!important}
+
+.zone{border-radius:12px;border:1px solid var(--line-soft);overflow:hidden;background:var(--card);margin-bottom:16px;
+  box-shadow:0 1px 3px rgba(27,42,74,.04)}
+.zonehead{padding:12px 16px 10px;border-bottom:1px solid var(--line-soft);background:transparent}
+.zonehead.compact{padding:0 0 8px;border:none}
+.zonehead .num{font-size:10px;font-weight:600;letter-spacing:.08em;color:var(--gold);text-transform:uppercase}
+.zonehead h2{margin:2px 0 0;font-family:"Cormorant Garamond",serif;font-size:18px;font-weight:600;color:var(--navy)}
+.zonehead p{margin:4px 0 0;font-size:12px;color:var(--mist);line-height:1.4}
+.zonebody{padding:12px 16px 14px}
+.zonebody.compact{padding:0}
+.card-soft{background:var(--paper);border:1px solid var(--line-soft);border-radius:10px;padding:12px 14px;margin-bottom:10px}
+.card-soft:last-child{margin-bottom:0}
+.card-soft h3{margin:0 0 8px;font-family:"Cormorant Garamond",serif;font-size:14px;font-weight:600;color:var(--navy)}
+.hint{font-size:11px;color:var(--mist);margin:0 0 8px;line-height:1.4}
+
+label.q{display:block;font-size:12px;margin:8px 0 3px;color:var(--ink);font-weight:500}
+label.q-compact{margin:6px 0 2px;font-size:11px;color:var(--mist)}
+textarea,input[type=text],input[type=time],select{width:100%;border:1px solid var(--line-soft);border-radius:8px;
+  padding:7px 10px;font:13px/1.4 inherit;color:var(--ink);background:var(--cream-raised)}
+.inp-sm{padding:6px 10px;font-size:13px}
+.ta-sm{min-height:36px;resize:vertical}
+.ta-md{min-height:56px;resize:vertical}
+textarea{resize:vertical}
+textarea:focus,input:focus,select:focus{outline:2px solid rgba(184,149,74,.45);outline-offset:1px;border-color:var(--gold)}
+
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:4px}
+.chip{border:1px solid var(--line-soft);background:var(--cream-raised);border-radius:999px;
+  padding:4px 10px;font-size:11px;cursor:pointer;color:var(--ink);transition:all .15s;font-family:inherit}
+.chip.on{background:var(--green-bg);border-color:var(--green);color:var(--green);font-weight:600}
+.motive-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px}
+.motive-list{display:flex;flex-direction:column;gap:4px;margin-bottom:4px}
+.motive-row{display:flex;align-items:center;gap:6px;padding:2px 0}
+.motive-row input[type=checkbox]{accent-color:var(--green);width:15px;height:15px;flex:none;margin:0}
+.motive-label{flex:1;padding:5px 8px!important;font-size:12px!important;min-width:0}
+.motive-add-row{display:flex;gap:4px;margin-top:4px}
+.motive-item{display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer}
+.motive-item input{accent-color:var(--green);width:14px;height:14px}
+
+/* Faithful Few hero */
+.ff-hero{background:linear-gradient(135deg,var(--cream-raised) 0%,rgba(184,149,74,.08) 100%);
+  border:1px solid var(--line-soft);border-radius:12px;padding:14px 16px;margin-bottom:16px}
+.ff-hero-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.ff-hero-head h2{margin:0;font-family:"Cormorant Garamond",serif;font-size:20px;color:var(--navy)}
+.ff-hero-head .prog{font-size:12px;font-weight:600;color:var(--green);font-variant-numeric:tabular-nums}
+.ff-grid{display:flex;flex-direction:column;gap:6px}
+.ff-accordion{border:1px solid var(--line-soft);border-radius:10px;background:var(--cream-raised);overflow:hidden}
+.ff-accordion[open]{border-color:rgba(184,149,74,.45);box-shadow:0 1px 4px rgba(27,42,74,.05)}
+.ff-accordion-summary{display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;list-style:none;
+  font-size:13px;font-weight:600;color:var(--navy);user-select:none}
+.ff-accordion-summary::-webkit-details-marker{display:none}
+.ff-accordion-summary::after{content:"";margin-left:auto;width:8px;height:8px;border-right:2px solid var(--mist);
+  border-bottom:2px solid var(--mist);transform:rotate(45deg);transition:transform .15s;flex:none}
+.ff-accordion[open]>.ff-accordion-summary::after{transform:rotate(-135deg);margin-top:4px}
+.ff-sum-left{display:flex;align-items:center;gap:6px;flex:none}
+.ff-sum-title{font-size:13px}
+.ff-preview{flex:1;font-size:11px;font-weight:400;color:var(--mist);text-align:right;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;min-width:0;margin:0 4px}
+.ff-accordion-body{padding:0 12px 12px;border-top:1px solid var(--line-soft)}
+.ff-card{border:none;border-radius:0;padding:0;background:transparent}
+.ff-card.done{border:none;background:transparent}
+.ff-card.done .ff-accordion-summary{color:var(--green)}
+.ff-card .icon{font-size:16px;color:var(--gold);line-height:1;flex:none}
+.ff-card .ff-cat-prog{font-size:10px;color:var(--green);font-weight:600;font-variant-numeric:tabular-nums;flex:none}
+.ff-card .ff-hint{font-size:11px;color:var(--mist);margin:0 0 8px;line-height:1.45}
+.ff-items{list-style:none;margin:0 0 8px;padding:0;display:flex;flex-direction:column;gap:6px}
+.ff-item{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:start;padding:8px 10px;
+  border:1px solid var(--line-soft);border-radius:8px;background:var(--paper)}
+.ff-item.done{opacity:.88;background:var(--green-bg);border-color:rgba(45,90,61,.25)}
+.ff-item.done .ff-item-text{text-decoration:line-through;color:var(--mist)}
+.ff-item input[type=checkbox]{accent-color:var(--green);width:16px;height:16px;flex:none;margin:6px 0 0}
+.ff-item-text{width:100%!important;min-height:40px;max-height:160px;padding:6px 8px!important;font-size:13px!important;
+  line-height:1.45!important;border-radius:6px!important;resize:vertical;white-space:pre-wrap;word-break:break-word;
+  overflow-wrap:anywhere;background:var(--cream-raised)!important}
+.ff-rm{border:none;background:none;color:var(--mist);cursor:pointer;font-size:16px;padding:4px;line-height:1;flex:none;margin-top:4px}
+.ff-rm:hover{color:var(--danger)}
+.ff-add-row{display:flex;gap:6px;margin-top:4px;align-items:flex-start}
+.ff-add-input{flex:1;padding:7px 10px!important;font-size:13px!important;min-height:36px}
+.ff-add-btn{border:1px solid var(--line-soft);background:var(--cream-raised);border-radius:6px;width:28px;height:28px;
+  cursor:pointer;font-size:16px;color:var(--green);font-weight:600;line-height:1;flex:none;font-family:inherit}
+.ff-add-btn:hover{background:var(--green-bg);border-color:var(--green)}
+.ff-check-group{margin-bottom:10px}
+.ff-check-group:last-child{margin-bottom:0}
+.ff-check-group-title{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--gold);margin-bottom:4px}
+
+.ff-checklist{display:flex;flex-direction:column;gap:6px}
+.ff-check-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--line-soft);
+  border-radius:8px;background:var(--cream-raised);font-size:13px}
+.ff-check-row.done{border-color:var(--green);background:var(--green-bg)}
+.ff-check-row input{accent-color:var(--green);width:16px;height:16px;flex:none}
+.ff-check-row .lbl{flex:1;font-weight:500}
+.ff-check-row .sub{font-size:11px;color:var(--mist);margin-left:auto;max-width:45%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.danger-reminder{background:var(--gold-bg);border:1px solid rgba(184,149,74,.25);border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.5}
+.danger-reminder b{color:var(--navy);font-size:11px;text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px}
+.danger-reminder .if-then{margin-top:8px;font-size:12px;color:var(--mist)}
+
+.sched-rows{display:flex;flex-direction:column;gap:6px}
+.sched-row{display:grid;grid-template-columns:110px 1fr;gap:8px;align-items:center}
+@media(max-width:480px){.sched-row{grid-template-columns:1fr}}
+.sched-lbl{font-size:12px;font-weight:500;color:var(--mist)}
+.study-block{border-top:1px dashed var(--line-soft);margin-top:12px;padding-top:12px}
+.study-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.study-done{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:12px}
+.study-done input{accent-color:var(--green);width:15px;height:15px}
+
+.rating-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.rating-row .rlbl{font-size:12px;min-width:90px;font-weight:500;color:var(--mist)}
+.rating-pills{display:flex;gap:4px;flex-wrap:wrap}
+.rate-pill{min-width:36px;height:32px;padding:0 10px;border:1px solid var(--line-soft);background:var(--cream-raised);
+  border-radius:999px;cursor:pointer;font-size:12px;font-weight:600;color:var(--mist);font-family:inherit;transition:all .15s}
+.rate-pill.on{background:var(--navy);color:var(--cream-raised);border-color:var(--navy)}
+
+.quick-cap-row{display:grid;grid-template-columns:1fr auto auto auto;gap:6px;align-items:center}
+@media(max-width:640px){.quick-cap-row{grid-template-columns:1fr 1fr}.quick-cap-row .gobtn{grid-column:1/-1}}
+.quick-cap-row select{font-size:12px;padding:6px 8px}
+.cap-list{margin-top:10px;display:flex;flex-direction:column;gap:4px}
+.cap-row{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;background:var(--cream-raised);font-size:12px}
+.cap-row .cat{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--gold);min-width:72px}
+.cap-row .txt{flex:1}
+.cap-row .proc{font-size:10px;padding:2px 6px;border-radius:4px;background:var(--green-bg);color:var(--green);font-weight:600;text-transform:uppercase}
+.cap-row .xbtn{border:none;background:none;color:var(--mist);cursor:pointer;font-size:14px;padding:0 4px}
+
+details.collapsible{border:1px solid var(--line-soft);border-radius:10px;background:var(--card);margin-bottom:12px}
+details.collapsible summary{padding:10px 14px;cursor:pointer;font-family:"Cormorant Garamond",serif;font-size:15px;
+  font-weight:600;color:var(--navy);list-style:none}
+details.collapsible summary::-webkit-details-marker{display:none}
+details.collapsible .zonebody{border-top:1px solid var(--line-soft)}
+
+.daily-reminder{margin-top:12px;padding:12px;border-left:2px solid var(--gold);background:var(--gold-bg);
+  font-family:"Cormorant Garamond",serif;font-size:14px;font-style:italic;color:var(--navy);line-height:1.45}
+
+.gobtn{border:1px solid var(--green);background:var(--green);color:#fff;border-radius:8px;
+  padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
+.gobtn:hover{filter:brightness(1.06)}
+
+.progress-list{display:flex;flex-direction:column;gap:10px}
+.progress-item{display:flex;align-items:center;gap:10px;font-size:13px}
+.progress-item .plbl{min-width:140px;font-weight:500}
+.progress-bar{flex:1;height:6px;background:var(--line-soft);border-radius:4px;overflow:hidden}
+.progress-bar .fill{height:100%;background:var(--green);border-radius:4px;transition:width .3s ease}
+.progress-item .pct{font-size:11px;color:var(--mist);min-width:36px;text-align:right;font-variant-numeric:tabular-nums}
+
+.fruit-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:768px){.fruit-grid{grid-template-columns:1fr}}
+.fruit-item{border:1px solid var(--line-soft);border-radius:8px;padding:10px;background:var(--paper)}
+.entrusted-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:640px){.entrusted-grid{grid-template-columns:1fr}}
+
+/* Why This Works drawer */
+.drawer-backdrop{position:fixed;inset:0;background:rgba(27,42,74,.25);z-index:80;opacity:0;pointer-events:none;transition:opacity .2s}
+.drawer-backdrop.open{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;width:min(420px,92vw);height:100%;background:var(--cream-raised);
+  border-left:1px solid var(--line-soft);z-index:90;transform:translateX(100%);transition:transform .25s ease;
+  overflow-y:auto;padding:20px 22px 40px;box-shadow:-4px 0 24px rgba(27,42,74,.1)}
+.drawer.open{transform:translateX(0)}
+.drawer-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+.drawer-head h2{margin:0;font-family:"Cormorant Garamond",serif;font-size:22px;color:var(--navy)}
+.drawer-close{border:none;background:var(--line-soft);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:18px;color:var(--mist)}
+.drawer-block{margin-bottom:18px}
+.drawer-block h4{font-family:"Cormorant Garamond",serif;font-size:15px;margin:0 0 8px;color:var(--navy)}
+.drawer-block p,.drawer-block li{font-size:12px;color:var(--mist);line-height:1.55;margin:0 0 6px}
+.drawer-block ul{padding-left:16px;margin:0}
+.drawer-mission{padding:14px;border-left:2px solid var(--gold);background:var(--gold-bg);font-family:"Cormorant Garamond",serif;
+  font-size:14px;color:var(--navy);line-height:1.55;font-style:italic}
+
+body.view-daily .site-foot{display:none}
+
+.journal-panel{max-width:900px;margin:0 auto}
+.journal-editor{min-height:min(62vh,560px);font-family:"Cormorant Garamond",Georgia,serif;font-size:17px;line-height:1.75}
+.journal-meta{display:flex;justify-content:space-between;gap:12px;margin-top:10px;font-size:11px;color:var(--mist)}
+.journal-past{margin-top:18px;padding-top:14px;border-top:1px solid var(--line-soft)}
+.journal-past summary{cursor:pointer;font-size:11px;font-weight:600;letter-spacing:.07em;color:var(--mist)}
+.journal-past summary::-webkit-details-marker{display:none}
+.journal-list{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.journal-list button{border:1px solid var(--line);background:var(--cream-raised);border-radius:4px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:inherit}
+.journal-list button.on{background:var(--navy);color:var(--cream-raised);border-color:var(--navy)}
+.journal-foot{display:flex;justify-content:space-between;align-items:center;margin-top:16px;flex-wrap:wrap;gap:8px}
+.disk-hint{font-size:11px;color:var(--mist);margin:0 0 10px;padding:8px 10px;border-radius:6px;background:var(--gold-bg);border-left:2px solid var(--gold)}
+.disk-hint.on{border-left-color:var(--green)}
+
+.site-foot{margin-top:40px;padding:24px 20px 32px;border-top:2px solid var(--navy);background:var(--cream-raised)}
+.foot-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;max-width:1200px;margin:0 auto}
+.foot-block h4{font-family:"Cormorant Garamond",serif;font-size:16px;margin:0 0 8px;color:var(--navy)}
+.foot-block p,.foot-block li{font-size:12px;color:var(--mist);line-height:1.55;margin:0 0 6px}
+.foot-block ul{padding-left:16px;margin:0}
+.mission{margin-top:20px;padding:16px;border:1.5px solid var(--gold);border-radius:8px;text-align:center;
+  font-family:"Cormorant Garamond",serif;font-size:16px;color:var(--navy);line-height:1.55;max-width:800px;margin-left:auto;margin-right:auto}
+.foot-actions{display:flex;justify-content:center;gap:10px;margin-top:16px;flex-wrap:wrap}
+.danger{border:1.5px solid var(--danger);background:transparent;color:var(--danger);border-radius:6px;padding:6px 14px;font-size:12px;cursor:pointer;font-family:inherit}
+.danger:hover{background:var(--danger-bg)}
+body.view-journal .daily-layout,body.view-journal .weekly-board,body.view-journal .monthly-board{display:none}
+body.view-prayer .daily-layout,body.view-prayer .weekly-board,body.view-prayer .monthly-board,body.view-prayer .journal-panel{display:none}
+body.view-prayer .site-foot,body.view-journal .site-foot{display:none}
+
+.prayer-panel{max-width:820px;margin:0 auto}
+.prayer-filters{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.prayer-filter{border:1px solid var(--line-soft);background:var(--cream-raised);border-radius:999px;
+  padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--mist)}
+.prayer-filter.on{background:var(--navy);color:var(--cream-raised);border-color:var(--navy)}
+.prayer-stats{font-size:12px;color:var(--mist);margin-bottom:14px;font-variant-numeric:tabular-nums}
+.prayer-add{margin-bottom:16px}
+.prayer-list{display:flex;flex-direction:column;gap:10px}
+.prayer-card{border:1px solid var(--line-soft);border-radius:10px;padding:12px 14px;background:var(--cream-raised);
+  transition:border-color .15s}
+.prayer-card.answered{border-left:3px solid var(--green)}
+.prayer-card.waiting{border-left:3px solid var(--gold)}
+.prayer-card-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.prayer-badge{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;padding:3px 8px;border-radius:999px}
+.prayer-badge.waiting{background:var(--gold-bg);color:var(--gold)}
+.prayer-badge.answered{background:var(--green-bg);color:var(--green)}
+.prayer-card-head .spacer{flex:1}
+.prayer-dates{font-size:11px;color:var(--mist)}
+.prayer-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+@media(max-width:560px){.prayer-grid{grid-template-columns:1fr}}
+.prayer-empty{text-align:center;padding:24px;color:var(--mist);font-size:13px;font-style:italic}
+
+/* Thought journal — sidebar card above Today's Flow */
+.thought-journal .thought-journal-head{padding:0}
+.thought-journal:not(.collapsed) .thought-journal-head{border-bottom:1px solid var(--line-soft)}
+.thought-journal-toggle{width:100%;border:none;background:transparent;padding:10px 14px;cursor:pointer;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;font-family:inherit;text-align:left}
+.thought-journal-toggle h3{margin:0;font-family:"Cormorant Garamond",serif;font-size:15px;font-weight:600;color:var(--navy)}
+.thought-journal-toggle .tj-chevron{font-size:10px;color:var(--mist);transition:transform .15s;flex:none}
+.thought-journal.collapsed .tj-chevron{transform:rotate(-90deg)}
+.thought-journal.collapsed .thought-journal-body{display:none}
+.thought-journal-body{display:flex;flex-direction:column;gap:4px}
+#thoughtJournalText{min-height:88px;max-height:180px;resize:vertical;width:100%;box-sizing:border-box;
+  font-size:12px;line-height:1.5;padding:8px 10px;border:1px solid var(--line-soft);border-radius:8px;
+  background:var(--paper);font-family:inherit}
+.thought-journal-meta{font-size:10px;color:var(--mist);text-align:right}
+</style>
+</head>
+<body>
+<div id="app">
+<header class="top">
+  <div class="top-left">
+    <div class="brand">
+      <h1>The Faithfulness System</h1>
+      <div class="tag">Daily · Weekly · Monthly stewardship</div>
+    </div>
+    <div class="scripture-strip serif" id="scriptureBanner">"Whatever you do, do it from the heart, as something done for the Lord." — Colossians 3:23</div>
+  </div>
+  <div class="view-toggle" role="tablist">
+    <button type="button" id="modeDaily" role="tab">Daily</button>
+    <button type="button" id="modeWeekly" role="tab">Weekly</button>
+    <button type="button" id="modeMonthly" role="tab">Monthly</button>
+    <button type="button" id="modeJournal" role="tab">Journal</button>
+    <button type="button" id="modePrayer" role="tab">Prayer</button>
+  </div>
+  <div class="navrow">
+    <button type="button" id="prevP" aria-label="Previous">&#8592;</button>
+    <span id="periodLabel">Today</span>
+    <button type="button" id="nextP" aria-label="Next">&#8594;</button>
+  </div>
+  <div class="topright">
+    <span class="score" id="score">0/5 · 0%</span>
+    <span id="saveState">Saved</span>
+    <button type="button" id="saveBtn">Save</button>
+    <details class="save-menu">
+      <summary>&#8943;</summary>
+      <button type="button" id="linkDiskFolder">Link save folder…</button>
+      <button type="button" class="danger-full" id="resetAll">Reset all data</button>
+    </details>
+    <button type="button" id="themeToggle" aria-label="Toggle theme">
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="board" id="dailyBoard" data-phase="morning">
+  <div class="page-head">
+    <div>
+      <h2>Daily Ledger</h2>
+      <p>Start the day on purpose. End the day in peace.</p>
+    </div>
+    <div class="page-head-actions">
+      <label class="simple-toggle"><input type="checkbox" id="simpleMode"> Simple Mode</label>
+      <button type="button" class="why-btn" id="whyWorksBtn">Why This Works</button>
+    </div>
+  </div>
+  <div class="daily-toolbar">
+    <div class="phase-tabs" role="tablist">
+      <button type="button" class="phase-tab on" data-phase="morning" role="tab">Morning Setup</button>
+      <button type="button" class="phase-tab" data-phase="day" role="tab">During the Day</button>
+      <button type="button" class="phase-tab" data-phase="evening" role="tab">Evening Review</button>
+    </div>
+  </div>
+  <div class="daily-layout">
+    <div class="main-col" id="dailyMain"></div>
+    <aside class="sidebar" id="dailySidebar"></aside>
+  </div>
+</div>
+
+<div class="board weekly-board" id="weeklyBoard" hidden>
+  <div class="page-head">
+    <h2>Weekly Stewardship Review</h2>
+    <p>Review. Adjust. Experiment.</p>
+  </div>
+  <div id="weeklyMain"></div>
+</div>
+
+<div class="board monthly-board" id="monthlyBoard" hidden>
+  <div class="page-head">
+    <h2>Monthly Fruit &amp; Multiplication Review</h2>
+    <p>Zoom out. Celebrate. Realign.</p>
+  </div>
+  <div id="monthlyMain"></div>
+</div>
+
+<div class="board journal-panel" id="journalPanel" hidden>
+  <div class="zone">
+    <div class="zonehead"><div class="num">Journal</div><h2>Honest lines</h2>
+      <p>No audience. Morning pages, evening debrief, or anything in between — one day per page.</p></div>
+    <div class="zonebody">
+      <p class="disk-hint" id="diskHint">Link a save folder once (⋯ menu) to also write files to disk.</p>
+      <label class="q" for="journalBody" id="journalDateLabel">Today</label>
+      <textarea id="journalBody" class="journal-editor" placeholder="What's actually going on? What are you carrying?" aria-label="Journal entry"></textarea>
+      <div class="journal-meta"><span id="journalWords">0 words</span><span id="journalUpdated"></span></div>
+      <details class="journal-past" open><summary>Past entries</summary><ul class="journal-list" id="journalList"></ul></details>
+      <div class="journal-foot">
+        <span class="hint" style="margin:0">Autosaves in browser; writes <code>journal-YYYY-MM-DD.txt</code> when a folder is linked.</span>
+        <button type="button" class="danger" id="clearJournal">Clear this entry</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="board prayer-panel" id="prayerPanel" hidden>
+  <div class="page-head">
+    <div>
+      <h2>Prayer Log</h2>
+      <p>Write your prayers. Record how God answered — and when.</p>
+    </div>
+  </div>
+  <div class="prayer-filters" role="tablist">
+    <button type="button" class="prayer-filter on" data-pfilter="all">All</button>
+    <button type="button" class="prayer-filter" data-pfilter="waiting">Waiting</button>
+    <button type="button" class="prayer-filter" data-pfilter="answered">Answered</button>
+  </div>
+  <p class="prayer-stats" id="prayerStats"></p>
+  <div class="card-soft prayer-add">
+    <h3>New prayer</h3>
+    <label class="q q-compact" for="prayerNewRequest">What are you bringing before the Lord?</label>
+    <textarea id="prayerNewRequest" class="ta-sm" rows="2" placeholder="Lord, I ask…"></textarea>
+    <div class="prayer-grid" style="margin-top:8px">
+      <div><label class="q q-compact" for="prayerNewDate">Date prayed</label>
+        <input type="date" id="prayerNewDate"></div>
+      <div style="display:flex;align-items:flex-end">
+        <button type="button" class="gobtn" id="prayerAddBtn" style="width:100%">Add to log</button></div>
+    </div>
+  </div>
+  <div class="prayer-list" id="prayerList"></div>
+</div>
+
+<footer class="site-foot">
+  <div class="foot-actions"><button type="button" class="danger" id="clearPeriod">Clear this period</button></div>
+</footer>
+
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+<aside class="drawer" id="whyDrawer" aria-label="Why This Works">
+  <div class="drawer-head">
+    <h2>Why This Works</h2>
+    <button type="button" class="drawer-close" id="drawerClose" aria-label="Close">×</button>
+  </div>
+  <div class="drawer-block">
+    <h4>Foundations</h4>
+    <ul>
+      <li>Faithfulness in small details compounds over time</li>
+      <li>Work from the heart for the Lord, not for approval</li>
+      <li>Steward talents for neighbor and kingdom</li>
+      <li>Measure to improve — data, not shame</li>
+      <li>Implementation intentions beat vague goals</li>
+    </ul>
+  </div>
+  <div class="drawer-block">
+    <h4>Scriptures</h4>
+    <p><em>"Whatever you do, do it from the heart, as something done for the Lord and not for people."</em> — Colossians 3:23</p>
+    <p><em>"So, whether you eat or drink, or whatever you do, do everything for the glory of God."</em> — 1 Corinthians 10:31</p>
+    <p><em>"Well done, good and faithful servant… You were faithful over a few things; I will put you in charge of many things."</em> — Matthew 25:21</p>
+    <p><em>"Commit your activities to the LORD, and your plans will be established."</em> — Proverbs 16:3</p>
+  </div>
+  <div class="drawer-block">
+    <h4>Research notes</h4>
+    <textarea id="researchNotes" data-global="researchNotes" placeholder="Implementation intentions, habit science, leadership notes…" style="min-height:80px;font-size:12px;width:100%"></textarea>
+  </div>
+  <div class="drawer-block">
+    <h4>Growth Logic Tree</h4>
+    <p class="hint">Take what is in front of you and build a faithful plan.</p>
+    <div id="drawerGrowthTree"></div>
+  </div>
+  <div class="drawer-mission">"Today I will glorify God in the small details. I will be faithful with what is in front of me so I can love God, serve my neighbor, multiply my talents, and build a life that glorifies Him."</div>
+</aside>
+</div>
+
+<script>
+
+if (!window.storage) {
+  const PREFIX = 'wsr:';
+  window.storage = {
+    async get(key) {
+      const v = localStorage.getItem(PREFIX + key);
+      return v === null ? null : { value: v };
+    },
+    async set(key, value) {
+      try { localStorage.setItem(PREFIX + key, value); return true; }
+      catch { return false; }
+    },
+    async list(prefix) {
+      const keys = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith(PREFIX + prefix)) keys.push(k.slice(PREFIX.length));
+      }
+      return { keys };
+    },
+    async clearAll() {
+      const rm = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith(PREFIX)) rm.push(k);
+      }
+      rm.forEach(k => localStorage.removeItem(k));
+      return true;
+    }
+  };
+}
+
+const DISK_IDB = 'wsr-disk', DISK_STORE = 'handles', DIR_KEY = 'saveDir';
+let diskFolderLinked = false;
+
+function openDiskDb(){
+  return new Promise((resolve, reject)=>{
+    const r = indexedDB.open(DISK_IDB, 1);
+    r.onupgradeneeded = ()=> r.result.createObjectStore(DISK_STORE);
+    r.onerror = ()=> reject(r.error);
+    r.onsuccess = ()=> resolve(r.result);
+  });
+}
+async function diskGetDirHandle(){
+  try{
+    const db = await openDiskDb();
+    return await new Promise((resolve, reject)=>{
+      const tx = db.transaction(DISK_STORE, 'readonly');
+      const req = tx.objectStore(DISK_STORE).get(DIR_KEY);
+      req.onsuccess = ()=> resolve(req.result || null);
+      req.onerror = ()=> reject(req.error);
+    });
+  }catch{ return null; }
+}
+async function diskSetDirHandle(handle){
+  const db = await openDiskDb();
+  return new Promise((resolve, reject)=>{
+    const tx = db.transaction(DISK_STORE, 'readwrite');
+    tx.objectStore(DISK_STORE).put(handle, DIR_KEY);
+    tx.oncomplete = ()=> resolve(true);
+    tx.onerror = ()=> reject(tx.error);
+  });
+}
+async function ensureDirPermission(handle){
+  if(!handle) return false;
+  let p = await handle.queryPermission({ mode:'readwrite' });
+  if(p === 'granted') return true;
+  if(p === 'prompt') return (await handle.requestPermission({ mode:'readwrite' })) === 'granted';
+  return false;
+}
+async function getWritableDir(){
+  const handle = await diskGetDirHandle();
+  if(!handle) return null;
+  return (await ensureDirPermission(handle)) ? handle : null;
+}
+async function writeDiskFile(dir, filename, content){
+  const fh = await dir.getFileHandle(filename, { create:true });
+  const w = await fh.createWritable();
+  await w.write(content);
+  await w.close();
+}
+async function diskSaveJournal(dateStr, data){
+  const dir = await getWritableDir();
+  if(!dir) return false;
+  const text = ['The Faithfulness System — Journal','Date: '+dateStr,
+    data.updated ? 'Updated: '+new Date(data.updated).toLocaleString() : '','',data.body||''].join('\n');
+  await writeDiskFile(dir, 'journal-'+dateStr+'.txt', text);
+  return true;
+}
+async function diskSaveLedger(dateStr, kind, data){
+  const dir = await getWritableDir();
+  if(!dir) return false;
+  const names = { daily:'faithfulness-day-', weekly:'faithfulness-week-', monthly:'faithfulness-month-' };
+  const ext = kind === 'monthly' ? dateStr+'.json' : dateStr+'.json';
+  const payload = JSON.stringify({ date:dateStr, saved:new Date().toISOString(), data }, null, 2);
+  await writeDiskFile(dir, names[kind]+ext, payload);
+  return true;
+}
+async function diskSaveCurrent(){
+  if(isJournal()) return diskSaveJournal(iso(dayOf(dayOffset)), journal);
+  if(isDaily()) return diskSaveLedger(iso(dayOf(dayOffset)), 'daily', dayData);
+  if(isWeekly()) return diskSaveLedger(iso(mondayOf(weekOffset)), 'weekly', weekData);
+  return diskSaveLedger(monthKey(monthOffset), 'monthly', monthData);
+}
+async function pickSaveDir(){
+  if(!window.showDirectoryPicker){
+    alert('Your browser cannot write directly to a folder. Use Chrome, Edge, or Safari 17+.');
+    return null;
+  }
+  try{
+    const handle = await window.showDirectoryPicker({ mode:'readwrite', startIn:'downloads' });
+    await diskSetDirHandle(handle);
+    diskFolderLinked = true;
+    updateDiskUI(handle.name);
+    await save();
+    return handle;
+  }catch(e){
+    if(e?.name !== 'AbortError') alert('Could not link folder: '+(e.message||e));
+    return null;
+  }
+}
+async function refreshDiskLink(){
+  const handle = await diskGetDirHandle();
+  diskFolderLinked = !!(handle && await ensureDirPermission(handle));
+  updateDiskUI(handle?.name || '');
+}
+function updateDiskUI(folderName){
+  const hint = document.getElementById('diskHint');
+  const linkBtn = document.getElementById('linkDiskFolder');
+  if(hint){
+    if(diskFolderLinked && folderName){
+      hint.textContent = 'Also saving to '+folderName;
+      hint.classList.add('on');
+    } else {
+      hint.textContent = 'Link a save folder once (⋯ menu) to also write files to disk.';
+      hint.classList.remove('on');
+    }
+  }
+  if(linkBtn) linkBtn.textContent = diskFolderLinked ? 'Change save folder…' : 'Link save folder…';
+}
+
+const VIRTUES = ['Diligence','Faithfulness','Service','Courage','Order','Excellence','Self-Control','Love for Neighbor'];
+const DEFAULT_MOTIVES = [
+  {id:'lord',label:'For the Lord'},{id:'neighbor',label:'For love of neighbor'},{id:'stewardship',label:'For stewardship'},
+  {id:'approval',label:'For approval'},{id:'pride',label:'Pride'},{id:'comfort',label:'Comfort / escape'}
+];
+const FF_KEYS = [
+  {key:'mustDo',icon:'★',title:'Must-Do',hint:'The one non-negotiable task that makes today faithful.'},
+  {key:'body',icon:'♥',title:'Body Habit',hint:'Care for my health so I can serve with energy.'},
+  {key:'order',icon:'☰',title:'Order Habit',hint:'Bring order to my peace, schedule, and responsibilities.'},
+  {key:'leadership',icon:'◎',title:'Leadership / Service',hint:'Serve, encourage, ask, listen, and make someone\'s day better.'},
+  {key:'skill',icon:'✦',title:'Skill / Talent Rep',hint:'Develop a gift God has given me. One rep counts.'}
+];
+const TRACK_KEYS = [
+  {k:'diligence',l:'Diligence'},{k:'focus',l:'Focus'},{k:'followThrough',l:'Follow-through'},
+  {k:'order',l:'Order'},{k:'service',l:'Service'}
+];
+const CAPTURE = [
+  {k:'people',t:'People in front of me',h:'Who needs love, encouragement, follow-up, or prayer?'},
+  {k:'responsibilities',t:'Responsibilities in front of me',h:'What has been entrusted to me at work, school, home, church, body, or money?'},
+  {k:'opportunities',t:'Opportunities in front of me',h:'What door, skill, project, or relationship is opening?'},
+  {k:'burdens',t:'Burdens in front of me',h:'What keeps coming up that needs action, prayer, or release?'}
+];
+const FRUITS = ['Love','Joy','Peace','Patience','Kindness','Goodness','Faithfulness','Gentleness','Self-Control'];
+const FLOW = ['Posture','Faithful Few','Danger Plan','Execute','Track','Learn','Commit'];
+const FLOW_PHASE = ['morning','morning','morning','morning','evening','evening','evening'];
+const DAILY_SECTIONS = ['posture','faithfulFew','danger','execute','track','learn','commit'];
+let dailyPhase = 'morning';
+let simpleMode = false;
+
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function uid(){return Math.random().toString(36).slice(2,10)}
+function iso(d){ return d.toISOString().slice(0,10); }
+function mondayOf(off){
+  const d = new Date(); d.setDate(d.getDate()-((d.getDay()+6)%7)+off*7); d.setHours(0,0,0,0); return d;
+}
+function dayOf(off){ const d = new Date(); d.setDate(d.getDate()+off); d.setHours(0,0,0,0); return d; }
+function monthOf(off){
+  const d = new Date(); d.setDate(1); d.setMonth(d.getMonth()+off); d.setHours(0,0,0,0); return d;
+}
+function monthKey(off){ const d = monthOf(off); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
+function dayKeyFor(off){ return 'fs-day:'+iso(dayOf(off)); }
+function weekKeyFor(off){ return 'fs-week:'+iso(mondayOf(off)); }
+function monthKeyFor(off){ return 'fs-month:'+monthKey(off); }
+function journalKeyFor(off){ return 'journal:'+iso(dayOf(off)); }
+function dayLabelFor(off){
+  const d = dayOf(off);
+  return (iso(dayOf(0))===iso(d)?'Today — ':'')+d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+}
+function weekLabelFor(off){
+  const m = mondayOf(off), s = new Date(m); s.setDate(m.getDate()+6);
+  const f = d=>d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  return 'Week of '+f(m)+' – '+f(s)+', '+s.getFullYear();
+}
+function monthLabelFor(off){
+  const d = monthOf(off);
+  return d.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+}
+function isDaily(){ return viewMode==='daily'; }
+function isWeekly(){ return viewMode==='weekly'; }
+function isMonthly(){ return viewMode==='monthly'; }
+function isJournal(){ return viewMode==='journal'; }
+function isPrayer(){ return viewMode==='prayer'; }
+function currentKey(){
+  if(isDaily()) return dayKeyFor(dayOffset);
+  if(isWeekly()) return weekKeyFor(weekOffset);
+  if(isMonthly()) return monthKeyFor(monthOffset);
+  return journalKeyFor(dayOffset);
+}
+
+function blankDaily(){
+  const ff = {};
+  FF_KEYS.forEach(f=>{ ff[f.key] = {items:[]}; });
+  return {
+    posture:{virtues:[],motives:[],prayer:''},
+    faithfulFew:ff,
+    danger:{danger:'',ifHappens:'',thenWill:'',why:'',guardrailKept:false},
+    execute:{beforeWork:'',duringWork:'',afterWork:'',eveningShutdown:'',
+      studyBlock:{from:'',to:'',work:'',doneDef:'',done:false}},
+    track:{ratings:{diligence:0,focus:0,followThrough:0,order:0,service:0},handledWell:'',neglected:'',happened:''},
+    learn:{reveal:'',principle:'',differently:'',encouraged:''},
+    capture:{people:[],responsibilities:[],opportunities:[],burdens:[]},
+    talent:{used:'',needsRep:'',served:''},
+    commit:{improvement:'',whenWhere:'',obstacle:'',ifThen:'',because:''},
+    growthTree:{root:'',why:'',requires:'',hinder:'',systems:'',nextAction:''}
+  };
+}
+function blankWeekly(){
+  return {
+    scorecardNotes:{mustDo:'',body:'',order:'',leadership:'',skill:'',journal:'',study:'',guardrail:'',overall:''},
+    patternRecognition:{repeating:'',momentum:'',drained:'',neglected:'',positiveCompound:'',negativeCompound:''},
+    talentReview:{usedWell:'',discovered:'',buried:'',practiceNext:''},
+    neighborLove:{whoInFront:'',howServed:'',followUp:''},
+    experiment:{test:'',why:'',success:'',block:'',ifThen:''},
+    planWeek:{top3:'',deadlines:'',studyBlocks:'',workResp:'',bodyHealth:'',sabbath:''}
+  };
+}
+function blankMonth(){
+  return {
+    entrusted:{work:'',school:'',body:'',money:'',relationships:'',faith:'',opportunities:''},
+    multiplied:{skills:'',habits:'',relationships:'',knowledge:'',leadership:'',service:''},
+    buried:{avoided:'',whyAvoided:'',support:''},
+    compounded:{smallAct:'',smallNeglect:''},
+    fruitOfSpirit:FRUITS.map(n=>({name:n,rating:0,note:''})),
+    theme:'', keystone:''
+  };
+}
+function normalizeFFCategory(raw){
+  if(Array.isArray(raw?.items)){
+    return {items: raw.items.map(it=>({
+      id: it.id||uid(), text: it.text||'', done: !!it.done
+    }))};
+  }
+  if(raw?.text || raw?.done){
+    return {items: raw.text ? [{id:uid(), text:raw.text, done:!!raw.done}] : []};
+  }
+  return {items:[]};
+}
+function ffGetItems(data, key){
+  return data?.faithfulFew?.[key]?.items || [];
+}
+function ffCategoryComplete(items){
+  return items.length > 0 && items.every(it=> it.done);
+}
+function ffDayStats(data){
+  let total = 0, done = 0, cats = 0;
+  FF_KEYS.forEach(f=>{
+    const items = ffGetItems(data, f.key);
+    total += items.length;
+    done += items.filter(it=> it.done).length;
+    if(ffCategoryComplete(items)) cats++;
+  });
+  return {total, done, cats, pct: total ? Math.round(done/total*100) : 0};
+}
+function normalizeDaily(s){
+  const b = blankDaily();
+  if(!s) return b;
+  const d = {...b,...s};
+  d.posture = {...b.posture,...(s.posture||{})};
+  d.faithfulFew = {...b.faithfulFew,...(s.faithfulFew||{})};
+  FF_KEYS.forEach(f=>{ d.faithfulFew[f.key] = normalizeFFCategory(s.faithfulFew?.[f.key]); });
+  d.danger = {...b.danger,...(s.danger||{})};
+  d.execute = {...b.execute,...(s.execute||{})};
+  d.execute.studyBlock = {...b.execute.studyBlock,...(s.execute?.studyBlock||{})};
+  d.track = {...b.track,...(s.track||{})};
+  d.track.ratings = {...b.track.ratings,...(s.track?.ratings||{})};
+  d.learn = {...b.learn,...(s.learn||{})};
+  d.capture = {...b.capture,...(s.capture||{})};
+  CAPTURE.forEach(c=>{ if(!Array.isArray(d.capture[c.k])) d.capture[c.k]=[]; });
+  d.talent = {...b.talent,...(s.talent||{})};
+  d.commit = {...b.commit,...(s.commit||{})};
+  d.growthTree = {...b.growthTree,...(s.growthTree||{})};
+  return d;
+}
+function normalizeWeekly(s){
+  const b = blankWeekly();
+  if(!s) return b;
+  const w = {...b,...s};
+  Object.keys(b).forEach(k=>{ if(typeof b[k]==='object' && !Array.isArray(b[k])) w[k]={...b[k],...(s[k]||{})}; });
+  return w;
+}
+function normalizeMonth(s){
+  const b = blankMonth();
+  if(!s) return b;
+  const m = {...b,...s};
+  m.entrusted = {...b.entrusted,...(s.entrusted||{})};
+  m.multiplied = {...b.multiplied,...(s.multiplied||{})};
+  m.buried = {...b.buried,...(s.buried||{})};
+  m.compounded = {...b.compounded,...(s.compounded||{})};
+  if(!s.fruitOfSpirit?.length) m.fruitOfSpirit = b.fruitOfSpirit;
+  else m.fruitOfSpirit = FRUITS.map((n,i)=>({name:n,rating:s.fruitOfSpirit[i]?.rating||0,note:s.fruitOfSpirit[i]?.note||''}));
+  return m;
+}
+
+function getNested(obj, path){
+  return path.split('.').reduce((o,k)=>o?.[k], obj);
+}
+function setNested(obj, path, val){
+  const parts = path.split('.');
+  let cur = obj;
+  for(let i=0;i<parts.length-1;i++){
+    if(cur[parts[i]]==null) cur[parts[i]] = {};
+    cur = cur[parts[i]];
+  }
+  cur[parts[parts.length-1]] = val;
+}
+
+let viewMode='daily', dayOffset=0, weekOffset=0, monthOffset=0;
+let dayData=null, weekData=null, monthData=null, journal={body:'',updated:null};
+let globals={researchNotes:'',motives:null,prayers:[],thoughtJournal:''};
+let prayerFilter = 'all';
+let dirty=false, saveTimer=null, saving=false;
+
+function scheduleSave(){ clearTimeout(saveTimer); saveTimer=setTimeout(()=>save(),800); }
+function markDirty(){
+  dirty=true; updateScore();
+  document.getElementById('saveState').textContent='Unsaved changes';
+  document.getElementById('saveState').classList.add('dirty');
+  scheduleSave();
+}
+async function save(){
+  if(saving) return;
+  saving=true;
+  const st = document.getElementById('saveState');
+  st.textContent='Saving…'; st.classList.add('saving');
+  try{
+    const S = window.storage;
+    const ops = [S.set('view-mode', viewMode), S.set('fs-globals', JSON.stringify(globals))];
+    if(isJournal()) ops.push(S.set(journalKeyFor(dayOffset), JSON.stringify(journal)));
+    else if(isDaily()) ops.push(S.set(dayKeyFor(dayOffset), JSON.stringify(dayData)));
+    else if(isWeekly()) ops.push(S.set(weekKeyFor(weekOffset), JSON.stringify(weekData)));
+    else if(isMonthly()) ops.push(S.set(monthKeyFor(monthOffset), JSON.stringify(monthData)));
+    const ok = await Promise.all(ops);
+    if(ok.every(Boolean)){
+      dirty=false;
+      let diskOk=false;
+      try{ diskOk=await diskSaveCurrent(); }catch(e){ console.warn('Disk save failed',e); }
+      st.textContent=diskOk?'Saved ✓ · Disk':'Saved ✓';
+      st.classList.remove('dirty','saving');
+    } else { st.textContent='Save failed'; st.classList.remove('saving'); }
+  }catch(e){ st.textContent='Error'; st.classList.remove('saving'); }
+  saving=false;
+}
+async function getJSON(key){
+  try{ const r=await window.storage.get(key); return r?.value?JSON.parse(r.value):null; }
+  catch{ return null; }
+}
+
+function sectionHead(num, title, desc, compact){
+  const cls = compact ? ' zonehead compact' : ' zonehead';
+  return '<div class="'+cls.trim()+'"><div class="num">'+num+'</div><h2>'+esc(title)+'</h2>'+(desc?'<p>'+esc(desc)+'</p>':'')+'</div>';
+}
+function field(path, label, opts={}){
+  const ph = opts.placeholder||'';
+  let el;
+  if(opts.input){
+    el = '<input type="text" class="inp-sm" data-field="'+path+'" placeholder="'+esc(ph)+'">';
+  } else {
+    const rows = opts.rows||(opts.short?2:3);
+    const cls = opts.short?' ta-sm':' ta-md';
+    el = '<textarea class="'+cls.trim()+'" rows="'+rows+'" data-field="'+path+'" placeholder="'+esc(ph)+'"></textarea>';
+  }
+  const lbl = label ? '<label class="q'+(opts.compact?' q-compact':'')+'">'+esc(label)+'</label>' : '';
+  return lbl+el;
+}
+function schedRow(path, label, ph=''){
+  return '<div class="sched-row"><span class="sched-lbl">'+esc(label)+'</span><input type="text" class="inp-sm" data-field="'+path+'" placeholder="'+esc(ph)+'"></div>';
+}
+function renderRating(path, label, val){
+  let pills='';
+  for(let i=1;i<=5;i++) pills+='<button type="button" class="rate-pill'+(val===i?' on':'')+'" data-rating="'+path+'" data-v="'+i+'">'+i+'</button>';
+  return '<div class="rating-row"><span class="rlbl">'+esc(label)+'</span><div class="rating-pills">'+pills+'</div></div>';
+}
+
+/* --- Daily UI components --- */
+function ffSummaryPreview(items){
+  if(!items.length) return 'Tap to add items';
+  const done = items.filter(i=>i.done).length;
+  const first = (items[0].text||'').replace(/\s+/g,' ').trim();
+  const snip = first.length > 42 ? first.slice(0,42)+'…' : first;
+  if(items.length===1) return (done ? '✓ ' : '')+snip;
+  return done+'/'+items.length+' done · '+snip;
+}
+function FaithfulFewHero(){
+  let cards='';
+  FF_KEYS.forEach((f,i)=>{
+    cards += '<details class="ff-accordion ff-card" data-ff="'+f.key+'"'+(i===0?' open':'')+'>';
+    cards += '<summary class="ff-accordion-summary">';
+    cards += '<span class="ff-sum-left"><span class="icon">'+f.icon+'</span><span class="ff-sum-title">'+esc(f.title)+'</span></span>';
+    cards += '<span class="ff-preview" data-ff-preview="'+f.key+'"></span>';
+    cards += '<span class="ff-cat-prog" data-ff-prog="'+f.key+'"></span>';
+    cards += '</summary><div class="ff-accordion-body">';
+    cards += '<p class="ff-hint">'+esc(f.hint)+'</p>';
+    cards += '<ul class="ff-items" data-ff-list="'+f.key+'"></ul>';
+    cards += '<div class="ff-add-row"><input type="text" class="ff-add-input" data-ff-add="'+f.key+'" placeholder="Add item…">';
+    cards += '<button type="button" class="ff-add-btn" data-ff-add-btn="'+f.key+'" aria-label="Add">+</button></div>';
+    cards += '</div></details>';
+  });
+  return '<div class="ff-hero daily-section" data-phases="morning" data-simple="1" id="sec-faithfulFew">'+
+    '<div class="ff-hero-head"><h2>Today\'s Faithful Few</h2><span class="prog" id="ffHeroProg">0 items</span></div>'+
+    '<p class="hint">Tap a category to expand. One open at a time keeps the page compact.</p><div class="ff-grid">'+cards+'</div></div>';
+}
+function autoResizeFFText(el){
+  if(!el) return;
+  el.style.height = 'auto';
+  el.style.height = Math.min(Math.max(el.scrollHeight, 40), 160) + 'px';
+}
+function resizeAllFFTexts(root){
+  (root||document).querySelectorAll('.ff-item-text').forEach(autoResizeFFText);
+}
+function renderFFItem(it, cat){
+  return '<li class="ff-item'+(it.done?' done':'')+'">'+
+    '<input type="checkbox" data-ff-check data-cat="'+cat+'" data-id="'+it.id+'"'+(it.done?' checked':'')+' aria-label="Done">'+
+    '<textarea class="ff-item-text" rows="2" data-ff-text data-cat="'+cat+'" data-id="'+it.id+'" placeholder="What specifically?">'+esc(it.text)+'</textarea>'+
+    '<button type="button" class="ff-rm" data-ff-rm data-cat="'+cat+'" data-id="'+it.id+'" aria-label="Remove">×</button></li>';
+}
+function renderFFLists(){
+  if(!dayData) return;
+  FF_KEYS.forEach(f=>{
+    const items = ffGetItems(dayData, f.key);
+    const list = document.querySelector('[data-ff-list="'+f.key+'"]');
+    if(list){
+      list.innerHTML = items.length
+        ? items.map(it=> renderFFItem(it, f.key)).join('')
+        : '<li class="hint" style="list-style:none;padding:2px 0">No items yet — add below.</li>';
+    }
+    const card = document.querySelector('.ff-card[data-ff="'+f.key+'"]');
+    if(card) card.classList.toggle('done', ffCategoryComplete(items));
+    const preview = document.querySelector('[data-ff-preview="'+f.key+'"]');
+    if(preview) preview.textContent = ffSummaryPreview(items);
+    const prog = document.querySelector('[data-ff-prog="'+f.key+'"]');
+    if(prog) prog.textContent = items.length ? items.filter(it=>it.done).length+'/'+items.length : '';
+    const mini = document.querySelector('.ff-mini-row[data-ff-mini="'+f.key+'"]');
+    if(mini){
+      mini.classList.toggle('done', ffCategoryComplete(items));
+      const lbl = mini.querySelector('.ff-mini-lbl');
+      if(lbl) lbl.textContent = items.length ? f.title+' · '+items.filter(it=>it.done).length+'/'+items.length : f.title;
+    }
+  });
+  const allBox = document.getElementById('ffChecklistAll');
+  if(allBox){
+    let h = '';
+    FF_KEYS.forEach((f,i)=>{
+      const items = ffGetItems(dayData, f.key);
+      if(!items.length) return;
+      h += '<details class="ff-accordion ff-card"'+(i===0?' open':'')+' data-ff="'+f.key+'">';
+      h += '<summary class="ff-accordion-summary"><span class="ff-sum-left"><span class="icon">'+f.icon+'</span>';
+      h += '<span class="ff-sum-title">'+esc(f.title)+'</span></span>';
+      h += '<span class="ff-preview">'+esc(ffSummaryPreview(items))+'</span></summary>';
+      h += '<div class="ff-accordion-body"><ul class="ff-items">';
+      h += items.map(it=> renderFFItem(it, f.key)).join('')+'</ul></div></details>';
+    });
+    allBox.innerHTML = h || '<p class="hint">Add items in Morning Setup first.</p>';
+  }
+  const st = ffDayStats(dayData);
+  const progTxt = st.total ? st.done+'/'+st.total+' items' : '0 items';
+  const el = document.getElementById('ffHeroProg');
+  if(el) el.textContent = progTxt;
+  const sb = document.getElementById('sidebarProg');
+  if(sb) sb.textContent = st.total ? st.done+'/'+st.total+' items · '+st.cats+'/5 categories' : '0 items';
+  resizeAllFFTexts();
+}
+function FaithfulFewChecklist(){
+  return '<div class="daily-section" data-phases="day" id="sec-ff-checklist">'+
+    '<p class="hint" style="margin-bottom:8px">Check off items as you go — tap to expand each category.</p>'+
+    '<div class="ff-checklist ff-grid" id="ffChecklistAll"></div></div>';
+}
+function ensurePrayers(){
+  if(!Array.isArray(globals.prayers)) globals.prayers = [];
+}
+function normalizePrayer(p){
+  return {
+    id: p.id||uid(),
+    request: p.request||'',
+    askedDate: p.askedDate||iso(dayOf(0)),
+    answer: p.answer||'',
+    answeredDate: p.answeredDate||'',
+    updated: p.updated||null
+  };
+}
+function prayerAnswered(p){
+  return !!(p.answer?.trim() || p.answeredDate);
+}
+function formatPrayerDate(d){
+  if(!d) return '—';
+  try{
+    return new Date(d+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  }catch{ return d; }
+}
+function renderPrayerList(){
+  ensurePrayers();
+  const list = document.getElementById('prayerList');
+  const stats = document.getElementById('prayerStats');
+  if(!list) return;
+  let items = globals.prayers.map(normalizePrayer);
+  if(prayerFilter==='waiting') items = items.filter(p=> !prayerAnswered(p));
+  else if(prayerFilter==='answered') items = items.filter(p=> prayerAnswered(p));
+  items.sort((a,b)=> (b.askedDate||'').localeCompare(a.askedDate||''));
+  const total = globals.prayers.length;
+  const ans = globals.prayers.filter(p=> prayerAnswered(normalizePrayer(p))).length;
+  if(stats) stats.textContent = total ? ans+' answered · '+(total-ans)+' waiting · '+total+' total' : 'No prayers logged yet.';
+  if(!items.length){
+    list.innerHTML = '<div class="prayer-empty">'+(prayerFilter==='all'?'Start by adding a prayer above.':'Nothing in this view yet.')+'</div>';
+    return;
+  }
+  list.innerHTML = items.map(p=>{
+    const answered = prayerAnswered(p);
+    const badge = answered ? 'answered' : 'waiting';
+    const lbl = answered ? 'Answered' : 'Waiting';
+    return '<div class="prayer-card '+badge+'" data-prayer-id="'+p.id+'">'+
+      '<div class="prayer-card-head">'+
+      '<span class="prayer-badge '+badge+'">'+lbl+'</span>'+
+      '<span class="prayer-dates">Asked '+formatPrayerDate(p.askedDate)+
+      (p.answeredDate ? ' · Answered '+formatPrayerDate(p.answeredDate) : '')+'</span>'+
+      '<span class="spacer"></span>'+
+      '<button type="button" class="ff-rm" data-prayer-rm data-id="'+p.id+'" aria-label="Remove">×</button></div>'+
+      '<label class="q q-compact">Prayer</label>'+
+      '<textarea class="ta-sm" rows="2" data-prayer-field="request" data-id="'+p.id+'" placeholder="What you prayed…">'+esc(p.request)+'</textarea>'+
+      '<div class="prayer-grid">'+
+      '<div><label class="q q-compact">How God answered</label>'+
+      '<textarea class="ta-sm" rows="2" data-prayer-field="answer" data-id="'+p.id+'" placeholder="Write the answer when it comes…">'+esc(p.answer)+'</textarea></div>'+
+      '<div><label class="q q-compact">Date answered</label>'+
+      '<input type="date" data-prayer-field="answeredDate" data-id="'+p.id+'" value="'+(p.answeredDate||'')+'">'+
+      '<label class="q q-compact" style="margin-top:8px">Date prayed</label>'+
+      '<input type="date" data-prayer-field="askedDate" data-id="'+p.id+'" value="'+(p.askedDate||'')+'"></div></div></div>';
+  }).join('');
+}
+function loadPrayer(){
+  ensurePrayers();
+  document.getElementById('prayerNewDate').value = iso(dayOf(dayOffset));
+  renderPrayerList();
+}
+function addPrayer(request, askedDate){
+  ensurePrayers();
+  globals.prayers.unshift(normalizePrayer({
+    id: uid(), request, askedDate: askedDate||iso(dayOf(0)), answer:'', answeredDate:'', updated: Date.now()
+  }));
+  renderPrayerList();
+  markDirty();
+}
+function ensureMotives(){
+  if(!globals.motives?.length){
+    globals.motives = DEFAULT_MOTIVES.map(m=>({id:m.id, label:m.label}));
+  }
+}
+function renderMotives(){
+  ensureMotives();
+  const box = document.getElementById('motiveList');
+  if(!box) return;
+  const checked = dayData?.posture?.motives || [];
+  box.innerHTML = globals.motives.map(m=>
+    '<div class="motive-row">'+
+    '<input type="checkbox" data-motive-check data-id="'+m.id+'"'+(checked.includes(m.id)?' checked':'')+' aria-label="Active today">'+
+    '<input type="text" class="motive-label" data-motive-label data-id="'+m.id+'" value="'+esc(m.label)+'">'+
+    '<button type="button" class="ff-rm" data-motive-rm data-id="'+m.id+'" aria-label="Remove">×</button></div>'
+  ).join('') +
+  '<div class="motive-add-row"><input type="text" class="motive-add-input" id="motiveAddInput" placeholder="Add a motive…">'+
+  '<button type="button" class="ff-add-btn" id="motiveAddBtn" aria-label="Add motive">+</button></div>';
+}
+function PostureCard(){
+  let chips=''; VIRTUES.forEach(v=> chips += '<button type="button" class="chip" data-virtue="'+esc(v)+'">'+esc(v)+'</button>');
+  return '<section class="zone daily-section" data-phases="morning" data-simple="1" id="sec-posture">'+
+    sectionHead('Posture','Work from the Heart','Start with motive, not productivity.',true)+
+    '<div class="zonebody compact"><label class="q q-compact">Today I work from the heart for the Lord by practicing:</label>'+
+    '<div class="chips" id="virtueChips">'+chips+'</div>'+
+    '<label class="q q-compact">Motive check <span class="hint" style="display:inline;font-weight:400">— check what\'s true today; edit or add motives below</span></label>'+
+    '<div class="motive-list" id="motiveList"></div>'+
+    field('posture.prayer','Prayer',{short:true,placeholder:'Lord, help me glorify You in the small details today.'})+
+    '</div></section>';
+}
+function DangerPlanCard(compact){
+  if(compact){
+    return '<div class="daily-section" data-phases="day" data-simple="1" id="sec-danger-reminder">'+
+      '<div class="danger-reminder" id="dangerReminder"><b>Today\'s danger plan</b>'+
+      '<div id="dangerReminderBody"><span class="hint">Set your plan in Morning Setup.</span></div></div></div>';
+  }
+  return '<section class="zone daily-section" data-phases="morning" data-simple="1" id="sec-danger">'+
+    sectionHead('Danger + Plan',"Today's Danger + Plan",'Anticipate obstacles. Prepare your response.',true)+
+    '<div class="zonebody compact">'+
+    field('danger.danger',"Today's danger",{input:true,placeholder:'What could derail my faithfulness?'})+
+    field('danger.ifHappens','If this happens…',{input:true})+
+    field('danger.thenWill','Then I will…',{input:true})+
+    field('danger.why','Why this matters',{short:true,placeholder:'Eternally and practically…'})+
+    '<label class="motive-item" style="margin-top:8px"><input type="checkbox" data-field="danger.guardrailKept"> Guardrail kept today</label>'+
+    '</div></section>';
+}
+function PlanOfActionCard(){
+  return '<section class="zone daily-section" data-phases="morning" id="sec-execute">'+
+    sectionHead('Execute','Plan of Action','Turn intention into a schedule.',true)+
+    '<div class="zonebody compact"><div class="sched-rows">'+
+    schedRow('execute.beforeWork','Before Work')+schedRow('execute.duringWork','During Work')+
+    schedRow('execute.afterWork','After Work')+schedRow('execute.eveningShutdown','Evening Shutdown')+
+    '</div></div></section>';
+}
+function StudyBlockCard(){
+  return '<div class="card-soft daily-section" data-phases="day" id="sec-study">'+
+    '<h3>Study / Work Block</h3><div class="study-grid">'+
+    '<div><label class="q q-compact">From</label><input type="time" data-field="execute.studyBlock.from"></div>'+
+    '<div><label class="q q-compact">To</label><input type="time" data-field="execute.studyBlock.to"></div></div>'+
+    field('execute.studyBlock.work','What I will work on',{input:true,placeholder:'Reading, assignment…'})+
+    field('execute.studyBlock.doneDef','Definition of done',{input:true})+
+    '<label class="study-done"><input type="checkbox" data-field="execute.studyBlock.done"> Block completed</label></div>';
+}
+function QuickCapture(){
+  let opts=''; CAPTURE.forEach(c=> opts += '<option value="'+c.k+'">'+esc(c.t.replace(' in front of me',''))+'</option>');
+  let acts=''; ['do','schedule','develop','release'].forEach(p=> acts += '<option value="'+p+'">'+p+'</option>');
+  return '<div class="card-soft daily-section" data-phases="day" id="sec-capture">'+
+    '<h3>Quick Capture</h3><p class="hint">What is in front of you? Process it and move on.</p>'+
+    '<div class="quick-cap-row"><input type="text" id="qcText" placeholder="Add item…">'+
+    '<select id="qcLane">'+opts+'</select><select id="qcAction">'+acts+'</select>'+
+    '<button type="button" class="gobtn" id="qcAdd">Add</button></div>'+
+    '<div class="cap-list" id="qcList"></div></div>';
+}
+function TrackCard(simple){
+  let ratings=''; TRACK_KEYS.forEach(t=> ratings += '<div data-rating-wrap="'+t.k+'"></div>');
+  let body = ratings+
+    field('track.handledWell','Detail handled well',{short:true})+
+    field('track.neglected','Detail neglected',{short:true})+
+    (simple ? '' : field('track.happened','What actually happened?',{short:true}));
+  return '<section class="zone daily-section" data-phases="evening" data-simple="1" id="sec-track">'+
+    sectionHead('Track','What Actually Happened?',simple?'Evening check-in.':'Measure what matters — data, not shame.',true)+
+    '<div class="zonebody compact">'+body+'</div></section>';
+}
+function LearnCard(){
+  return '<details class="collapsible daily-section" data-phases="evening" id="sec-learn">'+
+    '<summary>Learn — Wisdom from Today</summary><div class="zonebody">'+
+    field('learn.reveal','What did today reveal?',{short:true})+
+    field('learn.principle','Principle to extract',{short:true})+
+    field('learn.differently','Do differently next time',{short:true})+
+    field('learn.encouraged','Where did I see grace?',{short:true})+
+    '</div></details>';
+}
+function TalentStewardshipCard(){
+  return '<details class="collapsible daily-section" data-phases="evening" id="sec-talent">'+
+    '<summary>Talent Stewardship</summary><div class="zonebody">'+
+    field('talent.used','Gift/skill used today',{input:true})+
+    field('talent.needsRep','Gift/skill needing a rep',{input:true})+
+    field('talent.served','Who could be served?',{input:true})+
+    '</div></details>';
+}
+function CommitCard(simple){
+  if(simple){
+    return '<section class="zone daily-section" data-phases="evening" data-simple="1" id="sec-commit-simple">'+
+      sectionHead('Commit',"Tomorrow's One Faithful Improvement",'',true)+
+      '<div class="zonebody compact">'+field('commit.improvement','Tomorrow I will…',{input:true})+'</div></section>';
+  }
+  return '<section class="zone daily-section" data-phases="evening" id="sec-commit">'+
+    sectionHead('Commit',"Prepare Tomorrow's Obedience",'End strong. Prepare the next step.',true)+
+    '<div class="zonebody compact">'+
+    field('commit.improvement',"Tomorrow's one faithful improvement",{input:true})+
+    field('commit.whenWhere','When / where',{input:true})+
+    field('commit.obstacle','Obstacle',{input:true})+
+    field('commit.ifThen','If-then plan',{input:true})+
+    field('commit.because','Because — why this matters',{short:true})+
+    '<div class="daily-reminder">Small things done from the heart for the Lord become the foundation of a faithful life.</div>'+
+    '</div></section>';
+}
+function GrowthTreeFields(){
+  return field('growthTree.root','In Front of Me',{input:true,placeholder:'Grad school, project…'})+
+    field('growthTree.why','Why it matters',{input:true})+
+    field('growthTree.requires','Faithfulness requires',{input:true})+
+    field('growthTree.hinder','What could hinder',{input:true})+
+    field('growthTree.systems','Systems needed',{input:true})+
+    field('growthTree.nextAction','Next faithful action',{input:true});
+}
+function ThoughtJournalCard(){
+  return '<div id="thoughtJournal" class="side-card thought-journal" aria-label="Thought journal">'+
+    '<div class="side-head thought-journal-head">'+
+    '<button type="button" class="thought-journal-toggle" id="thoughtJournalToggle" aria-expanded="true" title="Collapse thought journal">'+
+    '<h3>Thought Journal</h3><span class="tj-chevron" aria-hidden="true">▾</span></button></div>'+
+    '<div class="thought-journal-body side-body">'+
+    '<textarea id="thoughtJournalText" placeholder="Quick thoughts — persists across days and tabs…" aria-label="Thought journal"></textarea>'+
+    '<div class="thought-journal-meta" id="thoughtJournalMeta">Autosaves across tabs</div></div></div>';
+}
+function DailySidebar(){
+  let flow='';
+  FLOW.forEach((f,i)=> flow += '<button type="button" class="flow-step" data-flow="'+i+'" data-goto-phase="'+FLOW_PHASE[i]+'"><span class="tick"></span>'+esc(f)+'</button>');
+  let mini='';
+  FF_KEYS.forEach(f=> mini += '<div class="ff-mini-row" data-ff-mini="'+f.key+'"><span class="dot"></span><span class="ff-mini-lbl">'+esc(f.title)+'</span></div>');
+  return ThoughtJournalCard()+
+    '<div class="side-card"><div class="side-head"><h3>Today\'s Flow</h3></div><div class="side-body" id="flowSteps">'+flow+'</div></div>'+
+    '<div class="side-card"><div class="side-head"><h3>Faithful Few</h3></div><div class="side-body">'+
+    '<div class="ff-progress" id="sidebarProg">0/5 completed</div><div class="ff-mini" id="ffMini">'+mini+'</div></div></div>'+
+    '<div class="side-card"><div class="side-head"><h3>Scripture</h3></div><div class="side-body scripture-card">'+
+    '"Whatever you do, do it from the heart, as something done for the Lord and not for people."'+
+    '<cite>Colossians 3:23</cite></div></div>';
+}
+function renderProgress(label, pct){
+  return '<div class="progress-item"><span class="plbl">'+esc(label)+'</span><div class="progress-bar"><div class="fill" style="width:'+pct+'%"></div></div><span class="pct">'+pct+'%</span></div>';
+}
+
+function loadThoughtJournal(){
+  const ta = document.getElementById('thoughtJournalText');
+  if(ta) ta.value = globals.thoughtJournal || '';
+  const meta = document.getElementById('thoughtJournalMeta');
+  if(meta){
+    const n = (globals.thoughtJournal||'').trim().split(/\s+/).filter(Boolean).length;
+    meta.textContent = n ? n+' words · autosaves' : 'Autosaves across tabs';
+  }
+  const panel = document.getElementById('thoughtJournal');
+  const collapsed = localStorage.getItem('wsr:thoughtJournalCollapsed')==='1';
+  if(panel){
+    panel.classList.toggle('collapsed', collapsed);
+    document.getElementById('thoughtJournalToggle')?.setAttribute('aria-expanded', collapsed?'false':'true');
+  }
+}
+function bindFFAccordion(){
+  document.getElementById('app')?.addEventListener('toggle', e=>{
+    const d = e.target;
+    if(!d.classList?.contains('ff-accordion') || !d.open) return;
+    const parent = d.closest('.ff-grid');
+    if(!parent) return;
+    parent.querySelectorAll('.ff-accordion').forEach(x=>{ if(x!==d) x.open=false; });
+  }, true);
+}
+function renderDaily(){
+  const main = document.getElementById('dailyMain');
+  main.innerHTML =
+    FaithfulFewHero() +
+    PostureCard() +
+    DangerPlanCard(false) +
+    PlanOfActionCard() +
+    FaithfulFewChecklist() +
+    StudyBlockCard() +
+    QuickCapture() +
+    DangerPlanCard(true) +
+    TrackCard(false) +
+    LearnCard() +
+    TalentStewardshipCard() +
+    CommitCard(false) +
+    CommitCard(true);
+  document.getElementById('dailySidebar').innerHTML = DailySidebar();
+  document.getElementById('drawerGrowthTree').innerHTML = GrowthTreeFields();
+  loadThoughtJournal();
+  applyDailyPhase();
+}
+function applyDailyPhase(){
+  const board = document.getElementById('dailyBoard');
+  board.dataset.phase = dailyPhase;
+  board.classList.toggle('simple-mode', simpleMode);
+  document.querySelectorAll('.phase-tab').forEach(t=> t.classList.toggle('on', t.dataset.phase===dailyPhase));
+  const sm = document.getElementById('simpleMode');
+  if(sm) sm.checked = simpleMode;
+  const trackHead = document.querySelector('#sec-track .zonehead h2');
+  const trackDesc = document.querySelector('#sec-track .zonehead p');
+  const happened = document.querySelector('[data-field="track.happened"]');
+  if(simpleMode){
+    if(trackHead) trackHead.textContent = 'Evening Check-in';
+    if(trackDesc) trackDesc.textContent = 'Honest data — not shame.';
+    if(happened) happened.closest('.q')?.previousElementSibling; 
+    if(happened){ const lbl = happened.previousElementSibling; if(lbl?.classList?.contains('q')) lbl.style.display='none'; happened.style.display='none'; }
+  } else {
+    if(trackHead) trackHead.textContent = 'What Actually Happened?';
+    if(trackDesc) trackDesc.textContent = 'Measure what matters — data, not shame.';
+    if(happened){ const lbl = happened.previousElementSibling; if(lbl?.classList?.contains('q')) lbl.style.display=''; happened.style.display=''; }
+  }
+}
+function setDailyPhase(phase){
+  dailyPhase = phase;
+  applyDailyPhase();
+}
+
+function renderWeekly(){
+  const el = document.getElementById('weeklyMain');
+  let h = '';
+  h += '<section class="zone">'+sectionHead('1 · Scorecard','Faithfulness Scorecard','Completion across the week from daily ledgers.')+'<div class="zonebody">';
+  h += '<div class="progress-list" id="weekScorecard"></div><div style="margin-top:16px">';
+  ['mustDo','body','order','leadership','skill','journal','study','guardrail','overall'].forEach(k=>{
+    const labels = {mustDo:'Must-do notes',body:'Body notes',order:'Order notes',leadership:'Leadership notes',skill:'Skill notes',
+      journal:'Journal notes',study:'Study block notes',guardrail:'Guardrail notes',overall:'Overall reflection'};
+    h += field('scorecardNotes.'+k, labels[k]||k);
+  });
+  h += '</div></div></section>';
+
+  h += '<section class="zone">'+sectionHead('2 · Patterns','Pattern Recognition','What kept repeating this week?')+'<div class="zonebody">';
+  h += field('patternRecognition.repeating','What kept repeating?')+field('patternRecognition.momentum','What created momentum?');
+  h += field('patternRecognition.drained','What drained me?')+field('patternRecognition.neglected','What details did I keep neglecting?');
+  h += field('patternRecognition.positiveCompound','What small thing compounded positively?');
+  h += field('patternRecognition.negativeCompound','What small thing compounded negatively?')+'</div></section>';
+
+  h += '<section class="zone">'+sectionHead('3 · Talent','Talent Review','Steward the gifts entrusted to you.')+'<div class="zonebody">';
+  h += field('talentReview.usedWell','What did I use well this week?')+field('talentReview.discovered','What did I discover?');
+  h += field('talentReview.buried','What did I bury or neglect?')+field('talentReview.practiceNext','What needs deliberate practice next week?')+'</div></section>';
+
+  h += '<section class="zone">'+sectionHead('4 · Neighbor','Neighbor Love','Who was in front of you this week?')+'<div class="zonebody">';
+  h += field('neighborLove.whoInFront','Who was in front of me this week?')+field('neighborLove.howServed','How did I serve them practically?');
+  h += field('neighborLove.followUp','Who needs follow-up?')+'</div></section>';
+
+  h += '<section class="zone">'+sectionHead('5 · Experiment','One Weekly Experiment','Test one change with intention.')+'<div class="zonebody">';
+  h += field('experiment.test','This week I will test…')+field('experiment.why','Why this matters');
+  h += field('experiment.success','What would count as success?')+field('experiment.block','What could block it?');
+  h += field('experiment.ifThen','If-then plan')+'</div></section>';
+
+  h += '<section class="zone">'+sectionHead('6 · Plan','Plan the Week','Set priorities and protections.')+'<div class="zonebody">';
+  h += field('planWeek.top3','Top 3 priorities')+field('planWeek.deadlines','Important deadlines');
+  h += field('planWeek.studyBlocks','Study blocks')+field('planWeek.workResp','Work responsibilities');
+  h += field('planWeek.bodyHealth','Body/health commitments')+field('planWeek.sabbath','Sabbath/rest/protection')+'</div></section>';
+  el.innerHTML = h;
+}
+
+function renderMonthly(){
+  const el = document.getElementById('monthlyMain');
+  let h = '';
+  h += '<section class="zone">'+sectionHead('1 · Entrusted','What was entrusted to me this month?','Categories of stewardship.')+'<div class="zonebody entrusted-grid">';
+  ['work','school','body','money','relationships','faith','opportunities'].forEach(k=>{
+    h += '<div>'+field('entrusted.'+k, k.charAt(0).toUpperCase()+k.slice(1))+'</div>';
+  });
+  h += '</div></section>';
+
+  h += '<section class="zone">'+sectionHead('2 · Multiplied','What did I multiply?','Fruit from faithful stewardship.')+'<div class="zonebody entrusted-grid">';
+  ['skills','habits','relationships','knowledge','leadership','service'].forEach(k=>{
+    h += '<div>'+field('multiplied.'+k, k.charAt(0).toUpperCase()+k.slice(1))+'</div>';
+  });
+  h += '</div></section>';
+
+  h += '<section class="zone">'+sectionHead('3 · Buried','What did I bury or neglect?','Not shame — honest inventory.')+'<div class="zonebody">';
+  h += field('buried.avoided','What ability, responsibility, or opportunity did I avoid?');
+  h += field('buried.whyAvoided','Why did I avoid it?');
+  h += field('buried.support','What support or system would help next month?')+'</div></section>';
+
+  h += '<section class="zone">'+sectionHead('4 · Compounded','What small details compounded?','The power of small acts.')+'<div class="zonebody">';
+  h += field('compounded.smallAct','Small act that helped more than expected');
+  h += field('compounded.smallNeglect','Small neglect that cost more than expected')+'</div></section>';
+
+  h += '<section class="zone">'+sectionHead('5 · Fruit','Fruit of the Spirit Check','Galatians 5:22–23 — rate and note each.')+'<div class="zonebody fruit-grid" id="fruitGrid"></div></section>';
+
+  h += '<section class="zone">'+sectionHead('6 · Theme',"Next Month's Theme",'One word or phrase to orient the month.')+'<div class="zonebody">';
+  h += field('theme','Theme',{placeholder:'Order before overflow · Diligence in hidden places · Faithful with little…'})+'</div></section>';
+
+  h += '<section class="zone">'+sectionHead('7 · Keystone','Keystone System','What one system will make the biggest difference?')+'<div class="zonebody">';
+  h += field('keystone','Keystone system',{placeholder:'The one system that unlocks faithfulness…'})+'</div></section>';
+  el.innerHTML = h;
+}
+
+function populateFields(root, data){
+  root.querySelectorAll('[data-field]').forEach(el=>{
+    const path = el.dataset.field;
+    const val = getNested(data, path);
+    if(el.type==='checkbox') el.checked = !!val;
+    else if(el.type==='time') el.value = val||'';
+    else el.value = val??'';
+  });
+}
+function updatePrayerCardUI(p){
+  const norm = normalizePrayer(p);
+  const answered = prayerAnswered(norm);
+  const card = document.querySelector('[data-prayer-id="'+p.id+'"]');
+  if(!card) return;
+  card.classList.toggle('answered', answered);
+  card.classList.toggle('waiting', !answered);
+  const badge = card.querySelector('.prayer-badge');
+  if(badge){
+    badge.className = 'prayer-badge '+(answered?'answered':'waiting');
+    badge.textContent = answered ? 'Answered' : 'Waiting';
+  }
+  const dates = card.querySelector('.prayer-dates');
+  if(dates){
+    dates.textContent = 'Asked '+formatPrayerDate(norm.askedDate)+
+      (norm.answeredDate ? ' · Answered '+formatPrayerDate(norm.answeredDate) : '');
+  }
+  const stats = document.getElementById('prayerStats');
+  if(stats && globals.prayers){
+    const total = globals.prayers.length;
+    const ans = globals.prayers.filter(x=> prayerAnswered(normalizePrayer(x))).length;
+    stats.textContent = total ? ans+' answered · '+(total-ans)+' waiting · '+total+' total' : 'No prayers logged yet.';
+  }
+}
+function populateVirtues(){
+  document.querySelectorAll('#virtueChips .chip').forEach(c=>{
+    c.classList.toggle('on', (dayData.posture.virtues||[]).includes(c.dataset.virtue));
+  });
+  renderMotives();
+}
+function populateRatings(){
+  TRACK_KEYS.forEach(t=>{
+    const wrap = document.querySelector('[data-rating-wrap="'+t.k+'"]');
+    if(wrap) wrap.innerHTML = renderRating('track.ratings.'+t.k, t.l, dayData.track.ratings[t.k]||0);
+  });
+}
+function populateFF(){ renderFFLists(); }
+function updateDangerReminder(){
+  const el = document.getElementById('dangerReminderBody');
+  if(!el || !dayData) return;
+  const d = dayData.danger;
+  if(!d?.danger){
+    el.innerHTML = '<span class="hint">Set your plan in Morning Setup.</span>';
+    return;
+  }
+  el.innerHTML = '<div><strong>'+esc(d.danger)+'</strong></div>'+
+    (d.ifHappens||d.thenWill ? '<div class="if-then">If '+esc(d.ifHappens||'…')+' → Then '+esc(d.thenWill||'…')+'</div>' : '');
+}
+function renderQuickCaptureList(){
+  const list = document.getElementById('qcList');
+  if(!list) return;
+  const all = [];
+  CAPTURE.forEach(c=>{
+    (dayData.capture[c.k]||[]).forEach(it=> all.push({...it, lane:c.k, cat:c.t.replace(' in front of me','')}));
+  });
+  list.innerHTML = all.length ? all.map(it=>
+    '<div class="cap-row"><span class="cat">'+esc(it.cat)+'</span><span class="txt">'+esc(it.text)+'</span>'+
+    (it.process?'<span class="proc">'+esc(it.process)+'</span>':'')+
+    '<button type="button" class="xbtn cap-rm" data-lane="'+it.lane+'" data-id="'+it.id+'">×</button></div>'
+  ).join('') : '<p class="hint">Nothing captured yet.</p>';
+}
+function renderCaptureItems(){ renderQuickCaptureList(); }
+function renderFruitGrid(){
+  const g = document.getElementById('fruitGrid');
+  if(!g || !monthData) return;
+  g.innerHTML = monthData.fruitOfSpirit.map((f,i)=>{
+    let btns='';
+    for(let r=1;r<=5;r++) btns+='<button type="button" class="rate-pill'+(f.rating===r?' on':'')+'" data-fruit="'+i+'" data-v="'+r+'">'+r+'</button>';
+    return '<div class="fruit-item"><h3>'+esc(f.name)+'</h3><div class="rating-pills" style="margin-bottom:6px">'+btns+'</div><textarea class="ta-sm" rows="2" data-field="fruitOfSpirit.'+i+'.note" placeholder="Note…"></textarea></div>';
+  }).join('');
+  populateFields(g, monthData);
+}
+
+async function computeWeekScorecard(){
+  const mon = mondayOf(weekOffset);
+  const days = [];
+  for(let i=0;i<7;i++){ const d=new Date(mon); d.setDate(mon.getDate()+i); days.push(iso(d)); }
+  const stats = {mustDo:0,body:0,order:0,leadership:0,skill:0,journal:0,study:0,guardrail:0};
+  for(const ds of days){
+    const dd = await getJSON('fs-day:'+ds);
+    if(dd){
+      FF_KEYS.forEach(f=>{ if(ffCategoryComplete(ffGetItems(dd, f.key))) stats[f.key]++; });
+      if(dd.execute?.studyBlock?.done) stats.study++;
+      if(dd.danger?.guardrailKept) stats.guardrail++;
+    }
+    const j = await getJSON('journal:'+ds);
+    if(j?.body?.trim()) stats.journal++;
+  }
+  const pct = k=> Math.round(stats[k]/7*100);
+  const el = document.getElementById('weekScorecard');
+  if(!el) return;
+  el.innerHTML =
+    renderProgress('Must-do', pct('mustDo'))+renderProgress('Body habit', pct('body'))+
+    renderProgress('Order habit', pct('order'))+renderProgress('Leadership/service', pct('leadership'))+
+    renderProgress('Skill/talent rep', pct('skill'))+renderProgress('Journal', pct('journal'))+
+    renderProgress('Study/work block', pct('study'))+renderProgress('Recovery guardrail', pct('guardrail'));
+}
+
+function updateScore(){
+  if(!isDaily() || !dayData){ document.getElementById('score').textContent='—'; return; }
+  const st = ffDayStats(dayData);
+  const el = document.getElementById('score');
+  el.textContent = st.total ? st.done+'/'+st.total+' · '+st.pct+'%' : '0 items';
+  el.classList.toggle('gold', st.pct>=80);
+  updateFlowSteps();
+}
+function updateFlowSteps(){
+  if(!dayData) return;
+  const checks = [
+    ()=>(dayData.posture.virtues?.length||dayData.posture.prayer),
+    ()=>FF_KEYS.some(f=> ffGetItems(dayData, f.key).length),
+    ()=>dayData.danger.danger,
+    ()=>dayData.execute.beforeWork||dayData.execute.studyBlock.work,
+    ()=>Object.values(dayData.track.ratings).some(v=>v>0),
+    ()=>dayData.learn.reveal,
+    ()=>dayData.commit.improvement
+  ];
+  document.querySelectorAll('.flow-step').forEach((btn,i)=>{
+    btn.classList.toggle('done', !!checks[i]?.());
+  });
+}
+
+function bindEvents(){
+  const app = document.getElementById('app');
+  app.addEventListener('input', e=>{
+    const el = e.target;
+    if(el.id==='thoughtJournalText'){
+      globals.thoughtJournal = el.value;
+      const meta = document.getElementById('thoughtJournalMeta');
+      if(meta){
+        const n = el.value.trim().split(/\s+/).filter(Boolean).length;
+        meta.textContent = n ? n+' words · autosaves' : 'Autosaves across tabs';
+      }
+      markDirty(); return;
+    }
+    if(el.dataset.motiveLabel && isDaily()){
+      const m = globals.motives?.find(x=>x.id===el.dataset.id);
+      if(m){ m.label = el.value; markDirty(); }
+      return;
+    }
+    if(el.dataset.prayerField){
+      const p = globals.prayers?.find(x=>x.id===el.dataset.id);
+      if(p){
+        p[el.dataset.prayerField] = el.value;
+        p.updated = Date.now();
+        updatePrayerCardUI(p);
+        markDirty();
+      }
+      return;
+    }
+    if(el.dataset.global){ globals[el.dataset.global]=el.value; markDirty(); return; }
+    if(el.dataset.ffText && isDaily()){
+      const it = dayData.faithfulFew[el.dataset.cat]?.items?.find(x=>x.id===el.dataset.id);
+      if(it){ it.text = el.value; autoResizeFFText(el); markDirty(); }
+      return;
+    }
+    if(!el.dataset.field) return;
+    const path = el.dataset.field;
+    let val = el.type==='checkbox' ? el.checked : el.value;
+    if(isDaily()){ setNested(dayData,path,val);
+      if(path.startsWith('danger.')) updateDangerReminder();
+      updateScore(); markDirty(); }
+    else if(isWeekly()){ setNested(weekData,path,val); markDirty(); }
+    else if(isMonthly()){ setNested(monthData,path,val); markDirty(); }
+  });
+  app.addEventListener('change', e=>{
+    const el = e.target;
+    if(el.dataset.ffCheck && isDaily()){
+      const it = dayData.faithfulFew[el.dataset.cat]?.items?.find(x=>x.id===el.dataset.id);
+      if(it){ it.done = el.checked; renderFFLists(); updateScore(); markDirty(); }
+      return;
+    }
+    if(el.dataset.motiveCheck && isDaily()){
+      const id = el.dataset.id;
+      const arr = dayData.posture.motives||[];
+      const i = arr.indexOf(id);
+      if(el.checked && i<0) arr.push(id);
+      else if(!el.checked && i>=0) arr.splice(i,1);
+      dayData.posture.motives = arr;
+      markDirty(); return;
+    }
+    if(el.dataset.field && el.type==='checkbox'){
+      el.dispatchEvent(new Event('input',{bubbles:true}));
+    }
+  });
+  app.addEventListener('keydown', e=>{
+    if(e.key==='Enter' && e.target.id==='prayerNewRequest' && !e.shiftKey){
+      e.preventDefault();
+      document.getElementById('prayerAddBtn')?.click();
+    }
+    if(e.key==='Enter' && e.target.id==='motiveAddInput'){
+      e.preventDefault();
+      document.getElementById('motiveAddBtn')?.click();
+    }
+    if(e.key==='Enter' && e.target.dataset?.ffAdd){
+      e.preventDefault();
+      e.target.closest('.ff-add-row')?.querySelector('[data-ff-add-btn]')?.click();
+    }
+    if(e.key==='Enter' && e.target.id==='qcText'){
+      e.preventDefault();
+      document.getElementById('qcAdd')?.click();
+    }
+  });
+  app.addEventListener('click', e=>{
+    if(e.target.closest('#thoughtJournalToggle')){
+      const panel = document.getElementById('thoughtJournal');
+      if(!panel) return;
+      panel.classList.toggle('collapsed');
+      const collapsed = panel.classList.contains('collapsed');
+      localStorage.setItem('wsr:thoughtJournalCollapsed', collapsed?'1':'0');
+      document.getElementById('thoughtJournalToggle')?.setAttribute('aria-expanded', collapsed?'false':'true');
+      return;
+    }
+    const v = e.target.closest('[data-virtue]');
+    if(v && isDaily()){
+      const name = v.dataset.virtue;
+      const arr = dayData.posture.virtues||[];
+      const i = arr.indexOf(name);
+      if(i>=0) arr.splice(i,1); else arr.push(name);
+      dayData.posture.virtues = arr;
+      populateVirtues(); markDirty(); return;
+    }
+    if(e.target.id==='motiveAddBtn' && isDaily()){
+      const inp = document.getElementById('motiveAddInput');
+      const label = inp?.value.trim();
+      if(!label) return;
+      ensureMotives();
+      globals.motives.push({id:uid(), label});
+      inp.value = '';
+      renderMotives(); markDirty(); return;
+    }
+    const motiveRm = e.target.closest('[data-motive-rm]');
+    if(motiveRm && isDaily()){
+      const id = motiveRm.dataset.id;
+      if(globals.motives.length<=1){ alert('Keep at least one motive in your list.'); return; }
+      globals.motives = globals.motives.filter(m=>m.id!==id);
+      dayData.posture.motives = (dayData.posture.motives||[]).filter(x=>x!==id);
+      renderMotives(); markDirty(); return;
+    }
+    if(e.target.id==='prayerAddBtn' || e.target.closest('#prayerAddBtn')){
+      const req = document.getElementById('prayerNewRequest')?.value.trim();
+      const dt = document.getElementById('prayerNewDate')?.value || iso(dayOf(0));
+      if(!req) return;
+      addPrayer(req, dt);
+      document.getElementById('prayerNewRequest').value = '';
+      return;
+    }
+    const prayerRm = e.target.closest('[data-prayer-rm]');
+    if(prayerRm){
+      if(!confirm('Remove this prayer from the log?')) return;
+      globals.prayers = globals.prayers.filter(p=>p.id!==prayerRm.dataset.id);
+      renderPrayerList(); markDirty(); return;
+    }
+    const pf = e.target.closest('[data-pfilter]');
+    if(pf){
+      prayerFilter = pf.dataset.pfilter;
+      document.querySelectorAll('.prayer-filter').forEach(b=> b.classList.toggle('on', b.dataset.pfilter===prayerFilter));
+      renderPrayerList(); return;
+    }
+    const rt = e.target.closest('[data-rating]');
+    if(rt && isDaily()){
+      setNested(dayData, rt.dataset.rating, +rt.dataset.v);
+      populateRatings(); markDirty(); return;
+    }
+    const fr = e.target.closest('[data-fruit]');
+    if(fr && isMonthly()){
+      monthData.fruitOfSpirit[+fr.dataset.fruit].rating = +fr.dataset.v;
+      renderFruitGrid(); markDirty(); return;
+    }
+    const ffAdd = e.target.closest('[data-ff-add-btn]');
+    if(ffAdd && isDaily()){
+      const key = ffAdd.dataset.ffAddBtn;
+      const inp = document.querySelector('[data-ff-add="'+key+'"]');
+      const text = inp?.value.trim();
+      if(!text) return;
+      if(!dayData.faithfulFew[key].items) dayData.faithfulFew[key].items = [];
+      dayData.faithfulFew[key].items.push({id:uid(), text, done:false});
+      inp.value = '';
+      renderFFLists(); updateScore(); markDirty(); return;
+    }
+    const ffRm = e.target.closest('[data-ff-rm]');
+    if(ffRm && isDaily()){
+      const {cat, id} = ffRm.dataset;
+      dayData.faithfulFew[cat].items = dayData.faithfulFew[cat].items.filter(x=>x.id!==id);
+      renderFFLists(); updateScore(); markDirty(); return;
+    }
+    const capAdd = e.target.closest('#qcAdd');
+    if(capAdd && isDaily()){
+      const text = document.getElementById('qcText')?.value.trim();
+      const lane = document.getElementById('qcLane')?.value;
+      const process = document.getElementById('qcAction')?.value || '';
+      if(!text || !lane) return;
+      dayData.capture[lane].push({id:uid(),text,process});
+      document.getElementById('qcText').value='';
+      renderQuickCaptureList(); markDirty(); return;
+    }
+    const proc = e.target.closest('.proc-btn');
+    if(proc && isDaily()){
+      const {lane,id} = proc.dataset;
+      const it = dayData.capture[lane].find(x=>x.id===id);
+      if(it){ it.process = it.process===proc.dataset.p ? '' : proc.dataset.p; renderQuickCaptureList(); markDirty(); }
+      return;
+    }
+    const rm = e.target.closest('.cap-rm');
+    if(rm && isDaily()){
+      const {lane,id} = rm.dataset;
+      dayData.capture[lane] = dayData.capture[lane].filter(x=>x.id!==id);
+      renderQuickCaptureList(); markDirty(); return;
+    }
+    const phaseTab = e.target.closest('.phase-tab');
+    if(phaseTab && isDaily()){ setDailyPhase(phaseTab.dataset.phase); return; }
+    const flow = e.target.closest('.flow-step');
+    if(flow && isDaily()){
+      const phase = flow.dataset.gotoPhase;
+      if(phase) setDailyPhase(phase);
+      const sec = DAILY_SECTIONS[+flow.dataset.flow];
+      setTimeout(()=> document.getElementById('sec-'+sec)?.scrollIntoView({behavior:'smooth',block:'start'}), 80);
+      return;
+    }
+  });
+  document.getElementById('simpleMode')?.addEventListener('change', e=>{
+    simpleMode = e.target.checked;
+    try{ localStorage.setItem('wsr:simpleMode', simpleMode?'1':'0'); }catch(x){}
+    applyDailyPhase(); markDirty();
+  });
+  document.getElementById('whyWorksBtn')?.addEventListener('click', openDrawer);
+  document.getElementById('drawerClose')?.addEventListener('click', closeDrawer);
+  document.getElementById('drawerBackdrop')?.addEventListener('click', closeDrawer);
+  function openDrawer(){
+    document.getElementById('whyDrawer')?.classList.add('open');
+    document.getElementById('drawerBackdrop')?.classList.add('open');
+    if(dayData) populateFields(document.getElementById('drawerGrowthTree'), dayData);
+  }
+  function closeDrawer(){
+    document.getElementById('whyDrawer')?.classList.remove('open');
+    document.getElementById('drawerBackdrop')?.classList.remove('open');
+  }
+  document.getElementById('saveBtn').onclick = ()=>save();
+  document.getElementById('linkDiskFolder').onclick = ()=>pickSaveDir();
+  document.getElementById('prevP').onclick = ()=>nav(-1);
+  document.getElementById('nextP').onclick = ()=>nav(1);
+  document.getElementById('modeDaily').onclick = ()=>setMode('daily');
+  document.getElementById('modeWeekly').onclick = ()=>setMode('weekly');
+  document.getElementById('modeMonthly').onclick = ()=>setMode('monthly');
+  document.getElementById('modeJournal').onclick = ()=>setMode('journal');
+  document.getElementById('modePrayer').onclick = ()=>setMode('prayer');
+  document.getElementById('clearPeriod').onclick = clearCurrent;
+  document.getElementById('clearJournal').onclick = clearJournalEntry;
+  document.getElementById('resetAll').onclick = resetAll;
+  document.getElementById('journalBody').addEventListener('input', e=>{
+    journal.body=e.target.value; journal.updated=Date.now();
+    updateJournalMeta(); markDirty();
+  });
+  window.addEventListener('beforeunload', e=>{ if(dirty){ save(); e.preventDefault(); }});
+  document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='hidden' && dirty) save(); });
+}
+
+function nav(dir){
+  if(dirty) save();
+  if(isJournal()||isDaily()) dayOffset += dir;
+  else if(isWeekly()) weekOffset += dir;
+  else if(isMonthly()) monthOffset += dir;
+  loadCurrent();
+}
+async function setMode(mode){
+  if(viewMode===mode) return;
+  if(dirty) await save();
+  viewMode=mode;
+  await loadCurrent();
+}
+function updateViewUI(){
+  ['daily','weekly','monthly','journal','prayer'].forEach(m=>{
+    document.getElementById('mode'+m.charAt(0).toUpperCase()+m.slice(1))?.classList.toggle('on', viewMode===m);
+  });
+  document.getElementById('dailyBoard').hidden = viewMode!=='daily';
+  document.body.classList.toggle('view-daily', viewMode==='daily');
+  document.getElementById('weeklyBoard').hidden = viewMode!=='weekly';
+  document.getElementById('monthlyBoard').hidden = viewMode!=='monthly';
+  document.getElementById('journalPanel').hidden = viewMode!=='journal';
+  document.getElementById('prayerPanel').hidden = viewMode!=='prayer';
+  document.body.classList.toggle('view-journal', viewMode==='journal');
+  document.body.classList.toggle('view-prayer', viewMode==='prayer');
+  const score = document.getElementById('score');
+  score.style.display = viewMode==='daily' ? '' : 'none';
+  const nav = document.querySelector('.navrow');
+  if(nav) nav.style.visibility = (isPrayer() ? 'hidden' : 'visible');
+  const banner = document.getElementById('scriptureBanner');
+  if(banner){
+    if(viewMode==='prayer'){
+      banner.textContent = '"Commit your activities to the LORD, and your plans will be established." — Proverbs 16:3';
+    } else if(viewMode==='weekly' || viewMode==='monthly'){
+      banner.textContent = '"So, whether you eat or drink, or whatever you do, do everything for the glory of God." — 1 Corinthians 10:31';
+    } else {
+      banner.textContent = '"Whatever you do, do it from the heart, as something done for the Lord." — Colossians 3:23';
+    }
+  }
+  if(isJournal()||isDaily()) document.getElementById('periodLabel').textContent = dayLabelFor(dayOffset);
+  else if(isWeekly()) document.getElementById('periodLabel').textContent = weekLabelFor(weekOffset);
+  else if(isMonthly()) document.getElementById('periodLabel').textContent = monthLabelFor(monthOffset);
+  else if(isPrayer()) document.getElementById('periodLabel').textContent = 'Prayer Log';
+}
+async function loadCurrent(){
+  updateViewUI();
+  if(isJournal()) await loadJournal();
+  else if(isPrayer()) loadPrayer();
+  else if(isDaily()) await loadDaily();
+  else if(isWeekly()) await loadWeekly();
+  else if(isMonthly()) await loadMonthly();
+  updateDiskUI((await diskGetDirHandle())?.name||'');
+}
+async function loadDaily(){
+  if(!document.getElementById('sec-faithfulFew')) renderDaily();
+  dayData = normalizeDaily(await getJSON(dayKeyFor(dayOffset)));
+  populateFields(document.getElementById('dailyMain'), dayData);
+  populateFields(document.getElementById('drawerGrowthTree'), dayData);
+  populateVirtues(); populateRatings(); renderFFLists(); renderQuickCaptureList(); updateDangerReminder();
+  applyDailyPhase();
+  updateScore();
+}
+async function loadWeekly(){
+  weekData = normalizeWeekly(await getJSON(weekKeyFor(weekOffset)));
+  populateFields(document.getElementById('weeklyMain'), weekData);
+  await computeWeekScorecard();
+}
+async function loadMonthly(){
+  monthData = normalizeMonth(await getJSON(monthKeyFor(monthOffset)));
+  renderFruitGrid();
+  populateFields(document.getElementById('monthlyMain'), monthData);
+}
+async function loadJournal(){
+  journal = await getJSON(journalKeyFor(dayOffset)) || {body:'',updated:null};
+  document.getElementById('journalBody').value = journal.body||'';
+  document.getElementById('journalDateLabel').textContent = dayLabelFor(dayOffset);
+  updateJournalMeta(); renderJournalList();
+}
+function updateJournalMeta(){
+  const body = document.getElementById('journalBody')?.value||journal.body||'';
+  const words = body.trim()?body.trim().split(/\s+/).length:0;
+  document.getElementById('journalWords').textContent = words+' words';
+  document.getElementById('journalUpdated').textContent = journal.updated
+    ? 'Updated '+new Date(journal.updated).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}) : '';
+}
+async function renderJournalList(){
+  const ul = document.getElementById('journalList');
+  const r = await window.storage.list('journal:');
+  const keys = (r?.keys||[]).sort().reverse().slice(0,30);
+  const cur = journalKeyFor(dayOffset).slice(8);
+  ul.innerHTML = keys.map(k=>{
+    const d = k.slice(8);
+    return '<li><button type="button" class="'+(d===cur?'on':'')+'" data-jdate="'+d+'">'+d+'</button></li>';
+  }).join('') || '<li class="hint">No past entries</li>';
+  ul.querySelectorAll('[data-jdate]').forEach(b=> b.onclick = ()=>{
+    if(dirty) save();
+    dayOffset = Math.round((new Date(b.dataset.jdate+'T12:00:00')-dayOf(0))/86400000);
+    loadJournal();
+  });
+}
+function clearCurrent(){
+  const labels = {daily:'this day',weekly:'this week',monthly:'this month'};
+  if(isJournal()) return;
+  if(!confirm('Clear everything for '+labels[viewMode]+'?')) return;
+  if(isDaily()) dayData = blankDaily();
+  else if(isWeekly()) weekData = blankWeekly();
+  else if(isMonthly()) monthData = blankMonth();
+  loadCurrent(); markDirty();
+}
+function clearJournalEntry(){
+  if(!confirm('Clear this journal entry?')) return;
+  journal={body:'',updated:null};
+  document.getElementById('journalBody').value='';
+  updateJournalMeta(); markDirty(); renderJournalList();
+}
+async function resetAll(){
+  if(!confirm('Delete ALL saved data? This cannot be undone.')) return;
+  if(prompt('Type RESET to confirm')!=='RESET') return;
+  clearTimeout(saveTimer);
+  await window.storage.clearAll();
+  dayData=null; weekData=null; monthData=null; journal={body:'',updated:null};
+  globals={researchNotes:'',motives:null,prayers:[],thoughtJournal:''}; dayOffset=0; weekOffset=0; monthOffset=0; viewMode='daily'; dirty=false;
+  localStorage.removeItem('wsr:thoughtJournalCollapsed');
+  await loadCurrent();
+  loadThoughtJournal();
+}
+
+(function initTheme(){
+  const btn = document.getElementById('themeToggle');
+  const sun = btn?.querySelector('.icon-sun');
+  const moon = btn?.querySelector('.icon-moon');
+  function applyTheme(dark){
+    document.documentElement.classList.toggle('dark', dark);
+    if(sun) sun.style.display = dark?'none':'block';
+    if(moon) moon.style.display = dark?'block':'none';
+    try{ localStorage.setItem('wsr:theme', dark?'dark':'light'); }catch(e){}
+  }
+  const stored = localStorage.getItem('wsr:theme');
+  applyTheme(stored==='dark' || (!stored && window.matchMedia('(prefers-color-scheme:dark)').matches));
+  btn?.addEventListener('click', ()=>applyTheme(!document.documentElement.classList.contains('dark')));
+})();
+
+(async function init(){
+  renderDaily(); renderWeekly(); renderMonthly(); bindEvents(); bindFFAccordion();
+  const vm = await window.storage.get('view-mode');
+  if(vm?.value && ['daily','weekly','monthly','journal','prayer'].includes(vm.value)) viewMode = vm.value;
+  const g = await getJSON('fs-globals');
+  if(g) globals = {...globals,...g};
+  ensureMotives();
+  ensurePrayers();
+  document.getElementById('researchNotes').value = globals.researchNotes||'';
+  simpleMode = localStorage.getItem('wsr:simpleMode')==='1';
+  await refreshDiskLink();
+  await loadCurrent();
+  loadThoughtJournal();
+})();
+</script>
+</body>
+</html>
