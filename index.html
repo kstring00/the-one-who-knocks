@@ -137,7 +137,8 @@ html,body{margin:0;background:var(--paper);color:var(--ink);
 #dailyBoard.simple-mode .daily-section[data-simple="1"]{display:block!important}
 #dailyBoard:not(.simple-mode) #sec-commit-simple{display:none!important}
 #dailyBoard.simple-mode .sat-sub{display:none}
-#dailyBoard.saturday-recovery .weekday-phase-tabs{display:none}
+#dailyBoard.saturday-recovery .daily-toolbar{flex-wrap:wrap;align-items:flex-start;gap:8px}
+#dailyBoard.saturday-recovery .sat-block-tabs{display:flex!important}
 #dailyBoard:not(.saturday-recovery) .sat-block-tabs{display:none!important}
 .sat-block-panel{display:none;margin-bottom:16px}
 #dailyBoard.saturday-recovery[data-sat-block="morning"] .sat-block-panel[data-sat-block="morning"],
@@ -1639,20 +1640,6 @@ function renderSatEveningBlock(){
     renderSatDontDoPanel(SAT_EVENING_DONT, 'evening')+
     '</div></section></div>';
 }
-function SaturdaySidebar(){
-  const st = dayData ? satDayStats(dayData) : {done:0,total:0,pct:0};
-  let blockLines = '';
-  SAT_BLOCKS.forEach(b=>{
-    const s = satBlockStats(b.id, dayData);
-    blockLines += '<div class="sat-rhythm-detail">'+esc(b.label)+': '+s.done+'/'+s.total+'</div>';
-  });
-  return ThoughtJournalCard()+
-    '<div class="side-card"><div class="side-head"><h3>Saturday Rhythm</h3></div><div class="side-body">'+
-    '<div class="sat-rhythm-prog" id="satRhythmProg">'+(st.total?st.done+'/'+st.total+' items · '+st.pct+'%':'0 items')+'</div>'+
-    '<div id="satRhythmDetail">'+blockLines+'</div></div></div>'+
-    '<div class="side-card"><div class="side-head"><h3>Scripture</h3></div><div class="side-body scripture-card">'+
-    '"Be still, and know that I am God."<cite>Psalm 46:10</cite></div></div>';
-}
 function applySatBlock(){
   const block = getActiveSatBlock();
   const board = document.getElementById('dailyBoard');
@@ -1693,21 +1680,37 @@ function updateSatBanner(){
     banner.textContent = SAT_BANNER_DEFAULT;
   }
 }
-function renderSaturdayDaily(){
+function updateSaturdayRecoveryUI(){
   const h2 = document.querySelector('#dailyBoard .page-head h2');
   const p = document.querySelector('#dailyBoard .page-head p');
-  if(h2) h2.textContent = 'Saturday Recovery';
-  if(p) p.textContent = 'Rest, reset, and close the week in peace.';
+  if(h2) h2.textContent = 'Daily Ledger';
+  if(p) p.textContent = 'Saturday Recovery — weekday rhythm below, time blocks at the bottom.';
   renderSatBlockTabs();
-  document.getElementById('dailyMain').innerHTML =
-    '<div id="sec-satRecovery" data-simple="1">'+
-    renderSatMorningBlock()+renderSatMiddayBlock()+renderSatAfternoonBlock()+renderSatEveningBlock()+
-    '</div>';
-  document.getElementById('dailySidebar').innerHTML = SaturdaySidebar();
-  loadThoughtJournal();
+  const blocks = renderSatMorningBlock()+renderSatMiddayBlock()+renderSatAfternoonBlock()+renderSatEveningBlock();
+  let sec = document.getElementById('sec-satRecovery');
+  const wrap = '<div id="sec-satRecovery" class="daily-section" data-phases="morning day evening" data-simple="1">'+blocks+'</div>';
+  if(sec) sec.outerHTML = wrap;
+  else document.getElementById('dailyMain')?.insertAdjacentHTML('beforeend', wrap);
+  injectSatRhythmSidebar();
   applySatBlock();
-  applyDailyPhase();
-  updateSatBanner();
+}
+function clearSaturdayRecoveryUI(){
+  document.getElementById('sec-satRecovery')?.remove();
+  document.querySelectorAll('.sat-sidebar-extra').forEach(el=> el.remove());
+  const tabs = document.getElementById('satBlockTabs');
+  if(tabs) tabs.innerHTML = '';
+  document.getElementById('dailyBoard')?.removeAttribute('data-sat-block');
+  restoreWeekdayPageHead();
+}
+function injectSatRhythmSidebar(){
+  if(!document.getElementById('satRhythmProg')){
+    const card = '<div class="side-card sat-sidebar-extra"><div class="side-head"><h3>Saturday Rhythm</h3></div><div class="side-body">'+
+      '<div class="sat-rhythm-prog" id="satRhythmProg">0 items</div><div id="satRhythmDetail"></div></div></div>';
+    const tj = document.getElementById('thoughtJournal');
+    if(tj) tj.insertAdjacentHTML('afterend', card);
+    else document.getElementById('dailySidebar')?.insertAdjacentHTML('afterbegin', card);
+  }
+  updateSatRhythm();
 }
 function bindFFAccordion(){
   document.getElementById('app')?.addEventListener('toggle', e=>{
@@ -1744,7 +1747,7 @@ function applyDailyPhase(){
   const board = document.getElementById('dailyBoard');
   board.dataset.phase = dailyPhase;
   board.classList.toggle('simple-mode', simpleMode);
-  document.querySelectorAll('.phase-tab').forEach(t=> t.classList.toggle('on', t.dataset.phase===dailyPhase));
+  document.querySelectorAll('.weekday-phase-tabs .phase-tab').forEach(t=> t.classList.toggle('on', t.dataset.phase===dailyPhase));
   const sm = document.getElementById('simpleMode');
   if(sm) sm.checked = simpleMode;
   const trackHead = document.querySelector('#sec-track .zonehead h2');
@@ -2176,12 +2179,12 @@ function bindEvents(){
       dayData.capture[lane] = dayData.capture[lane].filter(x=>x.id!==id);
       renderQuickCaptureList(); markDirty(); return;
     }
-    const phaseTab = e.target.closest('.phase-tab');
-    if(phaseTab && isDaily() && !isSaturdayRecovery()){ setDailyPhase(phaseTab.dataset.phase); return; }
+    const phaseTab = e.target.closest('.weekday-phase-tabs .phase-tab');
+    if(phaseTab?.dataset.phase && isDaily()){ setDailyPhase(phaseTab.dataset.phase); return; }
     const satTab = e.target.closest('.sat-block-tab');
     if(satTab && isDaily() && isSaturdayRecovery()){ setSatBlock(satTab.dataset.satBlock); return; }
     const flow = e.target.closest('.flow-step');
-    if(flow && isDaily() && !isSaturdayRecovery()){
+    if(flow && isDaily()){
       const phase = flow.dataset.gotoPhase;
       if(phase) setDailyPhase(phase);
       const sec = DAILY_SECTIONS[+flow.dataset.flow];
@@ -2291,18 +2294,15 @@ async function loadDaily(){
   const isSat = isSaturdayRecovery();
   document.getElementById('dailyBoard').classList.toggle('saturday-recovery', isSat);
   dayData = normalizeDaily(await getJSON(dayKeyFor(dayOffset)));
-  if(isSat){
-    renderSaturdayDaily();
-    updateScore();
-    updateSatBanner();
-  } else {
-    if(!document.getElementById('sec-faithfulFew') || document.getElementById('sec-satRecovery')) renderDaily();
-    populateFields(document.getElementById('dailyMain'), dayData);
-    populateFields(document.getElementById('drawerGrowthTree'), dayData);
-    populateVirtues(); populateRatings(); renderFFLists(); renderQuickCaptureList(); updateDangerReminder();
-    applyDailyPhase();
-    updateScore();
-  }
+  if(!document.getElementById('sec-faithfulFew') || document.getElementById('sec-satRecovery')) renderDaily();
+  populateFields(document.getElementById('dailyMain'), dayData);
+  populateFields(document.getElementById('drawerGrowthTree'), dayData);
+  populateVirtues(); populateRatings(); renderFFLists(); renderQuickCaptureList(); updateDangerReminder();
+  applyDailyPhase();
+  if(isSat) updateSaturdayRecoveryUI();
+  else clearSaturdayRecoveryUI();
+  updateScore();
+  if(isSat) updateSatBanner();
 }
 async function loadWeekly(){
   weekData = normalizeWeekly(await getJSON(weekKeyFor(weekOffset)));
