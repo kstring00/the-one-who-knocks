@@ -346,6 +346,77 @@ body.view-prayer .site-foot,body.view-journal .site-foot{display:none}
   font-size:12px;line-height:1.5;padding:8px 10px;border:1px solid var(--line-soft);border-radius:8px;
   background:var(--paper);font-family:inherit}
 .thought-journal-meta{font-size:10px;color:var(--mist);text-align:right}
+
+/* History, streak, weekend recovery */
+#streakBadge{font-size:11px;font-weight:600;color:var(--gold);background:var(--gold-bg);
+  padding:4px 10px;border-radius:999px;font-variant-numeric:tabular-nums;white-space:nowrap}
+#streakBadge.empty{color:var(--mist);background:var(--line-soft)}
+.history-banner{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  padding:10px 14px;margin-bottom:14px;border-radius:10px;background:var(--gold-bg);border:1px solid rgba(184,149,74,.3);
+  font-size:12px;color:var(--navy)}
+.history-banner.hidden{display:none}
+.history-banner button{border:1px solid var(--navy);background:var(--cream-raised);border-radius:6px;
+  padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--navy)}
+#dailyBoard.read-only .main-col{opacity:.92}
+#dailyBoard.read-only input,#dailyBoard.read-only textarea,#dailyBoard.read-only select,
+#dailyBoard.read-only button:not(.history-nav):not(.mode-override-btn){pointer-events:none;opacity:.72}
+.weekend-toggle{font-size:11px;color:var(--mist);display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none}
+.weekend-toggle input{accent-color:var(--green);width:14px;height:14px}
+
+.wk-principle{margin-bottom:16px;padding:12px 14px;border-left:3px solid var(--gold);background:var(--gold-bg);
+  border-radius:0 10px 10px 0;font-family:"Cormorant Garamond",serif;font-size:14px;color:var(--navy);line-height:1.5}
+.wk-principle cite{display:block;font-size:11px;font-style:normal;color:var(--mist);margin-top:6px;font-family:Inter,sans-serif}
+.wk-hero{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+@media(max-width:768px){.wk-hero{grid-template-columns:1fr}}
+.wk-morning-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.wk-ring-wrap{display:flex;align-items:center;gap:10px}
+.wk-ring{--pct:0;width:44px;height:44px;border-radius:50%;background:conic-gradient(var(--green) calc(var(--pct)*1%),var(--line-soft) 0);
+  display:flex;align-items:center;justify-content:center;flex:none}
+.wk-ring-inner{width:34px;height:34px;border-radius:50%;background:var(--card);display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:600;color:var(--navy);font-variant-numeric:tabular-nums}
+.wk-checklist{display:flex;flex-direction:column;gap:6px}
+.wk-check{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1px solid var(--line-soft);
+  border-radius:10px;background:var(--cream-raised);cursor:pointer;transition:border-color .15s,background .15s}
+.wk-check:hover{border-color:rgba(184,149,74,.4)}
+.wk-check.done{border-color:rgba(45,90,61,.35);background:var(--green-bg)}
+.wk-check input{accent-color:var(--green);width:17px;height:17px;margin-top:2px;flex:none;cursor:pointer}
+.wk-check-text{flex:1;min-width:0}
+.wk-check-text strong{display:block;font-size:13px;font-weight:600;color:var(--navy)}
+.wk-check-text span{display:block;font-size:11px;color:var(--mist);margin-top:2px;line-height:1.35}
+.wk-dont{border:1px solid rgba(139,58,58,.25);background:var(--danger-bg);border-radius:12px;padding:12px 14px}
+.wk-dont h3{margin:0 0 8px;font-family:"Cormorant Garamond",serif;font-size:16px;color:var(--danger)}
+.wk-dont-item{padding:8px 0;border-bottom:1px solid rgba(139,58,58,.12);font-size:12px;color:var(--ink);line-height:1.45}
+.wk-dont-item:last-child{border-bottom:none;padding-bottom:0}
+.wk-dont-item strong{color:var(--danger);font-weight:600}
+.wk-timer{font-size:11px;color:var(--mist);margin-top:4px;font-variant-numeric:tabular-nums}
+.wk-timer.live{color:var(--gold);font-weight:600}
+.wk-awake-btn{margin-top:6px;border:1px solid var(--danger);background:transparent;color:var(--danger);
+  border-radius:8px;padding:6px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit}
+.wk-awake-btn:hover{background:rgba(139,58,58,.08)}
+.wk-awake-btn.done{border-color:var(--green);color:var(--green);background:var(--green-bg)}
+.wk-fast-badge{display:inline-block;font-size:11px;font-weight:600;color:var(--gold);background:var(--gold-bg);
+  padding:4px 10px;border-radius:999px;margin-top:8px}
+.wk-rhythm{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+@media(max-width:640px){.wk-rhythm{grid-template-columns:1fr 1fr}}
+.wk-rhythm-block{border:1px dashed var(--line-soft);border-radius:10px;padding:10px 12px;background:var(--paper)}
+.wk-rhythm-block h4{margin:0 0 4px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--gold)}
+.wk-rhythm-block p{margin:0;font-size:11px;color:var(--mist);line-height:1.4}
+.wk-picks{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.wk-pick{border:1px solid var(--line-soft);background:var(--cream-raised);border-radius:999px;
+  padding:6px 12px;font-size:11px;cursor:pointer;font-family:inherit;color:var(--ink);transition:all .15s}
+.wk-pick.on{background:var(--green-bg);border-color:var(--green);color:var(--green);font-weight:600}
+.wk-loose{margin-top:10px;display:flex;flex-direction:column;gap:4px}
+.wk-loose-item{font-size:12px;padding:6px 10px;border-radius:8px;background:var(--gold-bg);color:var(--navy);
+  display:flex;align-items:center;justify-content:space-between;gap:8px}
+.wk-loose-item button{border:none;background:none;color:var(--mist);cursor:pointer;font-size:14px;padding:0}
+.wk-zone2{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.wk-zone2-opt{border:1px solid var(--line-soft);background:var(--cream-raised);border-radius:8px;
+  padding:8px 12px;font-size:12px;cursor:pointer;font-family:inherit;color:var(--ink)}
+.wk-zone2-opt.on{background:var(--navy);color:var(--cream-raised);border-color:var(--navy)}
+.wk-zone2-done{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px}
+.wk-zone2-done input{accent-color:var(--green);width:16px;height:16px}
+#weekendBoard .daily-toolbar{display:none}
+#weekendBoard .page-head h2::after{content:" · Recovery";font-weight:400;color:var(--mist);font-size:18px}
 </style>
 </head>
 <body>
@@ -371,9 +442,10 @@ body.view-prayer .site-foot,body.view-journal .site-foot{display:none}
     <button type="button" id="nextP" aria-label="Next">&#8594;</button>
   </div>
   <div class="topright">
+    <span id="streakBadge" class="empty" title="Morning checklist streak">🔥 0 day streak</span>
     <span class="score" id="score">0/5 · 0%</span>
     <span id="saveState">Saved</span>
-    <button type="button" id="saveBtn">Save</button>
+    <button type="button" id="saveBtn" hidden aria-hidden="true">Save</button>
     <details class="save-menu">
       <summary>&#8943;</summary>
       <button type="button" id="linkDiskFolder">Link save folder…</button>
@@ -387,13 +459,20 @@ body.view-prayer .site-foot,body.view-journal .site-foot{display:none}
 </header>
 
 <div class="board" id="dailyBoard" data-phase="morning">
+  <div id="historyBanner" class="history-banner hidden">
+    <span id="historyBannerText">Viewing a past day — read only</span>
+    <button type="button" class="history-nav" id="backToToday">Back to today</button>
+  </div>
   <div class="page-head">
     <div>
-      <h2>Daily Ledger</h2>
-      <p>Start the day on purpose. End the day in peace.</p>
+      <h2 id="dailyPageTitle">Daily Ledger</h2>
+      <p id="dailyPageDesc">Start the day on purpose. End the day in peace.</p>
     </div>
     <div class="page-head-actions">
-      <label class="simple-toggle"><input type="checkbox" id="simpleMode"> Simple Mode</label>
+      <label class="weekend-toggle" id="modeOverrideWrap" hidden title="Override auto weekend detection">
+        <input type="checkbox" id="weekendModeOverride"> <span id="modeOverrideLabel">Weekend recovery</span>
+      </label>
+      <label class="simple-toggle" id="simpleModeWrap"><input type="checkbox" id="simpleMode"> Simple Mode</label>
       <button type="button" class="why-btn" id="whyWorksBtn">Why This Works</button>
     </div>
   </div>
@@ -408,6 +487,10 @@ body.view-prayer .site-foot,body.view-journal .site-foot{display:none}
     <div class="main-col" id="dailyMain"></div>
     <aside class="sidebar" id="dailySidebar"></aside>
   </div>
+  <details class="journal-past" id="dayHistoryPanel">
+    <summary>Day history — tap a date to view (read-only)</summary>
+    <ul class="journal-list" id="dayHistoryList"></ul>
+  </details>
 </div>
 
 <div class="board weekly-board" id="weeklyBoard" hidden>
@@ -681,6 +764,41 @@ const FLOW_PHASE = ['morning','morning','morning','morning','evening','evening',
 const DAILY_SECTIONS = ['posture','faithfulFew','danger','execute','track','learn','commit'];
 let dailyPhase = 'morning';
 let simpleMode = false;
+let dailyLayout = 'weekday'; // 'weekday' | 'weekend'
+let lastRenderedDate = '';
+let weekendTimerInterval = null;
+
+/* Weekend Recovery — Huberman-inspired protocols */
+const MORNING_CHECKS = [
+  {key:'hydrate', label:'Hydrate first', sub:'Water with a pinch of sea salt — supports neural function'},
+  {key:'sunlight', label:'Sunlight', sub:'10–30 min outdoor light within an hour of waking'},
+  {key:'movement', label:'Movement', sub:'Walk, stretch, or light exercise'},
+  {key:'fast', label:'Fast until ~noon', sub:'16:8 window — gentle fasting until 12:00'},
+  {key:'prayer', label:'Prayer & Scripture', sub:'Start the day spiritually grounded'},
+  {key:'wakeTime', label:'Consistent wake', sub:'Within ~1 hour of weekday wake time'}
+];
+const DONT_DO_ITEMS = [
+  {key:'caffeine', label:'No caffeine for 90–120 minutes after waking', sub:'Prevents afternoon crash — adenosine clearance', timer:true},
+  {key:'screens', label:'No phone/screens first 30 minutes after waking', sub:'Protects morning cortisol & focus'},
+  {key:'sleepIn', label:'No sleeping in more than 1 hour past weekday wake', sub:'Keeps circadian rhythm stable'},
+  {key:'scheduling', label:'No intense scheduling', sub:'The weekend is for recovery, not optimization'},
+  {key:'caffeinePM', label:'No heavy caffeine after 2 PM', sub:'Protects sleep quality tonight'}
+];
+const RESTORATIVE_MENU = [
+  'Time outdoors','Hike','Friends & family','Read','Be creative',
+  'Healthy meals','Meal prep','Nap if needed','Early wind-down · dim lights'
+];
+const ZONE2_OPTIONS = [
+  {key:'walk', label:'Long walk'},{key:'hike', label:'Hike'},{key:'ruck', label:'Ruck'},
+  {key:'bike', label:'Easy bike'},{key:'run', label:'Easy run'}
+];
+const WK_RHYTHM = [
+  {id:'morning', title:'Morning', hint:'Checklist, light, movement, prayer'},
+  {id:'midday', title:'Midday', hint:'Loose plans, restorative picks, optional deep work'},
+  {id:'afternoon', title:'Afternoon', hint:'Outdoors, connection, creativity — unscheduled'},
+  {id:'evening', title:'Evening', hint:'Dim lights, wind-down, consistent bedtime'}
+];
+const CAFFEINE_WAIT_MS = 90 * 60 * 1000;
 
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function uid(){return Math.random().toString(36).slice(2,10)}
@@ -693,7 +811,42 @@ function monthOf(off){
   const d = new Date(); d.setDate(1); d.setMonth(d.getMonth()+off); d.setHours(0,0,0,0); return d;
 }
 function monthKey(off){ const d = monthOf(off); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
-function dayKeyFor(off){ return 'fs-day:'+iso(dayOf(off)); }
+function dayKeyFor(off){ return 'day-'+iso(dayOf(off)); }
+function legacyDayKeyFor(off){ return 'fs-day:'+iso(dayOf(off)); }
+function dateStrFor(off){ return iso(dayOf(off)); }
+
+/*
+ * saveDay / loadDay — localStorage is per-device/per-browser.
+ * Swap these two functions for a synced backend later without touching UI code.
+ */
+async function loadDay(dateStr){
+  let data = await getJSON('day-'+dateStr);
+  if(!data) data = await getJSON('fs-day:'+dateStr);
+  return data;
+}
+async function saveDay(dateStr, data){
+  return window.storage.set('day-'+dateStr, JSON.stringify(data));
+}
+async function listDayKeys(){
+  const r1 = await window.storage.list('day-');
+  const r2 = await window.storage.list('fs-day:');
+  const keys = new Set([...(r1?.keys||[]), ...(r2?.keys||[])]);
+  return [...keys].map(k=> k.startsWith('fs-day:') ? k.slice(7) : k.slice(4)).filter(Boolean).sort();
+}
+
+function dayOfWeek(off){ return dayOf(off).getDay(); } // 0 Sun … 6 Sat
+function isWeekendNatural(off=dayOffset){
+  const d = dayOfWeek(off);
+  return d === 0 || d === 6;
+}
+function isSunday(off=dayOffset){ return dayOfWeek(off) === 0; }
+function isSaturday(off=dayOffset){ return dayOfWeek(off) === 6; }
+function isReadOnlyView(){ return dayOffset !== 0; }
+function shouldShowWeekendMode(off=dayOffset){
+  if(globals.weekendOverride === 'weekday') return false;
+  if(globals.weekendOverride === 'weekend') return true;
+  return isWeekendNatural(off);
+}
 function weekKeyFor(off){ return 'fs-week:'+iso(mondayOf(off)); }
 function monthKeyFor(off){ return 'fs-month:'+monthKey(off); }
 function journalKeyFor(off){ return 'journal:'+iso(dayOf(off)); }
@@ -722,6 +875,83 @@ function currentKey(){
   return journalKeyFor(dayOffset);
 }
 
+function blankWeekend(){
+  return {
+    _mode:'weekend',
+    weekend:{
+      morning:{hydrate:false,sunlight:false,movement:false,fast:false,prayer:false,wakeTime:false},
+      awakeAt:null,
+      zone2:{choice:'',done:false},
+      saturday:{finances:'',habits:'',calendar:'',bcba:'',deepWork:'',deepWorkDone:false},
+      sunday:{church:'',rest:''},
+      restorative:[],
+      loosePlan:[],
+      evening:{dimLights:false,bedtimeNote:''}
+    }
+  };
+}
+function normalizeWeekend(s){
+  const b = blankWeekend();
+  if(!s) return b;
+  const w = {...b, ...s, weekend:{...b.weekend, ...(s.weekend||{})}};
+  w.weekend.morning = {...b.weekend.morning, ...(s.weekend?.morning||{})};
+  w.weekend.zone2 = {...b.weekend.zone2, ...(s.weekend?.zone2||{})};
+  w.weekend.saturday = {...b.weekend.saturday, ...(s.weekend?.saturday||{})};
+  w.weekend.sunday = {...b.weekend.sunday, ...(s.weekend?.sunday||{})};
+  w.weekend.evening = {...b.weekend.evening, ...(s.weekend?.evening||{})};
+  if(!Array.isArray(w.weekend.restorative)) w.weekend.restorative = [];
+  if(!Array.isArray(w.weekend.loosePlan)) w.weekend.loosePlan = [];
+  w._mode = 'weekend';
+  return w;
+}
+function blankDayForOffset(off){
+  return shouldShowWeekendMode(off) ? blankWeekend() : blankDaily();
+}
+function isMorningComplete(data, dateStr){
+  if(!data) return false;
+  if(data._mode === 'weekend' && data.weekend){
+    const m = data.weekend.morning;
+    return MORNING_CHECKS.every(c=> !!m[c.key]);
+  }
+  const p = data.posture || {};
+  const hasPosture = !!(p.prayer?.trim() || (p.virtues?.length > 0));
+  const hasMorningWork = !!(data.danger?.danger?.trim()) ||
+    FF_KEYS.some(f=> ffGetItems(data, f.key).length > 0);
+  return hasPosture && hasMorningWork;
+}
+async function computeMorningStreak(){
+  let streak = 0;
+  let start = 0;
+  if(dayOffset === 0 && dayData && !isMorningComplete(dayData, dateStrFor(0))) start = 1;
+  for(let i = start; i < 400; i++){
+    const ds = dateStrFor(-i);
+    const data = (i === 0 && dayOffset === 0) ? dayData : await loadDay(ds);
+    if(!data || !isMorningComplete(data, ds)) break;
+    streak++;
+  }
+  return streak;
+}
+async function updateStreakDisplay(){
+  const el = document.getElementById('streakBadge');
+  if(!el) return;
+  const n = await computeMorningStreak();
+  el.textContent = n === 1 ? '🔥 1 day streak' : '🔥 '+n+' day streak';
+  el.classList.toggle('empty', n === 0);
+}
+function applyReadOnlyMode(){
+  const ro = isReadOnlyView();
+  const board = document.getElementById('dailyBoard');
+  board?.classList.toggle('read-only', ro);
+  const banner = document.getElementById('historyBanner');
+  const bannerText = document.getElementById('historyBannerText');
+  if(banner) banner.classList.toggle('hidden', !ro);
+  if(bannerText && ro){
+    bannerText.textContent = 'Viewing '+dayLabelFor(dayOffset).replace('Today — ','')+' — read only';
+  }
+  const nextBtn = document.getElementById('nextP');
+  if(nextBtn) nextBtn.disabled = dayOffset >= 0;
+  document.getElementById('modeOverrideWrap')?.classList.toggle('hidden', ro || !isDaily());
+}
 function blankDaily(){
   const ff = {};
   FF_KEYS.forEach(f=>{ ff[f.key] = {items:[]}; });
@@ -841,27 +1071,30 @@ function setNested(obj, path, val){
 
 let viewMode='daily', dayOffset=0, weekOffset=0, monthOffset=0;
 let dayData=null, weekData=null, monthData=null, journal={body:'',updated:null};
-let globals={researchNotes:'',motives:null,prayers:[],thoughtJournal:''};
+let globals={researchNotes:'',motives:null,prayers:[],thoughtJournal:'',weekendOverride:'auto',weekdayWakeTime:'07:00'};
 let prayerFilter = 'all';
 let dirty=false, saveTimer=null, saving=false;
 
-function scheduleSave(){ clearTimeout(saveTimer); saveTimer=setTimeout(()=>save(),800); }
+function scheduleSave(){ clearTimeout(saveTimer); saveTimer = setTimeout(()=> save(), 50); }
 function markDirty(){
   dirty=true; updateScore();
-  document.getElementById('saveState').textContent='Unsaved changes';
-  document.getElementById('saveState').classList.add('dirty');
+  const st = document.getElementById('saveState');
+  if(st){ st.textContent='Saving…'; st.classList.add('saving'); }
   scheduleSave();
 }
 async function save(){
   if(saving) return;
   saving=true;
   const st = document.getElementById('saveState');
-  st.textContent='Saving…'; st.classList.add('saving');
+  if(st){ st.textContent='Saving…'; st.classList.add('saving'); }
   try{
     const S = window.storage;
     const ops = [S.set('view-mode', viewMode), S.set('fs-globals', JSON.stringify(globals))];
     if(isJournal()) ops.push(S.set(journalKeyFor(dayOffset), JSON.stringify(journal)));
-    else if(isDaily()) ops.push(S.set(dayKeyFor(dayOffset), JSON.stringify(dayData)));
+    else if(isDaily()){
+      const ds = dateStrFor(dayOffset);
+      ops.push(saveDay(ds, dayData));
+    }
     else if(isWeekly()) ops.push(S.set(weekKeyFor(weekOffset), JSON.stringify(weekData)));
     else if(isMonthly()) ops.push(S.set(monthKeyFor(monthOffset), JSON.stringify(monthData)));
     const ok = await Promise.all(ops);
@@ -869,10 +1102,13 @@ async function save(){
       dirty=false;
       let diskOk=false;
       try{ diskOk=await diskSaveCurrent(); }catch(e){ console.warn('Disk save failed',e); }
-      st.textContent=diskOk?'Saved ✓ · Disk':'Saved ✓';
-      st.classList.remove('dirty','saving');
-    } else { st.textContent='Save failed'; st.classList.remove('saving'); }
-  }catch(e){ st.textContent='Error'; st.classList.remove('saving'); }
+      if(st){
+        st.textContent=diskOk?'Saved ✓ · Disk':'Saved ✓';
+        st.classList.remove('dirty','saving');
+      }
+      updateStreakDisplay();
+    } else if(st){ st.textContent='Save failed'; st.classList.remove('saving'); }
+  }catch(e){ if(st){ st.textContent='Error'; st.classList.remove('saving'); } }
   saving=false;
 }
 async function getJSON(key){
@@ -1247,7 +1483,231 @@ function bindFFAccordion(){
     parent.querySelectorAll('.ff-accordion').forEach(x=>{ if(x!==d) x.open=false; });
   }, true);
 }
+
+function WeekendSidebar(){
+  const dow = isSunday() ? 'Sunday' : 'Saturday';
+  return ThoughtJournalCard()+
+    '<div class="side-card"><div class="side-head"><h3>'+dow+' Rhythm</h3></div><div class="side-body">'+
+    WK_RHYTHM.map(r=>'<div style="padding:4px 0;font-size:11px;color:var(--mist)"><strong style="color:var(--navy)">'+r.title+'</strong> — '+r.hint+'</div>').join('')+
+    '</div></div>'+
+    '<div class="side-card"><div class="side-head"><h3>Scripture</h3></div><div class="side-body scripture-card">'+
+    (isSunday()
+      ? '"Come to me, all who labor and are heavy laden, and I will give you rest."<cite>Matthew 11:28</cite>'
+      : '"Be still, and know that I am God."<cite>Psalm 46:10</cite>')+
+    '</div></div>';
+}
+function renderWeekendMorningChecks(){
+  const m = dayData?.weekend?.morning || {};
+  return MORNING_CHECKS.map(c=>{
+    const done = !!m[c.key];
+    return '<label class="wk-check'+(done?' done':'')+'">'+
+      '<input type="checkbox" data-wk-morning="'+c.key+'"'+(done?' checked':'')+'>'+
+      '<span class="wk-check-text"><strong>'+esc(c.label)+'</strong><span>'+esc(c.sub)+'</span></span></label>';
+  }).join('');
+}
+function renderWeekendDontDo(){
+  const wk = dayData?.weekend || {};
+  return DONT_DO_ITEMS.map(item=>{
+    let extra = '';
+    if(item.timer){
+      extra = '<div class="wk-timer" id="caffeineTimer">Tap "I\'m awake" when you wake up</div>'+
+        '<button type="button" class="wk-awake-btn'+(wk.awakeAt?' done':'')+'" id="awakeBtn">'+
+        (wk.awakeAt ? 'Awake logged · timer running' : 'I\'m awake')+'</button>';
+    }
+    return '<div class="wk-dont-item"><strong>'+esc(item.label)+'</strong>'+
+      (item.sub ? '<div style="color:var(--mist);font-size:11px;margin-top:2px">'+esc(item.sub)+'</div>' : '')+
+      (item.key === 'caffeinePM' ? '<div class="wk-timer" id="caffeinePmNote"></div>' : '')+
+      extra+'</div>';
+  }).join('');
+}
+function renderWeekendRecovery(){
+  const main = document.getElementById('dailyMain');
+  const sidebar = document.getElementById('dailySidebar');
+  const toolbar = document.querySelector('#dailyBoard .daily-toolbar');
+  const title = document.getElementById('dailyPageTitle');
+  const desc = document.getElementById('dailyPageDesc');
+  if(title) title.textContent = isSunday() ? 'Sunday Recovery' : 'Saturday Recovery';
+  if(desc) desc.textContent = 'Recovery and enjoyment are paramount — loose rhythm, stable circadian rhythm.';
+  if(toolbar) toolbar.style.display = 'none';
+  document.getElementById('simpleModeWrap')?.classList.add('hidden');
+  document.getElementById('modeOverrideWrap')?.classList.remove('hidden');
+  document.getElementById('dailyBoard')?.classList.add('weekend-mode');
+
+  let dayBlock = '';
+  if(isSaturday()){
+    dayBlock = '<section class="zone daily-section" id="sec-wk-saturday">'+
+      sectionHead('Saturday', 'Weekly Review', 'Light inventory — finances, habits, calendar, BCBA/grad school.')+
+      '<div class="zonebody">'+
+      field('weekend.saturday.finances','Finances',{short:true,placeholder:'Quick money check…'})+
+      field('weekend.saturday.habits','Habits',{short:true,placeholder:'What\'s working? What slipped?'})+
+      field('weekend.saturday.calendar','Calendar',{short:true,placeholder:'Upcoming week glance…'})+
+      field('weekend.saturday.bcba','BCBA / grad school',{short:true,placeholder:'Progress & next steps…'})+
+      '</div></section>'+
+      '<section class="zone daily-section" id="sec-wk-deepwork">'+
+      sectionHead('Optional', 'Deep Work Block', 'BCBA prep, app dev, reading — optional, not required.')+
+      '<div class="zonebody">'+
+      field('weekend.saturday.deepWork','If you feel like it…',{placeholder:'One optional focus block…'})+
+      '<label class="wk-zone2-done"><input type="checkbox" data-field="weekend.saturday.deepWorkDone"> Done (optional)</label>'+
+      '</div></section>';
+  } else {
+    dayBlock = '<section class="zone daily-section" id="sec-wk-sunday">'+
+      sectionHead('Sunday', 'Zone 2 Cardio', '60–75 min at conversational pace — long walk, hike, ruck, easy bike, or easy run.')+
+      '<div class="zonebody"><div class="wk-zone2" id="zone2Picker">'+
+      ZONE2_OPTIONS.map(o=>'<button type="button" class="wk-zone2-opt" data-zone2="'+o.key+'">'+esc(o.label)+'</button>').join('')+
+      '</div><label class="wk-zone2-done"><input type="checkbox" data-field="weekend.zone2.done"> Completed session</label></div></section>'+
+      '<section class="zone daily-section" id="sec-wk-church">'+
+      sectionHead('Sunday', 'Church · Worship · Rest', 'Space for worship, Sabbath rest, and being still.')+
+      '<div class="zonebody">'+
+      field('weekend.sunday.church','Church / worship',{placeholder:'Service, community, gratitude…'})+
+      field('weekend.sunday.rest','Rest emphasis',{placeholder:'How will you receive rest today?'})+
+      '</div></section>';
+  }
+
+  main.innerHTML =
+    '<div class="wk-principle">Avoid <em>weekend drift</em> — wake at roughly the same time as weekdays to keep your circadian rhythm stable, but stay flexible and unscheduled. Recovery is the goal, not optimization.'+
+    '<cite>Andrew Huberman — consistent light, wake time &amp; movement; flexible, unscheduled recovery</cite></div>'+
+    '<div class="wk-hero">'+
+      '<div class="zone" style="margin:0"><div class="zonehead compact"><div class="wk-morning-head">'+
+        '<div><div class="num">Morning</div><h2 style="margin:0">Checklist</h2></div>'+
+        '<div class="wk-ring-wrap"><div class="wk-ring" id="morningRing"><div class="wk-ring-inner" id="morningRingText">0/6</div></div></div>'+
+      '</div></div><div class="zonebody compact"><div class="wk-checklist" id="wkMorningList">'+renderWeekendMorningChecks()+'</div>'+
+      '<div class="wk-fast-badge" id="fastingBadge">Fasting until 12:00</div></div></div>'+
+      '<div class="wk-dont"><h3>Don\'t Do</h3>'+renderWeekendDontDo()+'</div>'+
+    '</div>'+
+    '<div class="wk-rhythm">'+WK_RHYTHM.map(r=>'<div class="wk-rhythm-block"><h4>'+r.title+'</h4><p>'+r.hint+'</p></div>').join('')+'</div>'+
+    dayBlock+
+    '<section class="zone daily-section" id="sec-wk-restorative">'+
+    sectionHead('Restorative', 'Pick a Few', 'Relaxed options — tap to add to today\'s loose plan. Not tasks.')+
+    '<div class="zonebody"><div class="wk-picks" id="restorativePicks">'+
+    RESTORATIVE_MENU.map(item=>'<button type="button" class="wk-pick" data-wk-pick="'+esc(item)+'">'+esc(item)+'</button>').join('')+
+    '</div><div class="wk-loose" id="loosePlanList"></div></div></section>'+
+    '<section class="zone daily-section" id="sec-wk-evening">'+
+    sectionHead('Evening', 'Wind-Down', 'Dim lights 1–2 hours before bed. Bedtime target: weekday ±1 hour.')+
+    '<div class="zonebody">'+
+    '<label class="wk-zone2-done"><input type="checkbox" data-field="weekend.evening.dimLights"> Dim lights reminder (~1–2 hr before bed)</label>'+
+    field('weekend.evening.bedtimeNote','Bedtime target / notes',{short:true,placeholder:'Aim for weekday bedtime ±1 hour…'})+
+    '</div></section>';
+
+  if(sidebar) sidebar.innerHTML = WeekendSidebar();
+  loadThoughtJournal();
+  populateWeekendUI();
+  startWeekendTimers();
+}
+function populateWeekendUI(){
+  if(!dayData?.weekend) return;
+  populateFields(document.getElementById('dailyMain'), dayData);
+  const wk = dayData.weekend;
+  document.querySelectorAll('[data-wk-morning]').forEach(el=>{
+    el.checked = !!wk.morning?.[el.dataset.wkMorning];
+    el.closest('.wk-check')?.classList.toggle('done', el.checked);
+  });
+  document.querySelectorAll('[data-zone2]').forEach(btn=>{
+    btn.classList.toggle('on', wk.zone2?.choice === btn.dataset.zone2);
+  });
+  document.querySelectorAll('[data-wk-pick]').forEach(btn=>{
+    btn.classList.toggle('on', (wk.restorative||[]).includes(btn.dataset.wkPick));
+  });
+  renderLoosePlan();
+  updateMorningRing();
+  updateWeekendTimers();
+  const override = document.getElementById('weekendModeOverride');
+  if(override){
+    override.checked = isWeekendNatural()
+      ? globals.weekendOverride === 'weekday'
+      : globals.weekendOverride === 'weekend';
+  }
+}
+function renderLoosePlan(){
+  const list = document.getElementById('loosePlanList');
+  if(!list || !dayData?.weekend) return;
+  const items = dayData.weekend.loosePlan || [];
+  list.innerHTML = items.length ? items.map((item,i)=>
+    '<div class="wk-loose-item"><span>'+esc(item)+'</span><button type="button" data-wk-loose-rm="'+i+'" aria-label="Remove">×</button></div>'
+  ).join('') : '<p class="hint">Tap restorative options above to build a loose plan.</p>';
+}
+function updateMorningRing(){
+  if(!dayData?.weekend) return;
+  const m = dayData.weekend.morning;
+  const done = MORNING_CHECKS.filter(c=> m[c.key]).length;
+  const pct = done / MORNING_CHECKS.length;
+  const ring = document.getElementById('morningRing');
+  const txt = document.getElementById('morningRingText');
+  if(ring) ring.style.setProperty('--pct', pct);
+  if(txt) txt.textContent = done+'/'+MORNING_CHECKS.length;
+}
+function updateWeekendTimers(){
+  const wk = dayData?.weekend;
+  const fastEl = document.getElementById('fastingBadge');
+  if(fastEl){
+    const now = new Date();
+    const noon = new Date(); noon.setHours(12,0,0,0);
+    if(now < noon){
+      const mins = Math.ceil((noon - now) / 60000);
+      const h = Math.floor(mins/60), m = mins%60;
+      fastEl.textContent = 'Fasting until 12:00 · '+h+'h '+m+'m left';
+    } else fastEl.textContent = 'Fast window open · 16:8 complete for today';
+  }
+  const now = new Date();
+  const twoPm = new Date(); twoPm.setHours(14,0,0,0);
+  const pmNote = document.getElementById('caffeinePmNote');
+  if(pmNote){
+    if(now >= twoPm) pmNote.textContent = 'Past 2 PM — skip heavy caffeine to protect sleep';
+    else {
+      const mins = Math.ceil((twoPm - now) / 60000);
+      pmNote.textContent = 'Heavy caffeine cutoff in '+Math.floor(mins/60)+'h '+(mins%60)+'m (2:00 PM)';
+    }
+    pmNote.classList.toggle('live', now < twoPm);
+  }
+  const cafEl = document.getElementById('caffeineTimer');
+  const awakeBtn = document.getElementById('awakeBtn');
+  if(cafEl && wk?.awakeAt){
+    const clearAt = wk.awakeAt + CAFFEINE_WAIT_MS;
+    const now = Date.now();
+    if(now < clearAt){
+      const mins = Math.ceil((clearAt - now) / 60000);
+      cafEl.textContent = 'Caffeine OK in ~'+mins+' min (90 min minimum · optimal 90–120 min)';
+      cafEl.classList.add('live');
+      if(awakeBtn){ awakeBtn.classList.add('done'); awakeBtn.textContent = 'Awake logged · wait '+mins+' min'; }
+    } else {
+      cafEl.textContent = '✓ Caffeine window open — adenosine cleared';
+      cafEl.classList.remove('live');
+      if(awakeBtn) awakeBtn.textContent = 'Caffeine cleared ✓';
+    }
+  }
+  const pmEl = document.querySelector('.wk-dont-item:last-child .wk-timer');
+  if(!pmEl && cafEl){
+    /* caffeine PM reminder handled in static text */
+  }
+}
+function startWeekendTimers(){
+  clearInterval(weekendTimerInterval);
+  if(dailyLayout !== 'weekend') return;
+  weekendTimerInterval = setInterval(updateWeekendTimers, 30000);
+  updateWeekendTimers();
+}
+function stopWeekendTimers(){ clearInterval(weekendTimerInterval); weekendTimerInterval = null; }
+
+function ensureDailyLayout(mode){
+  const ds = dateStrFor(dayOffset);
+  const needsRender = mode !== dailyLayout || (mode === 'weekend' && lastRenderedDate !== ds);
+  if(!needsRender) return;
+  dailyLayout = mode;
+  lastRenderedDate = ds;
+  if(mode === 'weekend') renderWeekendRecovery();
+  else renderDaily();
+}
 function renderDaily(){
+  stopWeekendTimers();
+  dailyLayout = 'weekday';
+  const toolbar = document.querySelector('#dailyBoard .daily-toolbar');
+  const title = document.getElementById('dailyPageTitle');
+  const desc = document.getElementById('dailyPageDesc');
+  if(toolbar) toolbar.style.display = '';
+  if(title) title.textContent = 'Daily Ledger';
+  if(desc) desc.textContent = 'Start the day on purpose. End the day in peace.';
+  document.getElementById('simpleModeWrap')?.classList.remove('hidden');
+  document.getElementById('modeOverrideWrap')?.classList.remove('hidden');
+  document.getElementById('dailyBoard')?.classList.remove('weekend-mode');
   const main = document.getElementById('dailyMain');
   main.innerHTML =
     FaithfulFewHero() +
@@ -1454,8 +1914,8 @@ async function computeWeekScorecard(){
   for(let i=0;i<7;i++){ const d=new Date(mon); d.setDate(mon.getDate()+i); days.push(iso(d)); }
   const stats = {mustDo:0,body:0,order:0,leadership:0,skill:0,journal:0,study:0,guardrail:0};
   for(const ds of days){
-    const dd = await getJSON('fs-day:'+ds);
-    if(dd){
+    const dd = await loadDay(ds);
+    if(dd && dd._mode !== 'weekend'){
       FF_KEYS.forEach(f=>{ if(ffCategoryComplete(ffGetItems(dd, f.key))) stats[f.key]++; });
       if(dd.execute?.studyBlock?.done) stats.study++;
       if(dd.danger?.guardrailKept) stats.guardrail++;
@@ -1475,6 +1935,13 @@ async function computeWeekScorecard(){
 
 function updateScore(){
   if(!isDaily() || !dayData){ document.getElementById('score').textContent='—'; return; }
+  if(dayData._mode === 'weekend' && dayData.weekend){
+    const done = MORNING_CHECKS.filter(c=> dayData.weekend.morning[c.key]).length;
+    const el = document.getElementById('score');
+    el.textContent = done+'/'+MORNING_CHECKS.length+' morning';
+    el.classList.toggle('gold', done >= MORNING_CHECKS.length);
+    return;
+  }
   const st = ffDayStats(dayData);
   const el = document.getElementById('score');
   el.textContent = st.total ? st.done+'/'+st.total+' · '+st.pct+'%' : '0 items';
@@ -1532,8 +1999,13 @@ function bindEvents(){
       return;
     }
     if(!el.dataset.field) return;
+    if(isReadOnlyView() && isDaily()) return;
     const path = el.dataset.field;
     let val = el.type==='checkbox' ? el.checked : el.value;
+    if(isDaily() && dayData?._mode === 'weekend'){
+      setNested(dayData, path, val);
+      updateScore(); markDirty(); return;
+    }
     if(isDaily()){ setNested(dayData,path,val);
       if(path.startsWith('danger.')) updateDangerReminder();
       updateScore(); markDirty(); }
@@ -1542,6 +2014,12 @@ function bindEvents(){
   });
   app.addEventListener('change', e=>{
     const el = e.target;
+    if(el.dataset.wkMorning && isDaily() && dayData?._mode === 'weekend' && !isReadOnlyView()){
+      if(!dayData.weekend.morning) dayData.weekend.morning = {};
+      dayData.weekend.morning[el.dataset.wkMorning] = el.checked;
+      el.closest('.wk-check')?.classList.toggle('done', el.checked);
+      updateMorningRing(); updateScore(); markDirty(); return;
+    }
     if(el.dataset.ffCheck && isDaily()){
       const it = dayData.faithfulFew[el.dataset.cat]?.items?.find(x=>x.id===el.dataset.id);
       if(it){ it.done = el.checked; renderFFLists(); updateScore(); markDirty(); }
@@ -1579,6 +2057,41 @@ function bindEvents(){
     }
   });
   app.addEventListener('click', e=>{
+    if(e.target.id === 'awakeBtn' && isDaily() && dayData?._mode === 'weekend' && !isReadOnlyView()){
+      if(!dayData.weekend.awakeAt){
+        dayData.weekend.awakeAt = Date.now();
+        updateWeekendTimers(); markDirty();
+      }
+      return;
+    }
+    const z2 = e.target.closest('[data-zone2]');
+    if(z2 && isDaily() && dayData?._mode === 'weekend' && !isReadOnlyView()){
+      dayData.weekend.zone2.choice = z2.dataset.zone2;
+      document.querySelectorAll('[data-zone2]').forEach(b=> b.classList.toggle('on', b.dataset.zone2 === z2.dataset.zone2));
+      markDirty(); return;
+    }
+    const pick = e.target.closest('[data-wk-pick]');
+    if(pick && isDaily() && dayData?._mode === 'weekend' && !isReadOnlyView()){
+      const label = pick.dataset.wkPick;
+      const arr = dayData.weekend.restorative || [];
+      const i = arr.indexOf(label);
+      if(i >= 0) arr.splice(i, 1); else arr.push(label);
+      dayData.weekend.restorative = arr;
+      if(!dayData.weekend.loosePlan.includes(label)) dayData.weekend.loosePlan.push(label);
+      pick.classList.toggle('on', i < 0);
+      renderLoosePlan(); markDirty(); return;
+    }
+    const looseRm = e.target.closest('[data-wk-loose-rm]');
+    if(looseRm && isDaily() && dayData?._mode === 'weekend' && !isReadOnlyView()){
+      const idx = +looseRm.dataset.wkLooseRm;
+      const removed = dayData.weekend.loosePlan.splice(idx, 1)[0];
+      const ri = dayData.weekend.restorative.indexOf(removed);
+      if(ri >= 0) dayData.weekend.restorative.splice(ri, 1);
+      document.querySelectorAll('[data-wk-pick]').forEach(b=>{
+        if(b.dataset.wkPick === removed) b.classList.remove('on');
+      });
+      renderLoosePlan(); markDirty(); return;
+    }
     if(e.target.closest('#thoughtJournalToggle')){
       const panel = document.getElementById('thoughtJournal');
       if(!panel) return;
@@ -1712,6 +2225,21 @@ function bindEvents(){
     document.getElementById('whyDrawer')?.classList.remove('open');
     document.getElementById('drawerBackdrop')?.classList.remove('open');
   }
+  document.getElementById('weekendModeOverride')?.addEventListener('change', async e=>{
+    if(isReadOnlyView()) return;
+    if(isWeekendNatural()){
+      globals.weekendOverride = e.target.checked ? 'weekday' : 'auto';
+    } else {
+      globals.weekendOverride = e.target.checked ? 'weekend' : 'auto';
+    }
+    markDirty();
+    await loadDaily();
+  });
+  document.getElementById('backToToday')?.addEventListener('click', ()=>{
+    if(dirty) save();
+    dayOffset = 0;
+    loadCurrent();
+  });
   document.getElementById('saveBtn').onclick = ()=>save();
   document.getElementById('linkDiskFolder').onclick = ()=>pickSaveDir();
   document.getElementById('prevP').onclick = ()=>nav(-1);
@@ -1733,6 +2261,7 @@ function bindEvents(){
 }
 
 function nav(dir){
+  if(dir > 0 && dayOffset >= 0) return;
   if(dirty) save();
   if(isJournal()||isDaily()) dayOffset += dir;
   else if(isWeekly()) weekOffset += dir;
@@ -1775,6 +2304,18 @@ function updateViewUI(){
   else if(isWeekly()) document.getElementById('periodLabel').textContent = weekLabelFor(weekOffset);
   else if(isMonthly()) document.getElementById('periodLabel').textContent = monthLabelFor(monthOffset);
   else if(isPrayer()) document.getElementById('periodLabel').textContent = 'Prayer Log';
+  const streakEl = document.getElementById('streakBadge');
+  if(streakEl) streakEl.style.display = (viewMode === 'daily' && !isReadOnlyView()) ? '' : 'none';
+  const nextBtn = document.getElementById('nextP');
+  if(nextBtn && (isDaily() || isJournal())) nextBtn.disabled = dayOffset >= 0;
+  const modeLbl = document.getElementById('modeOverrideLabel');
+  const modeCb = document.getElementById('weekendModeOverride');
+  const modeWrap = document.getElementById('modeOverrideWrap');
+  if(isDaily() && modeLbl && modeCb){
+    modeWrap?.classList.remove('hidden');
+    modeLbl.textContent = isWeekendNatural() ? 'Use weekday planner' : 'Use weekend recovery';
+    modeCb.checked = isWeekendNatural() ? globals.weekendOverride === 'weekday' : globals.weekendOverride === 'weekend';
+  } else if(modeWrap && !isDaily()) modeWrap.classList.add('hidden');
 }
 async function loadCurrent(){
   updateViewUI();
@@ -1785,14 +2326,52 @@ async function loadCurrent(){
   else if(isMonthly()) await loadMonthly();
   updateDiskUI((await diskGetDirHandle())?.name||'');
 }
+async function renderDayHistory(){
+  const ul = document.getElementById('dayHistoryList');
+  const panel = document.getElementById('dayHistoryPanel');
+  if(!ul || !panel) return;
+  panel.hidden = viewMode !== 'daily';
+  if(panel.hidden) return;
+  const keys = await listDayKeys();
+  const today = dateStrFor(0);
+  const past = keys.filter(d=> d !== today).reverse().slice(0, 40);
+  ul.innerHTML = past.length ? past.map(d=>{
+    const dt = new Date(d+'T12:00:00');
+    const lbl = dt.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+    const cur = d === dateStrFor(dayOffset);
+    return '<li><button type="button" class="history-nav'+(cur?' on':'')+'" data-hdate="'+d+'">'+lbl+'</button></li>';
+  }).join('') : '<li class="hint">No past days yet — your history builds automatically.</li>';
+  ul.querySelectorAll('[data-hdate]').forEach(b=> b.onclick = ()=>{
+    if(dirty) save();
+    dayOffset = Math.round((new Date(b.dataset.hdate+'T12:00:00') - dayOf(0)) / 86400000);
+    loadCurrent();
+  });
+}
 async function loadDaily(){
-  if(!document.getElementById('sec-faithfulFew')) renderDaily();
-  dayData = normalizeDaily(await getJSON(dayKeyFor(dayOffset)));
-  populateFields(document.getElementById('dailyMain'), dayData);
-  populateFields(document.getElementById('drawerGrowthTree'), dayData);
-  populateVirtues(); populateRatings(); renderFFLists(); renderQuickCaptureList(); updateDangerReminder();
-  applyDailyPhase();
+  const wantWeekend = shouldShowWeekendMode();
+  const ds = dateStrFor(dayOffset);
+  const raw = await loadDay(ds);
+  if(!raw) dayData = wantWeekend ? blankWeekend() : blankDaily();
+  else if(raw._mode === 'weekend') dayData = normalizeWeekend(raw);
+  else if(wantWeekend && globals.weekendOverride !== 'weekday') dayData = normalizeWeekend(null);
+  else dayData = normalizeDaily(raw);
+
+  const isWeekendView = dayData._mode === 'weekend';
+  if(isWeekendView){
+    ensureDailyLayout('weekend');
+    populateWeekendUI();
+  } else {
+    ensureDailyLayout('weekday');
+    if(!document.getElementById('sec-faithfulFew')) renderDaily();
+    populateFields(document.getElementById('dailyMain'), dayData);
+    populateFields(document.getElementById('drawerGrowthTree'), dayData);
+    populateVirtues(); populateRatings(); renderFFLists(); renderQuickCaptureList(); updateDangerReminder();
+    applyDailyPhase();
+  }
+  applyReadOnlyMode();
   updateScore();
+  await updateStreakDisplay();
+  await renderDayHistory();
 }
 async function loadWeekly(){
   weekData = normalizeWeekly(await getJSON(weekKeyFor(weekOffset)));
@@ -1835,8 +2414,9 @@ async function renderJournalList(){
 function clearCurrent(){
   const labels = {daily:'this day',weekly:'this week',monthly:'this month'};
   if(isJournal()) return;
+  if(isReadOnlyView()) return;
   if(!confirm('Clear everything for '+labels[viewMode]+'?')) return;
-  if(isDaily()) dayData = blankDaily();
+  if(isDaily()) dayData = blankDayForOffset(dayOffset);
   else if(isWeekly()) weekData = blankWeekly();
   else if(isMonthly()) monthData = blankMonth();
   loadCurrent(); markDirty();
@@ -1879,7 +2459,7 @@ async function resetAll(){
   const vm = await window.storage.get('view-mode');
   if(vm?.value && ['daily','weekly','monthly','journal','prayer'].includes(vm.value)) viewMode = vm.value;
   const g = await getJSON('fs-globals');
-  if(g) globals = {...globals,...g};
+  if(g) globals = {...globals,...g, weekendOverride: g.weekendOverride || 'auto'};
   ensureMotives();
   ensurePrayers();
   document.getElementById('researchNotes').value = globals.researchNotes||'';
