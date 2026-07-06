@@ -23,7 +23,10 @@
     if(mode && mode.startsWith('mentorship-')) return { type:'mentor', mentorId: mode.slice('mentorship-'.length) };
     return null;
   }
-  function isMentorshipMode(mode){ return !!(mode || viewMode).toString().startsWith('mentorship'); }
+  function isMentorshipMode(mode){
+    const m = mode || (typeof viewMode !== 'undefined' ? viewMode : '');
+    return String(m).startsWith('mentorship');
+  }
 
   function renderMentorshipNav(){
     const sub = document.getElementById('navMentorshipSub');
@@ -35,9 +38,6 @@
       html += '<button type="button" data-nav="mentorship-'+m.id+'"><span class="nav-icon" aria-hidden="true">✦</span><span>'+esc(m.label)+'</span></button>';
     });
     sub.innerHTML = html;
-    sub.querySelectorAll('[data-nav]').forEach(btn=>{
-      btn.addEventListener('click', ()=> setMode(btn.dataset.nav));
-    });
     updateSidebarNav?.();
   }
 
@@ -365,13 +365,6 @@
     if(document.body.dataset.msBound) return;
     document.body.dataset.msBound = '1';
     wrapCompleteTask();
-
-    document.getElementById('navMentorshipToggle')?.addEventListener('click', ()=>{
-      const sub = document.getElementById('navMentorshipSub');
-      const btn = document.getElementById('navMentorshipToggle');
-      const open = sub?.classList.toggle('open');
-      if(btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-    });
 
     document.getElementById('mentorAddBtn')?.addEventListener('click', async ()=>{
       if(!faithStore) return;

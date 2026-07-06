@@ -1187,11 +1187,11 @@ body.faithfulness-app #dailyBoard .ff-progress{color:var(--gold)}
       </div>
     </div>
     <div class="nav-group">
-      <button type="button" class="nav-item nav-accordion" id="navMentorshipToggle" aria-expanded="false">
+      <button type="button" class="nav-item nav-accordion" id="navMentorshipToggle" aria-expanded="true">
         <span class="nav-item-inner"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M12 3l2.5 7.5H22l-6 4.5 2.5 7.5L12 18l-6.5 4.5 2.5-7.5-6-4.5h7.5z"/></svg></span><span class="nav-label">Mentorship</span></span>
         <span class="chev">›</span>
       </button>
-      <div class="nav-sub" id="navMentorshipSub">
+      <div class="nav-sub open" id="navMentorshipSub">
         <button type="button" data-nav="mentorship-threads"><span class="nav-icon" aria-hidden="true">◎</span><span>Threads</span></button>
       </div>
     </div>
@@ -4280,14 +4280,28 @@ function bindEvents(){
   document.getElementById('modeJournal').onclick = ()=>setMode('journal');
   document.getElementById('modeIdeas').onclick = ()=>setMode('ideas');
   document.getElementById('modePrayer').onclick = ()=>setMode('prayer');
-  document.querySelectorAll('.sidebar-nav [data-nav]').forEach(btn=>{
-    btn.addEventListener('click', ()=> setMode(btn.dataset.nav));
-  });
-  document.getElementById('navRhythmsToggle')?.addEventListener('click', ()=>{
-    const sub = document.getElementById('navRhythmsSub');
-    const btn = document.getElementById('navRhythmsToggle');
-    const open = sub?.classList.toggle('open');
-    if(btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  document.querySelector('.sidebar-nav')?.addEventListener('click', e=>{
+    const navBtn = e.target.closest('[data-nav]');
+    if(navBtn && navBtn.closest('.sidebar-nav')){
+      setMode(navBtn.dataset.nav);
+      return;
+    }
+    if(e.target.closest('#navRhythmsToggle')){
+      const sub = document.getElementById('navRhythmsSub');
+      const btn = document.getElementById('navRhythmsToggle');
+      const open = sub?.classList.toggle('open');
+      if(btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      return;
+    }
+    if(e.target.closest('#navMentorshipToggle')){
+      const sub = document.getElementById('navMentorshipSub');
+      const btn = document.getElementById('navMentorshipToggle');
+      const willOpen = !sub?.classList.contains('open');
+      sub?.classList.toggle('open');
+      if(btn) btn.setAttribute('aria-expanded', sub?.classList.contains('open') ? 'true' : 'false');
+      if(willOpen || !isMentorship()) setMode('mentorship-threads');
+      return;
+    }
   });
   document.getElementById('clearPeriod').onclick = clearCurrent;
   document.getElementById('clearJournal').onclick = clearJournalEntry;
@@ -4336,11 +4350,14 @@ function openTagView(tag){
 }
 function updateSidebarNav(){
   document.querySelectorAll('.sidebar-nav [data-nav]').forEach(btn=>{
-    const nav = btn.dataset.nav;
+    const nav = btn.dataset.nav || '';
     let on = viewMode===nav || (nav==='calendar' && isCalendar());
     if(nav.startsWith('mentorship-')) on = viewMode === nav;
     btn.classList.toggle('on', on);
   });
+  const msOpen = isMentorship();
+  document.getElementById('navMentorshipSub')?.classList.toggle('open', msOpen);
+  document.getElementById('navMentorshipToggle')?.setAttribute('aria-expanded', msOpen ? 'true' : 'false');
 }
 function updateViewUI(){
   ['daily','weekly','monthly','journal','ideas','prayer'].forEach(m=>{
@@ -4398,10 +4415,6 @@ function updateViewUI(){
   else if(isMentorship()) document.getElementById('periodLabel').textContent = 'Mentorship';
   const foot = document.querySelector('.site-foot');
   if(foot) foot.style.display = (isIdeas()||isPrayer()||isDashboard()||isCalendar()||isTag()||isMentorship()) ? 'none' : '';
-  if(isMentorship()){
-    document.getElementById('navMentorshipSub')?.classList.add('open');
-    document.getElementById('navMentorshipToggle')?.setAttribute('aria-expanded','true');
-  }
   if(isIdeas() && typeof loadIdeasHub === 'function'){
     requestAnimationFrame(function(){ loadIdeasHub(); });
   }
