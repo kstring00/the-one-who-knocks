@@ -70,6 +70,18 @@
     return '<span class="ih-badge ih-badge-'+status+'">'+STATUS_LABELS[status]+'</span>';
   }
 
+  function stageSubtitle(st, n){
+    const num = n || 0;
+    switch(st){
+      case 'captured': return num+' raw thought'+(num===1?'':'s');
+      case 'clarified': return num+' taking shape';
+      case 'planned': return num+' blueprint ready';
+      case 'in_progress': return num+' in motion';
+      case 'completed': return num+' brought to life';
+      default: return '';
+    }
+  }
+
   function renderPipeline(){
     const el = document.getElementById('ihPipeline');
     if(!el) return;
@@ -77,29 +89,29 @@
     const stages = ['captured','clarified','planned','in_progress','completed'];
     el.innerHTML = stages.map((st,i)=>{
       const n = c[st]||0;
-      const sub = n+' '+plural(n, STATUS_SUBS[st])+(n!==1 && st!=='in_progress' && st!=='completed' ? 's' : st==='in_progress'||st==='completed' ? '' : '');
-      return (i ? '<div class="ih-pipe-arrow" aria-hidden="true">›</div>' : '')+
+      return (i ? '<div class="ih-pipe-arrow" aria-hidden="true"><span class="ih-pipe-dots"></span><span class="ih-pipe-chev">›</span></div>' : '')+
         '<button type="button" class="ih-pipe-stage'+(hub.tab===st?' on':'')+'" data-ih-pipe="'+st+'">'+
         '<span class="ih-pipe-icon">'+STATUS_ICONS[st]+'</span>'+
         '<span class="ih-pipe-count">'+n+'</span>'+
         '<span class="ih-pipe-label">'+STATUS_LABELS[st]+'</span>'+
-        '<span class="ih-pipe-sub">'+sub+'</span></button>';
+        '<span class="ih-pipe-sub">'+stageSubtitle(st,n)+'</span></button>';
     }).join('');
   }
 
   function renderInbox(){
     return '<div class="ih-card ih-inbox">'+
-      '<h3 class="ih-card-label">INBOX</h3>'+
+      '<h3 class="ih-card-title ih-inbox-title">Inbox</h3>'+
+      '<p class="ih-card-hint ih-inbox-hint">Capture ideas anywhere</p>'+
       '<textarea id="ihInboxText" class="ih-inbox-text" rows="4" placeholder="What\'s on your mind?"></textarea>'+
       '<div class="ih-inbox-tools">'+
-      '<button type="button" class="ih-icon-btn" id="ihVoiceBtn" title="Voice note">🎤</button>'+
-      '<button type="button" class="ih-icon-btn" id="ihCameraBtn" title="Photo">📷</button>'+
-      '<button type="button" class="ih-icon-btn" id="ihLinkBtn" title="Link">🔗</button>'+
-      '<button type="button" class="ih-icon-btn" id="ihAttachBtn" title="Attachment">📎</button>'+
+      '<button type="button" class="ih-icon-btn" id="ihVoiceBtn" title="Voice note"><span class="ih-ico">🎤</span></button>'+
+      '<button type="button" class="ih-icon-btn" id="ihCameraBtn" title="Photo"><span class="ih-ico">📷</span></button>'+
+      '<button type="button" class="ih-icon-btn" id="ihLinkBtn" title="Link"><span class="ih-ico">🔗</span></button>'+
+      '<button type="button" class="ih-icon-btn" id="ihAttachBtn" title="Attachment"><span class="ih-ico">📎</span></button>'+
       '<input type="file" id="ihCameraInput" accept="image/*" capture="environment" hidden>'+
       '<input type="file" id="ihAttachInput" hidden>'+
       '</div>'+
-      '<div class="ih-inbox-foot"><button type="button" class="ih-btn-gold" id="ihCaptureBtn">+ Capture</button></div>'+
+      '<div class="ih-inbox-foot"><button type="button" class="ih-btn-capture" id="ihCaptureBtn">+ Capture</button></div>'+
       '</div>';
   }
 
@@ -107,28 +119,29 @@
     return '<div class="ih-card ih-quick">'+
       '<h3 class="ih-card-title">Quick Capture</h3>'+
       '<div class="ih-quick-grid">'+
-      '<button type="button" class="ih-quick-btn" id="ihQuickVoice"><span>🎤</span>Voice Note</button>'+
-      '<button type="button" class="ih-quick-btn" id="ihQuickCamera"><span>📷</span>Camera Capture</button>'+
-      '<button type="button" class="ih-quick-btn" id="ihQuickNote"><span>✎</span>Quick Note</button>'+
+      '<button type="button" class="ih-quick-btn" id="ihQuickVoice"><span class="ih-quick-ico">🎤</span><strong>Voice Note</strong><em>Tap to record</em></button>'+
+      '<button type="button" class="ih-quick-btn" id="ihQuickCamera"><span class="ih-quick-ico">📷</span><strong>Camera Capture</strong><em>Take a photo</em></button>'+
+      '<button type="button" class="ih-quick-btn" id="ihQuickNote"><span class="ih-quick-ico">✎</span><strong>Quick Note</strong><em>Jot it down</em></button>'+
       '</div></div>';
   }
 
   function renderSparkBoard(){
     const notes = IdeasStore.getIdeas().filter(i=> i.status==='captured').slice(0,6);
-    const boardH = 140;
+    const boardH = 168;
     const html = notes.map((idea,idx)=>{
-      const x = idea.position?.x ?? (12 + (idx%3)*88);
-      const y = idea.position?.y ?? (12 + Math.floor(idx/3)*52);
+      const x = idea.position?.x ?? (14 + (idx%3)*94);
+      const y = idea.position?.y ?? (14 + Math.floor(idx/3)*58);
       const color = STICKY_COLORS[idx % STICKY_COLORS.length];
-      const text = (idea.title||idea.description||'Note').slice(0,40);
-      return '<div class="ih-sticky" data-ih-sticky="'+idea.id+'" style="left:'+x+'px;top:'+y+'px;background:'+color+'" draggable="false">'+
+      const rot = [-2, 1, -1, 2, 0, -3][idx % 6];
+      const text = (idea.title||idea.description||'Note').slice(0,48);
+      return '<div class="ih-sticky" data-ih-sticky="'+idea.id+'" style="left:'+x+'px;top:'+y+'px;background:'+color+';transform:rotate('+rot+'deg)">'+
         esc(text)+'</div>';
     }).join('');
     return '<div class="ih-card ih-spark">'+
       '<h3 class="ih-card-title">Spark Board</h3>'+
       '<p class="ih-card-hint">A free-thinking space</p>'+
       '<div class="ih-spark-board" id="ihSparkBoard" style="min-height:'+boardH+'px">'+html+'</div>'+
-      '<button type="button" class="ih-btn-ghost" id="ihAddSticky">+ Add note</button></div>';
+      '<button type="button" class="ih-btn-ghost ih-add-sticky" id="ihAddSticky">+ Add note</button></div>';
   }
 
   function renderVault(){
@@ -137,6 +150,7 @@
     const list = ideas.length ? ideas.map(ideaRow).join('') :
       '<div class="ih-empty">No ideas here yet. Capture something from the inbox.</div>';
     return '<div class="ih-card ih-vault">'+
+      '<h3 class="ih-card-title ih-vault-title">Ideas Vault</h3>'+
       '<div class="ih-vault-head">'+
       '<div class="ih-tabs">'+tabs.map(t=>
         '<button type="button" class="ih-tab'+(hub.tab===t.id?' on':'')+'" data-ih-tab="'+t.id+'">'+t.label+'</button>'
@@ -150,13 +164,14 @@
 
   function ideaRow(idea){
     const meta = STATUS_LABELS[idea.status]+' · '+formatIdeaDate(idea.createdAt)+' · '+formatIdeaTime(idea.createdAt);
+    const desc = (idea.description||'').trim();
+    const showDesc = desc && desc !== idea.title;
     return '<article class="ih-idea-row" data-ih-idea="'+idea.id+'">'+
       '<div class="ih-idea-main">'+
-      '<h4 class="ih-idea-title">'+esc(idea.title||'Untitled')+'</h4>'+
-      '<p class="ih-idea-desc">'+esc((idea.description||'').slice(0,120))+'</p>'+
+      '<div class="ih-idea-top"><h4 class="ih-idea-title">'+esc(idea.title||'Untitled')+'</h4>'+statusBadge(idea.status)+'</div>'+
+      (showDesc ? '<p class="ih-idea-desc">'+esc(desc.slice(0,140))+'</p>' : '')+
       '<span class="ih-idea-meta">'+meta+'</span></div>'+
       '<div class="ih-idea-actions">'+
-      statusBadge(idea.status)+
       '<button type="button" class="ih-star'+(idea.favorite?' on':'')+'" data-ih-fav="'+idea.id+'" aria-label="Favorite">'+(idea.favorite?'★':'☆')+'</button>'+
       '<details class="ih-more"><summary>⋯</summary>'+
       '<button type="button" data-ih-open="'+idea.id+'">Open workspace</button>'+
@@ -693,6 +708,7 @@
         closeWorkspace();
       }
     });
+    const saveBtn = document.getElementById('saveBtn');
     if(saveBtn && !saveBtn.dataset.ihSave){
       saveBtn.dataset.ihSave = '1';
       saveBtn.addEventListener('click', ()=>{
@@ -706,11 +722,28 @@
   }
 
   function loadIdeasHub(){
-    IdeasStore.init(typeof root.globals !== 'undefined' ? (root.globals.ideasHub || root.globals.ideas) : []);
-    syncGlobalsIdeas();
-    renderHub();
-    bindHubEvents();
-    bindSparkDrag();
+    const panel = document.getElementById('ideasPanel');
+    const showError = (msg)=>{
+      if(!panel) return;
+      const grid = panel.querySelector('.ih-grid');
+      if(grid){
+        grid.innerHTML = '<div class="ih-load-error" style="grid-column:1/-1"><p>'+esc(msg)+'</p><button type="button" class="ih-btn-gold" onclick="location.reload()">Reload page</button></div>';
+      }
+    };
+    try{
+      if(typeof IdeasStore === 'undefined'){
+        showError('Ideas Hub scripts failed to load. Hard-refresh (Cmd+Shift+R) or check that ideas-store.js and ideas-ui.js are present.');
+        return;
+      }
+      IdeasStore.init(typeof root.globals !== 'undefined' ? (root.globals.ideasHub || root.globals.ideas) : []);
+      syncGlobalsIdeas();
+      renderHub();
+      bindHubEvents();
+      bindSparkDrag();
+    }catch(e){
+      console.error('[Ideas Hub] load failed', e);
+      showError('Ideas Hub could not start: '+(e.message||'unknown error')+'. Try clearing site data or hard-refresh.');
+    }
   }
 
   root.loadIdeasHub = loadIdeasHub;

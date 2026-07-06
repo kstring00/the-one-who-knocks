@@ -88,14 +88,44 @@
   function loadRaw(){
     try{
       const v = localStorage.getItem(STORAGE_KEY);
-      if(v) return JSON.parse(v);
-    }catch(e){}
+      if(!v) return null;
+      const parsed = JSON.parse(v);
+      if(Array.isArray(parsed)) return parsed;
+      if(parsed && Array.isArray(parsed.ideas)) return parsed.ideas;
+    }catch(e){
+      console.warn('[IdeasStore] load failed, resetting', e);
+      try{ localStorage.removeItem(STORAGE_KEY); }catch(_){}
+    }
     return null;
   }
 
+  function stripHeavyAttachments(ideas){
+    return ideas.map(idea=>{
+      if(!Array.isArray(idea.attachments) || !idea.attachments.length) return idea;
+      const attachments = idea.attachments.map(a=>{
+        if(!a.url || a.url.length < 2000) return a;
+        const key = 'fs:ideas-attach:'+idea.id+':'+(a.name||'file');
+        try{ localStorage.setItem(key, a.url); }catch(e){
+          return { ...a, url:'', name:(a.name||'file')+' (stored locally)' };
+        }
+        return { type:a.type, url:'local:'+key, name:a.name||'attachment' };
+      });
+      return { ...idea, attachments };
+    });
+  }
+
   function saveRaw(ideas){
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(ideas));
-    touchActivityDay(isoLocal(new Date()));
+    try{
+      const slim = stripHeavyAttachments(ideas);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(slim));
+      touchActivityDay(isoLocal(new Date()));
+    }catch(e){
+      console.warn('[IdeasStore] save failed', e);
+      try{
+        const slim = ideas.map(i=>({ ...i, attachments:[] }));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(slim));
+      }catch(e2){ console.error('[IdeasStore] save fallback failed', e2); }
+    }
   }
 
   function isoLocal(d){
@@ -119,12 +149,19 @@
 
     init(legacyGlobalsIdeas){
       if(this._ideas) return this._ideas;
-      let ideas = loadRaw();
-      if(!ideas?.length && legacyGlobalsIdeas?.length){
-        ideas = legacyGlobalsIdeas.map(migrateLegacyIdea);
-        saveRaw(ideas);
+      try{
+        let ideas = loadRaw();
+        const legacy = Array.isArray(legacyGlobalsIdeas) ? legacyGlobalsIdeas : [];
+        if((!ideas || !ideas.length) && legacy.length){
+          ideas = legacy.map(migrateLegacyIdea);
+          saveRaw(ideas);
+        }
+        if(!Array.isArray(ideas)) ideas = [];
+        this._ideas = ideas.map(normalizeIdea);
+      }catch(e){
+        console.error('[IdeasStore] init error', e);
+        this._ideas = [];
       }
-      this._ideas = (ideas || []).map(normalizeIdea);
       return this._ideas;
     },
 
@@ -266,11 +303,11 @@
       const out = [];
       const d = new Date();
       d.setHours(12,0,0,0);
-      const dow = d.getDay();
-      const monOffset = (dow + 6) % 7;
-      d.setDate(d.getDate() - monOffset);
+      d.setDate(d.getDate() - 6);
+      const labels = ['S','M','T','W','T','F','S'];
       for(let i = 0; i < 7; i++){
-        out.push({ label: ['M','T','W','T','F','S','S'][i], date: isoLocal(d), active: days.has(isoLocal(d)) });
+        const dow = d.getDay();
+        out.push({ label: labels[dow], date: isoLocal(d), active: days.has(isoLocal(d)) });
         d.setDate(d.getDate() + 1);
       }
       return out;
