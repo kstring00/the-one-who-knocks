@@ -10,19 +10,26 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 :root{
-  --navy:#1B2A4A; --green:#2D5A3D; --gold:#B8954A;
-  --cream:#F7F3EA; --cream-raised:#FDFBF6; --ink:var(--navy);
+  --bg-deep:#0d0f12; --bg-card:#151922; --bg-card-hover:#1a1f2a;
+  --border-subtle:rgba(255,255,255,.06); --text-primary:#e8e4dc; --text-muted:#8b919a;
+  --gold:#c9a045; --gold-dim:rgba(201,160,69,.15); --green:#4ade80;
+  --navy:var(--text-primary); --green-old:#2D5A3D;
+  --cream:var(--bg-deep); --cream-raised:var(--bg-card); --ink:var(--text-primary);
+  --mist:var(--text-muted); --line:var(--border-subtle); --line-soft:var(--border-subtle);
+  --card:var(--bg-card); --paper:var(--bg-deep);
+  --green-bg:rgba(74,222,128,.12); --gold-bg:var(--gold-dim);
+  --danger:#f87171; --danger-bg:rgba(248,113,113,.1);
+  --scroll-track:var(--bg-deep); --scroll-thumb:#3a4050;
+}
+html.light{
+  --bg-deep:#F7F3EA; --bg-card:#FDFBF6; --bg-card-hover:#fff;
+  --border-subtle:#D4CFC0; --text-primary:#1B2A4A; --text-muted:#6B7280;
+  --gold:#B8954A; --gold-dim:rgba(184,149,74,.12); --green:#2D5A3D;
+  --navy:#1B2A4A; --cream:#F7F3EA; --cream-raised:#FDFBF6; --ink:var(--navy);
   --mist:#6B7280; --line:#D4CFC0; --line-soft:#E8E3D8;
   --card:var(--cream-raised); --paper:var(--cream);
-  --green-bg:rgba(45,90,61,.1); --gold-bg:rgba(184,149,74,.12);
-  --danger:#8B3A3A; --danger-bg:rgba(139,58,58,.08);
+  --green-bg:rgba(45,90,61,.1); --danger:#8B3A3A; --danger-bg:rgba(139,58,58,.08);
   --scroll-track:var(--cream); --scroll-thumb:#A39E93;
-}
-html.dark{
-  --cream:#141820; --cream-raised:#1C2230; --ink:#E8E4DC; --navy:#C8D0E0;
-  --mist:#9CA3AF; --line:#3A4050; --line-soft:#2A3040; --card:var(--cream-raised);
-  --paper:var(--cream); --green-bg:rgba(45,90,61,.25); --gold-bg:rgba(184,149,74,.15);
-  --scroll-track:#141820; --scroll-thumb:#5A6070;
 }
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--paper);color:var(--ink);
@@ -485,8 +492,8 @@ body.view-prayer .site-foot,body.view-journal .site-foot{display:none}
 .cal-slot-block h4{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mist);margin:0 0 6px}
 .cal-slot-item{font-size:12px;padding:6px 8px;border-radius:6px;background:var(--paper);margin-bottom:4px;display:flex;align-items:flex-start;gap:6px}
 .cal-slot-item input{accent-color:var(--green);margin-top:2px;flex:none}
-.idea-toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--navy);color:var(--cream-raised);
-  padding:10px 18px;border-radius:999px;font-size:13px;z-index:100;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+.idea-toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--bg-card);color:var(--text-primary);
+  padding:10px 18px;border-radius:999px;font-size:13px;z-index:100;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;border:1px solid var(--border-subtle)}
 .idea-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .idea-triage-item{border:1px dashed var(--gold);border-radius:10px;padding:12px 14px;margin-bottom:10px;background:var(--gold-bg)}
 .guard-msg{padding:10px;border-left:2px solid var(--gold);background:var(--gold-bg);font-size:11px;line-height:1.5;color:var(--navy);
@@ -521,32 +528,176 @@ body.view-ideas .site-foot{display:none}
   font-size:12px;line-height:1.5;padding:8px 10px;border:1px solid var(--line-soft);border-radius:8px;
   background:var(--paper);font-family:inherit}
 .thought-journal-meta{font-size:10px;color:var(--mist);text-align:right}
+
+/* ── Phase 2: App shell + dashboard ── */
+body.faithfulness-app{background:var(--bg-deep);color:var(--text-primary);min-height:100vh}
+.app-shell{display:flex;min-height:100vh}
+.app-sidebar{width:220px;flex:none;background:rgba(13,15,18,.98);border-right:1px solid var(--border-subtle);
+  display:flex;flex-direction:column;padding:20px 12px;position:sticky;top:0;height:100vh;z-index:50;
+  transition:transform .25s ease,width .25s ease}
+.sidebar-brand{display:flex;align-items:center;gap:10px;padding:4px 8px 20px;border-bottom:1px solid var(--border-subtle);margin-bottom:12px}
+.brand-icon{width:36px;height:36px;border-radius:10px;background:var(--gold-dim);border:1px solid rgba(201,160,69,.35);
+  display:grid;place-items:center;color:var(--gold);font-size:16px}
+.brand-text{font-size:17px;font-weight:600;color:var(--text-primary);line-height:1.2}
+.sidebar-nav{flex:1;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+.nav-item{display:flex;align-items:center;justify-content:space-between;width:100%;border:none;background:transparent;
+  color:var(--text-muted);padding:10px 12px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;
+  font-family:inherit;text-align:left;transition:background .15s,color .15s,border-color .15s;border:1px solid transparent}
+.nav-item:hover{background:var(--bg-card-hover);color:var(--text-primary)}
+.nav-item.on{background:var(--gold-dim);color:var(--gold);border-color:rgba(201,160,69,.25)}
+.nav-sub{display:none;flex-direction:column;gap:2px;padding-left:8px;margin-bottom:4px}
+.nav-sub.open{display:flex}
+.nav-sub button{border:none;background:transparent;color:var(--text-muted);padding:7px 12px 7px 20px;
+  border-radius:6px;font-size:12px;cursor:pointer;text-align:left;font-family:inherit;transition:color .15s,background .15s}
+.nav-sub button:hover,.nav-sub button.on{color:var(--gold);background:var(--gold-dim)}
+.nav-accordion .chev{transition:transform .2s;font-size:14px;opacity:.6}
+.nav-accordion[aria-expanded="true"] .chev{transform:rotate(90deg)}
+.sidebar-verse{margin-top:auto;border-radius:12px;overflow:hidden;border:1px solid var(--border-subtle);position:relative;min-height:88px}
+.verse-img{position:absolute;inset:0;background:linear-gradient(180deg,rgba(13,15,18,.2),rgba(13,15,18,.92)),
+  url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 80"><path fill="%23151922" d="M0 50 Q50 20 100 45 T200 35 V80 H0Z"/></svg>') center/cover}
+.verse-text{position:relative;padding:12px;font-size:11px;line-height:1.45;color:var(--text-muted);font-style:italic}
+.app-main{flex:1;min-width:0;display:flex;flex-direction:column}
+.app-topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 24px;
+  border-bottom:1px solid var(--border-subtle);background:rgba(13,15,18,.85);backdrop-filter:blur(8px);
+  position:sticky;top:0;z-index:40;flex-wrap:wrap}
+.topbar-left,.topbar-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.btn-ghost{border:1px solid var(--border-subtle);background:transparent;color:var(--text-muted);
+  padding:6px 12px;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit}
+.btn-ghost:hover{color:var(--text-primary);border-color:rgba(201,160,69,.3)}
+.btn-gold{border:none;background:var(--gold);color:#0d0f12;padding:8px 16px;border-radius:8px;
+  font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:filter .15s}
+.btn-gold:hover{filter:brightness(1.08)}
+.btn-focus{border:1px solid var(--border-subtle);background:var(--bg-card);color:var(--text-muted);
+  padding:7px 12px;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px}
+.btn-focus:hover{color:var(--gold);border-color:rgba(201,160,69,.3)}
+.app-content{padding:20px 24px 40px;flex:1}
+.legacy-header{display:none!important}
+.view-toggle{display:none!important}
+body.faithfulness-app .auth-card{max-width:none;margin:0 24px 12px;background:var(--bg-card);border-color:var(--border-subtle)}
+body.faithfulness-app .board{background:transparent}
+body.faithfulness-app .page-head h2,.page-head h2{color:var(--text-primary)}
+body.faithfulness-app .card,body.faithfulness-app .panel-card{background:var(--bg-card);border-color:var(--border-subtle);color:var(--text-primary)}
+body.faithfulness-app input,body.faithfulness-app textarea,body.faithfulness-app select{
+  background:var(--bg-card-hover);border-color:var(--border-subtle);color:var(--text-primary)}
+body.faithfulness-app .site-foot{border-color:var(--border-subtle)}
+body.faithfulness-app .score{background:var(--bg-card);color:var(--gold);border-color:var(--border-subtle)}
+body.faithfulness-app #saveBtn{background:var(--green-old);border-color:var(--green-old)}
+body.faithfulness-app .navrow button{border-color:var(--border-subtle);color:var(--text-muted)}
+body.faithfulness-app .navrow button:hover{background:var(--gold-dim);color:var(--gold)}
+body.faithfulness-app #periodLabel{color:var(--text-primary);font-weight:500;min-width:220px}
+body.focus-mode .app-sidebar{transform:translateX(-100%);width:0;padding:0;border:none;overflow:hidden}
+body.focus-mode .app-topbar .topbar-right > *:not(#btnFocusMode){display:none}
+body.focus-mode .app-topbar .topbar-left .btn-ghost{display:none}
+#dashboardPanel[hidden]{display:none!important}
+.dash-greeting{margin-bottom:20px}
+.dash-greeting h2{font-family:"Cormorant Garamond",serif;font-size:28px;font-weight:600;margin:0 0 6px;color:var(--text-primary)}
+.dash-greeting p{margin:0;font-size:13px;color:var(--text-muted)}
+.dash-stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:16px}
+.dash-stat-card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:14px;padding:18px 20px}
+.dash-stat-label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:8px}
+.dash-stat-val{font-family:"Cormorant Garamond",serif;font-size:32px;font-weight:600;color:var(--text-primary)}
+.dash-stat-sub{font-size:12px;color:var(--text-muted);margin-top:4px}
+.dash-stat-bar-wrap{height:4px;background:rgba(255,255,255,.06);border-radius:99px;margin-top:12px;overflow:hidden}
+.dash-stat-bar-fill{height:100%;background:var(--gold);border-radius:99px;transition:width .3s ease}
+.dash-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:1100px){.dash-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:720px){.dash-grid{grid-template-columns:1fr}.app-sidebar{position:fixed;left:0;transform:translateX(-100%)}}
+.dash-widget{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;min-height:220px}
+.dash-widget.span2{grid-column:span 2}
+@media(max-width:1100px){.dash-widget.span2{grid-column:span 1}}
+.dash-widget-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.dash-widget-head h3{margin:0;font-family:"Cormorant Garamond",serif;font-size:18px;font-weight:600;color:var(--text-primary)}
+.dash-widget-link{border:none;background:none;padding:0;font-size:12px;color:var(--text-muted);cursor:pointer;font-family:inherit;
+  display:flex;align-items:center;gap:4px;transition:color .15s}
+.dash-widget-link:hover{color:var(--gold)}
+.dash-task{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-subtle);cursor:pointer;font-size:13px}
+.dash-task:last-child{border-bottom:none}
+.dash-task input{accent-color:var(--gold);width:16px;height:16px;flex:none}
+.dash-task.done .dash-task-text{text-decoration:line-through;color:var(--gold);opacity:.85}
+.dash-task.bloom{animation:dashBloom .6s ease}
+@keyframes dashBloom{0%{background:transparent}40%{background:var(--gold-dim)}100%{background:transparent}}
+.dash-task-text{flex:1}
+.dash-dur{font-size:11px;color:var(--text-muted)}
+.dash-tag{font-size:10px;padding:2px 8px;border-radius:99px;background:var(--gold-dim);color:var(--gold);font-weight:600}
+.dash-tag.growth{background:rgba(74,222,128,.12);color:var(--green)}
+.dash-tag.stewardship{background:rgba(147,197,253,.1);color:#93c5fd}
+.dash-add-row{display:flex;gap:8px;margin-top:12px}
+.dash-add-row input{flex:1;font-size:12px;padding:8px 10px;border-radius:8px;border:1px solid var(--border-subtle)}
+.dash-add-row button{border:1px solid rgba(201,160,69,.4);background:transparent;color:var(--gold);
+  padding:8px 12px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit}
+.dash-tl-row{display:flex;gap:12px;padding:6px 0;position:relative}
+.dash-tl-row:not(:last-child)::after{content:"";position:absolute;left:5px;top:22px;bottom:-6px;width:1px;background:rgba(201,160,69,.25)}
+.dash-tl-dot{width:11px;height:11px;border-radius:50%;background:var(--gold);flex:none;margin-top:4px;box-shadow:0 0 0 3px var(--gold-dim)}
+.dash-tl-time{font-size:11px;color:var(--gold);font-weight:600}
+.dash-tl-title{font-size:13px;color:var(--text-primary)}
+.dash-tl-sub{font-size:11px;color:var(--text-muted)}
+.dash-proj-row{margin-bottom:12px}
+.dash-proj-head{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px}
+.dash-proj-bar{height:3px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden}
+.dash-proj-fill{height:100%;background:var(--gold);border-radius:99px;transition:width .3s}
+.dash-journal-text{font-size:13px;line-height:1.55;color:var(--text-muted);flex:1;margin-bottom:14px;font-style:italic}
+.dash-journal-btn{align-self:flex-start;border:none;background:var(--gold-dim);color:var(--gold);padding:8px 14px;
+  border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+.dash-journal-btn:hover{background:rgba(201,160,69,.25)}
+.dash-capture textarea{width:100%;min-height:72px;border-radius:10px;border:1px solid var(--border-subtle);
+  background:var(--bg-card-hover);padding:10px 12px;font-size:13px;resize:vertical;font-family:inherit;color:var(--text-primary)}
+.dash-capture-actions{display:flex;justify-content:flex-end;margin-top:10px}
+.dash-seedbed{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.dash-seed-chip{border:1px solid rgba(201,160,69,.25);background:var(--gold-dim);color:var(--text-primary);
+  padding:6px 12px;border-radius:99px;font-size:12px;cursor:pointer;font-family:inherit;transition:border-color .15s}
+.dash-seed-chip:hover{border-color:var(--gold);color:var(--gold)}
+.dash-empty{font-size:12px;color:var(--text-muted);font-style:italic}
+.dash-note-row{display:flex;align-items:center;gap:8px;font-size:12px;padding:6px 0;border-top:1px solid var(--border-subtle)}
+.dash-note-row span{flex:1;color:var(--text-muted)}
+.dash-note-promote{border:none;background:none;color:var(--gold);font-size:11px;cursor:pointer;font-family:inherit;padding:0}
+#projectsPanel .proj-list{display:flex;flex-direction:column;gap:12px}
+#projectsPanel .proj-card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:14px;padding:16px 18px}
+#projectsPanel .proj-card h4{margin:0 0 8px;font-family:"Cormorant Garamond",serif;font-size:18px}
+body.view-dashboard #authCard{display:none}
+body.view-dashboard .idea-fab{display:none!important}
+.idea-fab[hidden]{display:none!important}
 </style>
 </head>
-<body>
-<div id="app">
-<header class="top">
-  <div class="top-left">
-    <div class="brand">
-      <h1>The Faithfulness System</h1>
-      <div class="tag">Daily · Weekly · Monthly stewardship</div>
+<body class="faithfulness-app">
+<div id="app" class="app-shell">
+<aside class="app-sidebar" aria-label="Main navigation">
+  <div class="sidebar-brand">
+    <div class="brand-icon" aria-hidden="true">✦</div>
+    <div class="brand-text serif">The Faithfulness System</div>
+  </div>
+  <nav class="sidebar-nav">
+    <button type="button" class="nav-item on" data-nav="dashboard">Dashboard</button>
+    <div class="nav-group">
+      <button type="button" class="nav-item nav-accordion" id="navRhythmsToggle" aria-expanded="true">Rhythms <span class="chev">›</span></button>
+      <div class="nav-sub open" id="navRhythmsSub">
+        <button type="button" data-nav="daily">Daily</button>
+        <button type="button" data-nav="weekly">Weekly</button>
+        <button type="button" data-nav="monthly">Monthly</button>
+      </div>
     </div>
-    <div class="scripture-strip serif" id="scriptureBanner">"Whatever you do, do it from the heart, as something done for the Lord." — Colossians 3:23</div>
+    <button type="button" class="nav-item" data-nav="ideas">Ideas</button>
+    <button type="button" class="nav-item" data-nav="journal">Journal</button>
+    <button type="button" class="nav-item" data-nav="prayer">Prayer</button>
+    <button type="button" class="nav-item" data-nav="projects">Projects</button>
+    <button type="button" class="nav-item" data-nav="calendar">Calendar</button>
+    <button type="button" class="nav-item" data-nav="settings">Settings</button>
+  </nav>
+  <div class="sidebar-verse">
+    <div class="verse-img" aria-hidden="true"></div>
+    <div class="verse-text serif">"Whatever you do, do it from the heart, as something done for the Lord." — Colossians 3:23</div>
   </div>
-  <div class="view-toggle" role="tablist">
-    <button type="button" id="modeDaily" role="tab">Daily</button>
-    <button type="button" id="modeWeekly" role="tab">Weekly</button>
-    <button type="button" id="modeMonthly" role="tab">Monthly</button>
-    <button type="button" id="modeJournal" role="tab">Journal</button>
-    <button type="button" id="modeIdeas" role="tab">Ideas</button>
-    <button type="button" id="modePrayer" role="tab">Prayer</button>
+</aside>
+<div class="app-main">
+<header class="app-topbar">
+  <div class="topbar-left">
+    <div class="navrow">
+      <button type="button" id="prevP" aria-label="Previous">&#8592;</button>
+      <span id="periodLabel">Today</span>
+      <button type="button" id="nextP" aria-label="Next">&#8594;</button>
+    </div>
+    <button type="button" class="btn-ghost" id="btnCalJump">Today</button>
   </div>
-  <div class="navrow">
-    <button type="button" id="prevP" aria-label="Previous">&#8592;</button>
-    <span id="periodLabel">Today</span>
-    <button type="button" id="nextP" aria-label="Next">&#8594;</button>
-  </div>
-  <div class="topright">
+  <div class="topbar-right">
     <span class="score" id="score">0/5 · 0%</span>
     <div id="authSignedIn" class="auth-signed-in" hidden>
       <span class="auth-email" id="authEmailDisplay"></span>
@@ -562,6 +713,25 @@ body.view-ideas .site-foot{display:none}
       <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
       <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
     </button>
+    <button type="button" class="btn-focus" id="btnFocusMode">☀ Focus Mode</button>
+    <button type="button" class="btn-gold" id="btnQuickAdd">+ Quick Add</button>
+  </div>
+</header>
+<header class="top legacy-header" hidden aria-hidden="true">
+  <div class="top-left">
+    <div class="brand">
+      <h1>The Faithfulness System</h1>
+      <div class="tag">Daily · Weekly · Monthly stewardship</div>
+    </div>
+    <div class="scripture-strip serif" id="scriptureBanner">"Whatever you do, do it from the heart, as something done for the Lord." — Colossians 3:23</div>
+  </div>
+  <div class="view-toggle" role="tablist">
+    <button type="button" id="modeDaily" role="tab">Daily</button>
+    <button type="button" id="modeWeekly" role="tab">Weekly</button>
+    <button type="button" id="modeMonthly" role="tab">Monthly</button>
+    <button type="button" id="modeJournal" role="tab">Journal</button>
+    <button type="button" id="modeIdeas" role="tab">Ideas</button>
+    <button type="button" id="modePrayer" role="tab">Prayer</button>
   </div>
 </header>
 
@@ -574,6 +744,90 @@ body.view-ideas .site-foot{display:none}
   </div>
   <div class="auth-msg" id="authMsg" aria-live="polite"></div>
 </div>
+
+<div class="app-content">
+
+<section id="dashboardPanel" class="dash-panel" aria-label="Dashboard">
+  <div class="dash-greeting">
+    <h2 class="serif" id="dashGreeting">Good morning, Kevin</h2>
+    <p id="dashSummary">Loading your day…</p>
+  </div>
+  <div class="dash-stat-row">
+    <div class="dash-stat-card">
+      <div class="dash-stat-label">Tasks Completed</div>
+      <div class="dash-stat-val"><span id="dashStatFraction">0 / 0</span></div>
+      <div class="dash-stat-sub"><span id="dashStatPct">0%</span> of today's priorities</div>
+      <div class="dash-stat-bar-wrap"><div class="dash-stat-bar-fill" id="dashStatBar" style="width:0%"></div></div>
+    </div>
+  </div>
+  <div class="dash-grid">
+    <div class="dash-widget span2">
+      <div class="dash-widget-head">
+        <h3>Today's Priorities</h3>
+        <button type="button" class="dash-widget-link" data-dash-link="daily">Open Daily →</button>
+      </div>
+      <div id="dashPriorities"></div>
+      <div class="dash-add-row">
+        <input type="text" id="dashNewTask" placeholder="Add a priority…" aria-label="New priority">
+        <button type="button" id="dashAddTask">+ Add Task</button>
+      </div>
+    </div>
+    <div class="dash-widget">
+      <div class="dash-widget-head">
+        <h3>Schedule</h3>
+        <button type="button" class="dash-widget-link" data-dash-link="calendar">View Calendar →</button>
+      </div>
+      <div id="dashScheduleList"></div>
+    </div>
+    <div class="dash-widget">
+      <div class="dash-widget-head">
+        <h3>Projects</h3>
+        <button type="button" class="dash-widget-link" data-dash-link="projects">All Projects →</button>
+      </div>
+      <div id="dashProjects"></div>
+    </div>
+    <div class="dash-widget">
+      <div class="dash-widget-head">
+        <h3>Journal Prompt</h3>
+        <button type="button" class="dash-widget-link" data-dash-link="journal-prefill">Write in Journal →</button>
+      </div>
+      <p class="dash-journal-text" id="dashJournalPrompt"></p>
+      <button type="button" class="dash-journal-btn" data-dash-link="journal-prefill">Write in Journal →</button>
+    </div>
+    <div class="dash-widget">
+      <div class="dash-widget-head">
+        <h3>Quick Capture</h3>
+      </div>
+      <div class="dash-capture">
+        <textarea id="dashQuickNote" placeholder="Write a thought, idea, or note…" aria-label="Quick note"></textarea>
+        <div class="dash-capture-actions">
+          <button type="button" class="btn-gold" id="dashSaveNote">Save Note</button>
+        </div>
+      </div>
+      <div id="dashNotesInbox"></div>
+    </div>
+    <div class="dash-widget">
+      <div class="dash-widget-head">
+        <h3>Seedbed</h3>
+        <button type="button" class="dash-widget-link" data-dash-link="ideas">Open Ideas →</button>
+      </div>
+      <div class="dash-seedbed" id="dashSeedbed"></div>
+    </div>
+  </div>
+</section>
+
+<section id="projectsPanel" hidden aria-label="Projects">
+  <div class="page-head"><div><h2 class="serif">Projects</h2><p>Faithful work over time — progress from linked tasks.</p></div></div>
+  <div class="proj-list" id="projectsList"></div>
+</section>
+
+<section id="settingsPanel" hidden aria-label="Settings">
+  <div class="page-head"><div><h2 class="serif">Settings</h2><p>Preferences and data.</p></div></div>
+  <div class="settings-card">
+    <p style="margin:0 0 12px;font-size:13px;color:var(--text-muted)">Theme, sync, and reset live in the top bar. More settings coming soon.</p>
+    <button type="button" class="btn-ghost" id="settingsThemeBtn">Toggle light / dark theme</button>
+  </div>
+</section>
 
 <div class="board" id="dailyBoard" data-phase="morning">
   <div class="page-head">
@@ -819,9 +1073,12 @@ body.view-ideas .site-foot{display:none}
   </div>
   <div class="drawer-mission">"Today I will glorify God in the small details. I will be faithful with what is in front of me so I can love God, serve my neighbor, multiply my talents, and build a life that glorifies Him."</div>
 </aside>
-</div>
+</div><!-- /.app-content -->
+</div><!-- /.app-main -->
+</div><!-- /.app-shell -->
 
 <script src="faithfulness-store.js"></script>
+<script src="dashboard-ui.js"></script>
 <script>
 
 if (!window.storage) {
@@ -1531,6 +1788,7 @@ async function moveIdeaSchedule(ideaId,newDate){
 function syncIdeaFromMustDo(mustDoId,done){
   if(faithStore && isDaily()){
     faithStore.syncLegacyMustDoToTask(mustDoId, iso(dayOf(dayOffset)), done, dayData);
+    if(typeof renderDashboard === 'function') renderDashboard();
   }
   ensureIdeas();
   for(const raw of globals.ideas){
@@ -1807,12 +2065,30 @@ function monthLabelFor(off){
   const d = monthOf(off);
   return d.toLocaleDateString('en-US',{month:'long',year:'numeric'});
 }
+function isDashboard(){ return viewMode==='dashboard'; }
 function isDaily(){ return viewMode==='daily'; }
 function isWeekly(){ return viewMode==='weekly'; }
 function isMonthly(){ return viewMode==='monthly'; }
 function isJournal(){ return viewMode==='journal'; }
 function isPrayer(){ return viewMode==='prayer'; }
 function isIdeas(){ return viewMode==='ideas'; }
+function isProjects(){ return viewMode==='projects'; }
+function isSettings(){ return viewMode==='settings'; }
+function dashPeriodLabel(){
+  const d = dayOf(dayOffset);
+  const prefix = dayOffset===0 ? 'Today' : dayLabelFor(dayOffset);
+  return prefix + ' — ' + d.toLocaleDateString('en-US',{weekday:'short', month:'short', day:'numeric', year:'numeric'});
+}
+function renderProjects(){
+  const el = document.getElementById('projectsList');
+  if(!el || !faithStore) return;
+  const projects = faithStore.data.projects || [];
+  el.innerHTML = projects.length ? projects.map(p=>{
+    const pc = faithStore.getProjectPercentComplete(p.id);
+    return '<div class="proj-card"><h4>'+esc(p.title)+'</h4><div class="dash-proj-bar"><div class="dash-proj-fill" style="width:'+pc+'%"></div></div>'+
+      '<div style="font-size:12px;color:var(--text-muted);margin-top:6px">'+pc+'% complete</div></div>';
+  }).join('') : '<p class="dash-empty">No projects yet — link tasks to a project as you work.</p>';
+}
 function currentKey(){
   if(isDaily()) return dayKeyFor(dayOffset);
   if(isWeekly()) return weekKeyFor(weekOffset);
@@ -2027,7 +2303,7 @@ function setNested(obj, path, val){
   cur[parts[parts.length-1]] = val;
 }
 
-let viewMode='daily', dayOffset=0, weekOffset=0, monthOffset=0;
+let viewMode='dashboard', dayOffset=0, weekOffset=0, monthOffset=0;
 let dayData=null, weekData=null, monthData=null, journal={body:'',updated:null};
 let globals={researchNotes:'',motives:null,prayers:[],thoughtJournal:'',ideas:[],myWeek:null};
 let prayerFilter = 'all';
@@ -3144,6 +3420,15 @@ function bindEvents(){
   document.getElementById('modeJournal').onclick = ()=>setMode('journal');
   document.getElementById('modeIdeas').onclick = ()=>setMode('ideas');
   document.getElementById('modePrayer').onclick = ()=>setMode('prayer');
+  document.querySelectorAll('.sidebar-nav [data-nav]').forEach(btn=>{
+    btn.addEventListener('click', ()=> setMode(btn.dataset.nav));
+  });
+  document.getElementById('navRhythmsToggle')?.addEventListener('click', ()=>{
+    const sub = document.getElementById('navRhythmsSub');
+    const btn = document.getElementById('navRhythmsToggle');
+    const open = sub?.classList.toggle('open');
+    if(btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
   document.getElementById('clearPeriod').onclick = clearCurrent;
   document.getElementById('clearJournal').onclick = clearJournalEntry;
   document.getElementById('resetAll').onclick = resetAll;
@@ -3159,22 +3444,35 @@ function bindEvents(){
 function nav(dir){
   if(dirty) save();
   satBlockSessionOverride = null;
-  if(isJournal()||isDaily()) dayOffset += dir;
+  if(isDashboard()||isJournal()||isDaily()) dayOffset += dir;
   else if(isWeekly()) weekOffset += dir;
   else if(isMonthly()) monthOffset += dir;
   loadCurrent();
 }
 async function setMode(mode){
+  if(mode==='calendar'){ viewMode='ideas'; await loadCurrent(); setTimeout(()=> document.getElementById('ideasCalendarSection')?.scrollIntoView({behavior:'smooth'}), 200); return; }
   if(viewMode===mode) return;
   if(dirty) await save();
   viewMode=mode;
   await loadCurrent();
 }
+function updateSidebarNav(){
+  document.querySelectorAll('.sidebar-nav [data-nav]').forEach(btn=>{
+    const nav = btn.dataset.nav;
+    let on = (nav==='calendar' && viewMode==='ideas') || viewMode===nav;
+    btn.classList.toggle('on', on);
+  });
+}
 function updateViewUI(){
   ['daily','weekly','monthly','journal','ideas','prayer'].forEach(m=>{
     document.getElementById('mode'+m.charAt(0).toUpperCase()+m.slice(1))?.classList.toggle('on', viewMode===m);
   });
+  updateSidebarNav();
+  document.getElementById('dashboardPanel').hidden = viewMode!=='dashboard';
+  document.getElementById('projectsPanel').hidden = viewMode!=='projects';
+  document.getElementById('settingsPanel').hidden = viewMode!=='settings';
   document.getElementById('dailyBoard').hidden = viewMode!=='daily';
+  document.body.classList.toggle('view-dashboard', viewMode==='dashboard');
   document.body.classList.toggle('view-daily', viewMode==='daily');
   document.getElementById('weeklyBoard').hidden = viewMode!=='weekly';
   document.getElementById('monthlyBoard').hidden = viewMode!=='monthly';
@@ -3188,8 +3486,11 @@ function updateViewUI(){
   if(fab) fab.hidden = !(isDaily() || isWeekly() || isMonthly());
   const score = document.getElementById('score');
   score.style.display = viewMode==='daily' ? '' : 'none';
-  const nav = document.querySelector('.navrow');
-  if(nav) nav.style.visibility = (isPrayer() ? 'hidden' : 'visible');
+  const nav = document.querySelector('.app-topbar .navrow');
+  const hideNav = isPrayer() || isIdeas() || isProjects() || isSettings();
+  if(nav) nav.style.visibility = hideNav ? 'hidden' : 'visible';
+  const calJump = document.getElementById('btnCalJump');
+  if(calJump) calJump.hidden = !(isDashboard() || isDaily() || isJournal());
   const banner = document.getElementById('scriptureBanner');
   if(banner){
     if(viewMode==='prayer'){
@@ -3202,16 +3503,23 @@ function updateViewUI(){
       banner.textContent = '"Whatever you do, do it from the heart, as something done for the Lord." — Colossians 3:23';
     }
   }
-  if(isJournal()||isDaily()) document.getElementById('periodLabel').textContent = dayLabelFor(dayOffset);
+  if(isDashboard()) document.getElementById('periodLabel').textContent = dashPeriodLabel();
+  else if(isJournal()||isDaily()) document.getElementById('periodLabel').textContent = dayLabelFor(dayOffset);
   else if(isWeekly()) document.getElementById('periodLabel').textContent = weekLabelFor(weekOffset);
   else if(isMonthly()) document.getElementById('periodLabel').textContent = monthLabelFor(monthOffset);
   else if(isIdeas()) document.getElementById('periodLabel').textContent = 'Ideas';
   else if(isPrayer()) document.getElementById('periodLabel').textContent = 'Prayer Log';
+  else if(isProjects()) document.getElementById('periodLabel').textContent = 'Projects';
+  else if(isSettings()) document.getElementById('periodLabel').textContent = 'Settings';
+  const foot = document.querySelector('.site-foot');
+  if(foot) foot.style.display = (isIdeas()||isPrayer()||isDashboard()) ? 'none' : '';
 }
 async function loadCurrent(){
   updateViewUI();
   if(authUser) await syncPullForView();
-  if(isJournal()) await loadJournal();
+  if(isDashboard()) loadDashboard();
+  else if(isProjects()) renderProjects();
+  else if(isJournal()) await loadJournal();
   else if(isPrayer()) loadPrayer();
   else if(isIdeas()) loadIdeas();
   else if(isDaily()) await loadDaily();
@@ -3245,7 +3553,14 @@ async function loadMonthly(){
 }
 async function loadJournal(){
   journal = await getJSON(journalKeyFor(dayOffset)) || {body:'',updated:null};
-  document.getElementById('journalBody').value = journal.body||'';
+  let body = journal.body||'';
+  if(window._journalPromptPrefill){
+    body = window._journalPromptPrefill + (body ? '\n\n'+body : '');
+    window._journalPromptPrefill = null;
+    journal.body = body;
+    markDirty();
+  }
+  document.getElementById('journalBody').value = body;
   document.getElementById('journalDateLabel').textContent = dayLabelFor(dayOffset);
   updateJournalMeta(); renderJournalList();
 }
@@ -3273,7 +3588,7 @@ async function renderJournalList(){
 }
 function clearCurrent(){
   const labels = {daily:'this day',weekly:'this week',monthly:'this month'};
-  if(isJournal() || isPrayer() || isIdeas()) return;
+  if(isJournal() || isPrayer() || isIdeas() || isDashboard() || isProjects() || isSettings()) return;
   if(!confirm('Clear everything for '+labels[viewMode]+'?')) return;
   if(isDaily()) dayData = blankDaily();
   else if(isWeekly()) weekData = blankWeekly();
@@ -3292,7 +3607,7 @@ async function resetAll(){
   clearTimeout(saveTimer);
   await window.storage.clearAll();
   dayData=null; weekData=null; monthData=null; journal={body:'',updated:null};
-  globals={researchNotes:'',motives:null,prayers:[],thoughtJournal:'',ideas:[],myWeek:null}; dayOffset=0; weekOffset=0; monthOffset=0; viewMode='daily'; dirty=false;
+  globals={researchNotes:'',motives:null,prayers:[],thoughtJournal:'',ideas:[],myWeek:null}; dayOffset=0; weekOffset=0; monthOffset=0; viewMode='dashboard'; dirty=false;
   localStorage.removeItem('wsr:thoughtJournalCollapsed');
   await loadCurrent();
   loadThoughtJournal();
@@ -3302,22 +3617,24 @@ async function resetAll(){
   const btn = document.getElementById('themeToggle');
   const sun = btn?.querySelector('.icon-sun');
   const moon = btn?.querySelector('.icon-moon');
-  function applyTheme(dark){
-    document.documentElement.classList.toggle('dark', dark);
-    if(sun) sun.style.display = dark?'none':'block';
-    if(moon) moon.style.display = dark?'block':'none';
-    try{ localStorage.setItem('wsr:theme', dark?'dark':'light'); }catch(e){}
+  function applyTheme(light){
+    document.documentElement.classList.toggle('light', light);
+    document.documentElement.classList.toggle('dark', !light);
+    if(sun) sun.style.display = light?'block':'none';
+    if(moon) moon.style.display = light?'none':'block';
+    try{ localStorage.setItem('wsr:theme', light?'light':'dark'); }catch(e){}
   }
   const stored = localStorage.getItem('wsr:theme');
-  applyTheme(stored==='dark' || (!stored && window.matchMedia('(prefers-color-scheme:dark)').matches));
-  btn?.addEventListener('click', ()=>applyTheme(!document.documentElement.classList.contains('dark')));
+  applyTheme(stored==='light');
+  btn?.addEventListener('click', ()=>applyTheme(!document.documentElement.classList.contains('light')));
+  document.getElementById('settingsThemeBtn')?.addEventListener('click', ()=> btn?.click());
 })();
 
 (async function init(){
   renderDaily(); renderWeekly(); renderMonthly(); bindEvents(); bindFFAccordion();
   await initAuth();
   const vm = await window.storage.get('view-mode');
-  if(vm?.value && ['daily','weekly','monthly','journal','ideas','prayer'].includes(vm.value)) viewMode = vm.value;
+  if(vm?.value && ['dashboard','daily','weekly','monthly','journal','ideas','prayer','projects','settings'].includes(vm.value)) viewMode = vm.value;
   const g = await getJSON('fs-globals');
   if(g) globals = {...globals,...g};
   ensureMotives();
@@ -3332,6 +3649,7 @@ async function resetAll(){
   }
   document.getElementById('researchNotes').value = globals.researchNotes||'';
   simpleMode = localStorage.getItem('wsr:simpleMode')==='1';
+  bindDashboardEvents?.();
   await loadCurrent();
   loadThoughtJournal();
   if(authUser && !dirty) updateSaveState('synced');
