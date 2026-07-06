@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Faithfulness Store — Phase 1 Tests</title>
+<style>
+  body{font:15px/1.5 system-ui,sans-serif;max-width:640px;margin:40px auto;padding:0 20px;background:#0d0f12;color:#e8e4dc}
+  h1{font-family:Georgia,serif;color:#b8954a}
+  .pass{color:#6ecf8a}.fail{color:#e88}
+  li{margin:6px 0}
+</style>
+</head>
+<body>
+<h1>Phase 1 — Data Layer Tests</h1>
+<p id="status">Running…</p>
+<ul id="results"></ul>
+<script src="faithfulness-store.js"></script>
+<script>
+(async function(){
+  const out = await runFaithfulnessStoreTests();
+  document.getElementById('status').innerHTML = out.pass
+    ? '<span class="pass">All tests passed</span>'
+    : '<span class="fail">Tests failed: '+esc(out.error||'')+'</span>';
+  document.getElementById('results').innerHTML = out.results.map(r=>
+    '<li class="'+(r.pass?'pass':'fail')+'">'+(r.pass?'✓':'✗')+' '+r.name+(r.detail?' — '+r.detail:'')+'</li>'
+  ).join('');
+  function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;'})[c]||c); }
+})();
+</script>
+</body>
+</html>

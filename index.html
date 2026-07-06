@@ -821,6 +821,7 @@ body.view-ideas .site-foot{display:none}
 </aside>
 </div>
 
+<script src="faithfulness-store.js"></script>
 <script>
 
 if (!window.storage) {
@@ -869,7 +870,7 @@ function initSupabaseClient(){
 }
 function isSyncableKey(key){
   return key.startsWith('fs-day:') || key.startsWith('journal:') ||
-    key.startsWith('fs-week:') || key.startsWith('fs-month:') || key === 'fs-globals';
+    key.startsWith('fs-week:') || key.startsWith('fs-month:') || key === 'fs-globals' || key === 'fs-core';
 }
 function syncMetaKey(storageKey){ return 'sync-at:'+storageKey; }
 function getLocalSyncAt(storageKey){
@@ -915,6 +916,7 @@ function syncKeysForView(){
   if(isPrayer()) keys.push('fs-globals');
   else keys.push(currentKey());
   if(!keys.includes('fs-globals')) keys.push('fs-globals');
+  if(!keys.includes('fs-core')) keys.push('fs-core');
   return keys.filter(isSyncableKey);
 }
 async function syncPullKey(storageKey){
@@ -962,6 +964,7 @@ async function syncPullForView(){
   for(const key of syncKeysForView()){
     const r = await syncPullKey(key);
     if(r && key === 'fs-globals') globalsPulled = true;
+    if(r && key === 'fs-core' && faithStore) await faithStore.load();
   }
   if(globalsPulled){
     const g = await getJSON('fs-globals');
@@ -1350,6 +1353,7 @@ async function pipePlant(){
   idea.flow.stage=4;
   idea.updatedAt=new Date().toISOString();
   markDirty();
+  await syncPlantToCore(idea, f, mustDoId);
   const dayLabel=formatCalDay(f.scheduleDate);
   triggerPipeShimmer();
   showIdeaToast('Planted for '+dayLabel+'.');
@@ -1525,6 +1529,9 @@ async function moveIdeaSchedule(ideaId,newDate){
   }
 }
 function syncIdeaFromMustDo(mustDoId,done){
+  if(faithStore && isDaily()){
+    faithStore.syncLegacyMustDoToTask(mustDoId, iso(dayOf(dayOffset)), done, dayData);
+  }
   ensureIdeas();
   for(const raw of globals.ideas){
     if(!raw.flow || raw.flow.mustDoId!==mustDoId) continue;
@@ -2027,6 +2034,54 @@ let prayerFilter = 'all';
 const FLOW_SLOT_LABELS = {beforeWork:'Before Work',duringWork:'During Work',afterWork:'After Work',eveningShutdown:'Evening Shutdown'};
 const FLOW_SLOT_FIELDS = {beforeWork:'beforeWork',duringWork:'duringWork',afterWork:'afterWork',eveningShutdown:'eveningShutdown'};
 let dirty=false, saveTimer=null, saving=false;
+let faithStore = null;
+
+async function initFaithStore(){
+  if(typeof FaithfulnessStore === 'undefined') return;
+  faithStore = new FaithfulnessStore(window.storage);
+  window.faithStore = faithStore;
+  await faithStore.load();
+  await faithStore.migrateFromLegacy({ globals, getDayJSON: key => getJSON(key) });
+  faithStore.onChange(()=>{ dirty = true; updateSaveState('dirty'); scheduleSave(); });
+}
+
+async function syncPlantToCore(idea, f, mustDoId){
+  if(!faithStore) return;
+  let seed = faithStore.getSeedByLegacyIdea(idea.id);
+  if(!seed){
+    seed = faithStore.createSeed({
+      legacyIdeaId: idea.id, title: f.text, lifeArea: f.category || 'other',
+      status: 'active', why: f.doneDef || '', flow: idea.flow
+    });
+  } else {
+    faithStore.updateSeed(seed.id, { title: f.text, status: 'active', flow: idea.flow });
+  }
+  const slot = f.scheduleSlot || 'beforeWork';
+  if(!faithStore.getTasksForDate(f.scheduleDate).some(t=> t.seedId===seed.id && t.stepNumber===1)){
+    faithStore.createTask({
+      title: f.steps[0], date: f.scheduleDate, timeSlot: slot,
+      seedId: seed.id, stepNumber: 1, tag: 'growth', durationMin: null
+    });
+  }
+  [1,2].forEach(i=>{
+    if(!f.steps[i]) return;
+    if(!faithStore.getTasksBySeed(seed.id).some(t=> t.stepNumber===i+1)){
+      faithStore.createTask({
+        title: f.steps[i], date: f.scheduleDate, timeSlot: slot,
+        seedId: seed.id, stepNumber: i+1, tag: 'growth'
+      });
+    }
+  });
+  if(f.addMustDo && mustDoId){
+    if(!faithStore.findTaskByLegacyMustDo(mustDoId, f.scheduleDate)){
+      faithStore.createTask({
+        title: f.firstAction, date: f.scheduleDate, timeSlot: 'beforeWork',
+        tag: 'growth', seedId: seed.id, legacyMustDoId: mustDoId
+      });
+    }
+  }
+  await faithStore.save();
+}
 
 function scheduleSave(){ clearTimeout(saveTimer); saveTimer=setTimeout(()=>save(),800); }
 function markDirty(){
@@ -2046,6 +2101,7 @@ async function save(){
     else if(isDaily()){ ops.push(S.set(dayKeyFor(dayOffset), JSON.stringify(dayData))); savedKeys.push(dayKeyFor(dayOffset)); }
     else if(isWeekly()){ ops.push(S.set(weekKeyFor(weekOffset), JSON.stringify(weekData))); savedKeys.push(weekKeyFor(weekOffset)); }
     else if(isMonthly()){ ops.push(S.set(monthKeyFor(monthOffset), JSON.stringify(monthData))); savedKeys.push(monthKeyFor(monthOffset)); }
+    if(faithStore){ await faithStore.save(); savedKeys.push('fs-core'); }
     const ok = await Promise.all(ops);
     if(ok.every(Boolean)){
       dirty=false;
@@ -3268,6 +3324,12 @@ async function resetAll(){
   ensurePrayers();
   ensureIdeas();
   ensureMyWeek();
+  await initFaithStore();
+  if(new URLSearchParams(location.search).get('test')==='store' && typeof runFaithfulnessStoreTests === 'function'){
+    const out = await runFaithfulnessStoreTests(()=> new FaithfulnessStore(createMemoryStorage()));
+    console.log('[FaithfulnessStore tests]', out);
+    alert(out.pass ? 'FaithfulnessStore tests passed ('+out.results.length+' checks)' : 'Store tests FAILED: '+out.error);
+  }
   document.getElementById('researchNotes').value = globals.researchNotes||'';
   simpleMode = localStorage.getItem('wsr:simpleMode')==='1';
   await loadCurrent();
