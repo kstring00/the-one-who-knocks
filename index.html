@@ -378,16 +378,68 @@ details.collapsible .zonebody{border-top:1px solid var(--line-soft)}
 
 body.view-daily .site-foot{display:none}
 
-.journal-panel{max-width:900px;margin:0 auto}
-.journal-editor{min-height:min(62vh,560px);font-family:"Cormorant Garamond",Georgia,serif;font-size:17px;line-height:1.75}
-.journal-meta{display:flex;justify-content:space-between;gap:12px;margin-top:10px;font-size:11px;color:var(--mist)}
-.journal-past{margin-top:18px;padding-top:14px;border-top:1px solid var(--line-soft)}
-.journal-past summary{cursor:pointer;font-size:11px;font-weight:600;letter-spacing:.07em;color:var(--mist)}
-.journal-past summary::-webkit-details-marker{display:none}
+.journal-panel{max-width:none;margin:0;padding:0}
+.journal-hero{position:relative;border-radius:16px;overflow:hidden;min-height:200px;margin-bottom:20px;
+  background:var(--bg-card) center/cover no-repeat;background-image:linear-gradient(90deg,color-mix(in srgb,var(--bg-page) 55%,transparent) 0%,color-mix(in srgb,var(--bg-page) 20%,transparent) 55%,color-mix(in srgb,var(--bg-page) 35%,transparent) 100%),url('assets/journal-hero.jpg')}
+.journal-hero-inner{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;padding:28px 32px;min-height:200px;flex-wrap:wrap}
+.journal-hero-text{flex:1;min-width:200px}
+.journal-hero-kicker{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+.journal-hero-title{font-family:"Cormorant Garamond",serif;font-size:36px;font-weight:600;color:var(--text-primary);margin:0 0 6px;line-height:1.1}
+.journal-hero-sub{margin:0;font-size:14px;color:var(--text-secondary);line-height:1.5;max-width:420px}
+.journal-verse-card{flex:none;width:min(280px,100%);background:color-mix(in srgb,var(--bg-card) 82%,transparent);backdrop-filter:blur(8px);
+  border:1px solid var(--border);border-radius:14px;padding:16px 18px}
+.journal-verse-head{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--gold);margin-bottom:10px}
+.journal-verse-icon{font-size:14px}
+.journal-verse-text{font-family:"Cormorant Garamond",serif;font-size:15px;line-height:1.55;color:var(--text-primary);font-style:italic;margin:0 0 8px}
+.journal-verse-ref{font-size:11px;color:var(--text-secondary)}
+.journal-layout{display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:start}
+@media(max-width:960px){.journal-layout{grid-template-columns:1fr}}
+.journal-entry-card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:18px 20px}
+.journal-entry-head{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.journal-entry-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex:none}
+.journal-entry-head h3{margin:0;font-family:"Cormorant Garamond",serif;font-size:18px;font-weight:600;color:var(--text-primary)}
+.journal-toolbar{display:flex;gap:4px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.journal-tool{border:1px solid var(--border);background:var(--bg-card-2);color:var(--text-secondary);width:32px;height:32px;border-radius:8px;
+  cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;display:grid;place-items:center}
+.journal-tool:hover{color:var(--gold);border-color:var(--gold-border-soft)}
+.journal-editor{width:100%;min-height:min(50vh,480px);border:none;background:transparent;padding:0;
+  font-family:"Cormorant Garamond",Georgia,serif;font-size:17px;line-height:1.75;color:var(--text-primary);resize:vertical}
+.journal-editor:focus{outline:none}
+.journal-meta{display:flex;justify-content:space-between;gap:12px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:11px;color:var(--text-secondary)}
+.journal-foot{display:flex;justify-content:space-between;align-items:center;margin-top:14px;flex-wrap:wrap;gap:10px}
+.journal-past-btn{border:none;background:none;color:var(--text-secondary);font-size:12px;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;padding:0}
+.journal-past-btn:hover{color:var(--gold)}
+.journal-past-panel{display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
+.journal-past-panel.open{display:block}
 .journal-list{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
-.journal-list button{border:1px solid var(--line);background:var(--cream-raised);border-radius:4px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:inherit}
-.journal-list button.on{background:var(--navy);color:var(--cream-raised);border-color:var(--navy)}
-.journal-foot{display:flex;justify-content:space-between;align-items:center;margin-top:16px;flex-wrap:wrap;gap:8px}
+.journal-list button{border:1px solid var(--border);background:var(--bg-card-2);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:inherit;color:var(--text-secondary)}
+.journal-list button.on{background:var(--gold-dim);color:var(--gold);border-color:var(--gold-border-soft)}
+.journal-sidebar{display:flex;flex-direction:column;gap:16px}
+.journal-widget{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:16px 18px}
+.journal-widget-head{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.journal-widget-head h4{margin:0;font-family:"Cormorant Garamond",serif;font-size:16px;font-weight:600;color:var(--text-primary)}
+.journal-widget-icon{font-size:14px;flex:none}
+.journal-prompt-item{display:flex;align-items:flex-start;gap:10px;width:100%;text-align:left;border:none;background:transparent;
+  padding:8px 6px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:13px;color:var(--text-secondary);line-height:1.45}
+.journal-prompt-item:hover{background:var(--bg-hover);color:var(--text-primary)}
+.journal-prompt-num{font-size:11px;font-weight:700;color:var(--gold);flex:none;min-width:16px}
+.journal-add-prompt{border:none;background:none;color:var(--gold);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;padding:8px 6px 0;margin-top:4px}
+.journal-gratitude-list{display:flex;flex-direction:column;gap:8px}
+.journal-gratitude-row{display:flex;align-items:center;gap:8px}
+.journal-gratitude-num{font-size:12px;font-weight:600;color:var(--text-secondary);flex:none;width:16px}
+.journal-gratitude-row input{flex:1;font-size:13px;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg-card-2);color:var(--text-primary)}
+.journal-stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+@media(max-width:400px){.journal-stat-grid{grid-template-columns:1fr}}
+.journal-stat{text-align:center;padding:8px 4px}
+.journal-stat-val{display:block;font-family:"Cormorant Garamond",serif;font-size:22px;font-weight:600;color:var(--text-primary);line-height:1.2}
+.journal-stat-lbl{display:block;font-size:10px;color:var(--text-secondary);margin-top:4px;line-height:1.3}
+.journal-stat-sub{display:block;font-size:9px;color:var(--gold);margin-top:2px}
+.journal-progress-wrap{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.journal-progress-bar{flex:1;height:6px;background:var(--bar-track);border-radius:99px;overflow:hidden}
+.journal-progress-fill{height:100%;background:var(--gold);border-radius:99px;transition:width .3s ease}
+.journal-progress-meta{font-size:11px;font-weight:600;color:var(--gold);min-width:32px;text-align:right}
+.journal-progress-caption{margin:0;font-size:11px;color:var(--text-secondary);font-style:italic;text-align:center}
+.journal-widget-hint{margin:0 0 10px;font-size:12px;color:var(--text-secondary);line-height:1.45}
 
 .site-foot{margin-top:40px;padding:24px 20px 32px;border-top:2px solid var(--navy);background:var(--cream-raised)}
 .foot-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;max-width:1200px;margin:0 auto}
@@ -1068,19 +1120,59 @@ body.faithfulness-app #dailyBoard .ff-progress{color:var(--gold)}
 </div>
 
 <div class="board journal-panel" id="journalPanel" hidden>
-  <div class="zone">
-    <div class="zonehead"><div class="num">Journal</div><h2>Honest lines</h2>
-      <p>No audience. Morning pages, evening debrief, or anything in between — one day per page.</p></div>
-    <div class="zonebody">
-      <label class="q" for="journalBody" id="journalDateLabel">Today</label>
+  <header class="journal-hero" role="banner">
+    <div class="journal-hero-inner">
+      <div class="journal-hero-text">
+        <div class="journal-hero-kicker">Journal</div>
+        <h2 class="journal-hero-title serif">Honest lines.</h2>
+        <p class="journal-hero-sub">No audience. Morning pages, evening debrief, or anything in between — one day per page.</p>
+      </div>
+      <aside class="journal-verse-card" aria-label="Today's verse">
+        <div class="journal-verse-head"><span class="journal-verse-icon">☀</span> Today's posture</div>
+        <p class="journal-verse-text" id="journalVerseText"></p>
+        <cite class="journal-verse-ref" id="journalVerseRef"></cite>
+      </aside>
+    </div>
+  </header>
+  <div class="journal-layout">
+    <section class="journal-entry-card" aria-label="Today's entry">
+      <div class="journal-entry-head"><span class="journal-entry-dot"></span><h3 class="serif">Today's entry</h3></div>
+      <div class="journal-toolbar" id="journalToolbar" role="toolbar" aria-label="Formatting">
+        <button type="button" class="journal-tool" data-jtool="bold" title="Bold">B</button>
+        <button type="button" class="journal-tool" data-jtool="italic" title="Italic"><em>I</em></button>
+        <button type="button" class="journal-tool" data-jtool="bullet" title="Bullet list">≡</button>
+        <button type="button" class="journal-tool" data-jtool="num" title="Numbered list">#</button>
+      </div>
       <textarea id="journalBody" class="journal-editor" placeholder="What's actually going on? What are you carrying?" aria-label="Journal entry"></textarea>
       <div class="journal-meta"><span id="journalWords">0 words</span><span id="journalUpdated"></span></div>
-      <details class="journal-past" open><summary>Past entries</summary><ul class="journal-list" id="journalList"></ul></details>
       <div class="journal-foot">
-        <span class="hint" style="margin:0">Autosaves in your browser. Sign in to sync across devices.</span>
+        <button type="button" class="journal-past-btn" id="journalPastToggle"><span aria-hidden="true">🕐</span> Past entries</button>
         <button type="button" class="danger" id="clearJournal">Clear this entry</button>
       </div>
-    </div>
+      <div class="journal-past-panel" id="journalPastPanel">
+        <ul class="journal-list" id="journalList"></ul>
+      </div>
+    </section>
+    <aside class="journal-sidebar" aria-label="Journal widgets">
+      <div class="journal-widget">
+        <div class="journal-widget-head"><span class="journal-widget-icon">✒</span><h4 class="serif">Reflection Prompts</h4></div>
+        <div id="journalPromptsList"></div>
+        <button type="button" class="journal-add-prompt" id="journalAddPromptBtn">+ Add your own prompt</button>
+      </div>
+      <div class="journal-widget">
+        <div class="journal-widget-head"><span class="journal-widget-icon">♥</span><h4 class="serif">Gratitude</h4></div>
+        <p class="journal-widget-hint">List three things you're thankful for today</p>
+        <div class="journal-gratitude-list">
+          <div class="journal-gratitude-row"><span class="journal-gratitude-num">1</span><input type="text" id="journalGratitude1" placeholder=""></div>
+          <div class="journal-gratitude-row"><span class="journal-gratitude-num">2</span><input type="text" id="journalGratitude2" placeholder=""></div>
+          <div class="journal-gratitude-row"><span class="journal-gratitude-num">3</span><input type="text" id="journalGratitude3" placeholder=""></div>
+        </div>
+      </div>
+      <div class="journal-widget">
+        <div class="journal-widget-head"><span class="journal-widget-icon">▤</span><h4 class="serif">Today's Snapshot</h4></div>
+        <div id="journalSnapshot"></div>
+      </div>
+    </aside>
   </div>
 </div>
 
@@ -1250,6 +1342,7 @@ body.faithfulness-app #dailyBoard .ff-progress{color:var(--gold)}
 <script src="faithfulness-store.js"></script>
 <script src="tags-ui.js"></script>
 <script src="projects-ui.js"></script>
+<script src="journal-ui.js"></script>
 <script src="dashboard-ui.js"></script>
 <script>
 
@@ -2742,7 +2835,7 @@ function setNested(obj, path, val){
 }
 
 let viewMode='dashboard', dayOffset=0, weekOffset=0, monthOffset=0;
-let dayData=null, weekData=null, monthData=null, journal={body:'',updated:null};
+let dayData=null, weekData=null, monthData=null, journal={body:'',gratitude:['','',''],updated:null};
 let globals={researchNotes:'',motives:null,prayers:[],thoughtJournal:'',ideas:[],myWeek:null};
 let prayerFilter = 'all';
 const FLOW_SLOT_LABELS = {beforeWork:'Before Work',duringWork:'During Work',afterWork:'After Work',eveningShutdown:'Evening Shutdown'};
@@ -3892,9 +3985,12 @@ function bindEvents(){
   document.getElementById('clearJournal').onclick = clearJournalEntry;
   document.getElementById('resetAll').onclick = resetAll;
   document.getElementById('journalBody').addEventListener('input', e=>{
+    if(typeof normalizeJournal === 'function' && !journal.gratitude) journal = normalizeJournal(journal);
     journal.body=e.target.value; journal.updated=Date.now();
     updateJournalMeta(); markDirty();
+    if(typeof scheduleSnapshotRefresh === 'function') scheduleSnapshotRefresh();
   });
+  if(typeof bindJournalEvents === 'function') bindJournalEvents();
   window.addEventListener('beforeunload', e=>{ if(dirty){ save(); e.preventDefault(); }});
   document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='hidden' && dirty) save(); });
   window.addEventListener('online', ()=>{ if(authUser && cloudPushKeys.size) flushCloudPush(); });
@@ -4026,7 +4122,8 @@ async function loadMonthly(){
   populateFields(document.getElementById('monthlyMain'), monthData);
 }
 async function loadJournal(){
-  journal = await getJSON(journalKeyFor(dayOffset)) || {body:'',updated:null};
+  const raw = await getJSON(journalKeyFor(dayOffset)) || {body:'',updated:null};
+  journal = typeof normalizeJournal === 'function' ? normalizeJournal(raw) : raw;
   let body = journal.body||'';
   if(window._journalPromptPrefill){
     body = window._journalPromptPrefill + (body ? '\n\n'+body : '');
@@ -4035,8 +4132,9 @@ async function loadJournal(){
     markDirty();
   }
   document.getElementById('journalBody').value = body;
-  document.getElementById('journalDateLabel').textContent = dayLabelFor(dayOffset);
-  updateJournalMeta(); renderJournalList();
+  updateJournalMeta();
+  renderJournalList();
+  if(typeof refreshJournalUI === 'function') await refreshJournalUI();
 }
 function updateJournalMeta(){
   const body = document.getElementById('journalBody')?.value||journal.body||'';
@@ -4071,8 +4169,9 @@ function clearCurrent(){
 }
 function clearJournalEntry(){
   if(!confirm('Clear this journal entry?')) return;
-  journal={body:'',updated:null};
+  journal={body:'',gratitude:['','',''],updated:null};
   document.getElementById('journalBody').value='';
+  [1,2,3].forEach(n=>{ const el=document.getElementById('journalGratitude'+n); if(el) el.value=''; });
   updateJournalMeta(); markDirty(); renderJournalList();
 }
 async function resetAll(){
@@ -4080,7 +4179,7 @@ async function resetAll(){
   if(prompt('Type RESET to confirm')!=='RESET') return;
   clearTimeout(saveTimer);
   await window.storage.clearAll();
-  dayData=null; weekData=null; monthData=null; journal={body:'',updated:null};
+  dayData=null; weekData=null; monthData=null; journal={body:'',gratitude:['','',''],updated:null};
   globals={researchNotes:'',motives:null,prayers:[],thoughtJournal:'',ideas:[],myWeek:null}; dayOffset=0; weekOffset=0; monthOffset=0; viewMode='dashboard'; dirty=false;
   localStorage.removeItem('wsr:thoughtJournalCollapsed');
   await loadCurrent();

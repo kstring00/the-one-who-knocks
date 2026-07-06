@@ -35,10 +35,13 @@
   }
 
   function journalPromptForDay(){
-    const d = dayOf(dayOffset);
-    const start = new Date(d.getFullYear(),0,0);
+    const prompts = typeof getAllJournalPrompts === 'function'
+      ? getAllJournalPrompts()
+      : JOURNAL_PROMPTS;
+    const d = dayOf(typeof dayOffset === 'number' ? dayOffset : 0);
+    const start = new Date(d.getFullYear(), 0, 0);
     const dayNum = Math.floor((d - start) / 86400000);
-    return JOURNAL_PROMPTS[dayNum % JOURNAL_PROMPTS.length];
+    return prompts[dayNum % prompts.length];
   }
 
   function buildSummaryLine(summary){
