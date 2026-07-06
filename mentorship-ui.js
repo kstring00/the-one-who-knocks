@@ -4,6 +4,22 @@
 (function(root){
   'use strict';
 
+  function escHtml(s){
+    return String(s ?? '').replace(/[&<>"']/g, ch => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[ch]));
+  }
+  function esc(s){
+    if(typeof window !== 'undefined' && typeof window.esc === 'function') return window.esc(s);
+    return escHtml(s);
+  }
+  function msUid(){
+    if(typeof window !== 'undefined' && typeof window.uid === 'function') return window.uid();
+    return Math.random().toString(36).slice(2, 10);
+  }
+  function getViewMode(){
+    if(typeof window !== 'undefined' && typeof window.viewMode === 'string') return window.viewMode;
+    try { return viewMode; } catch (_) { return ''; }
+  }
+
   const TIME_SLOTS = [
     { id:'beforeWork', label:'Before Work' },
     { id:'duringWork', label:'During Work' },
@@ -24,15 +40,15 @@
     return null;
   }
   function isMentorshipMode(mode){
-    const m = mode || (typeof viewMode !== 'undefined' ? viewMode : '');
+    const m = mode || (getViewMode());
     return String(m).startsWith('mentorship');
   }
 
   function renderMentorshipNav(){
     const sub = document.getElementById('navMentorshipSub');
-    if(!sub || !faithStore) return;
-    faithStore.ensureDefaultMentors();
-    const mentors = faithStore.getMentors();
+    if(!sub || !window.faithStore) return;
+    window.faithStore.ensureDefaultMentors();
+    const mentors = window.faithStore.getMentors();
     let html = '<button type="button" data-nav="mentorship-threads"><span class="nav-icon" aria-hidden="true">◎</span><span>Threads</span></button>';
     mentors.forEach(m=>{
       html += '<button type="button" data-nav="mentorship-'+m.id+'"><span class="nav-icon" aria-hidden="true">✦</span><span>'+esc(m.label)+'</span></button>';
@@ -43,9 +59,9 @@
 
   function renderMentorSettings(){
     const el = document.getElementById('mentorSettings');
-    if(!el || !faithStore) return;
-    faithStore.ensureDefaultMentors();
-    el.innerHTML = faithStore.getMentors().map((m,i)=>
+    if(!el || !window.faithStore) return;
+    window.faithStore.ensureDefaultMentors();
+    el.innerHTML = window.faithStore.getMentors().map((m,i)=>
       '<div class="mentor-row" data-mentor-row data-mentor-idx="'+i+'">'+
       '<input type="text" data-mentor-label value="'+esc(m.label)+'" placeholder="Label" aria-label="Label">'+
       '<input type="text" data-mentor-role value="'+esc(m.role)+'" placeholder="Role" aria-label="Role">'+
@@ -55,19 +71,19 @@
   }
 
   async function saveMentorSettingsFromDOM(){
-    if(!faithStore) return;
+    if(!window.faithStore) return;
     const rows = [...document.querySelectorAll('#mentorSettings [data-mentor-row]')];
-    const prev = faithStore.getMentors();
+    const prev = window.faithStore.getMentors();
     const cfg = rows.map((row,i)=>({
-      id: prev[i]?.id || uid(),
+      id: prev[i]?.id || msUid(),
       label: row.querySelector('[data-mentor-label]')?.value.trim() || 'M',
       role: row.querySelector('[data-mentor-role]')?.value.trim() || '',
       name: row.querySelector('[data-mentor-name]')?.value.trim() || '',
       nextSessionDate: prev[i]?.nextSessionDate || '',
       sortOrder: i
     }));
-    faithStore.setMentorConfig(cfg);
-    await faithStore.save();
+    window.faithStore.setMentorConfig(cfg);
+    await window.faithStore.save();
     renderMentorshipNav();
     if(isMentorshipMode()) renderMentorship();
     markDirty?.();
@@ -84,7 +100,7 @@
   }
 
   function renderApplicationTimeline(principleId){
-    const apps = faithStore.getApplicationsByPrinciple(principleId);
+    const apps = window.faithStore.getApplicationsByPrinciple(principleId);
     if(!apps.length) return '<p class="ms-muted">No applications yet.</p>';
     return '<div class="ms-app-timeline">'+apps.map(a=>
       '<div class="ms-app-row"><span class="ms-app-date">'+esc(a.date)+'</span><span class="ms-app-note">'+esc(a.note || '(no note)')+'</span></div>'
@@ -93,7 +109,7 @@
 
   function renderPrincipleCard(p){
     const open = expandedPrinciples.has(p.id);
-    const appCount = faithStore.getApplicationCount(p.id);
+    const appCount = window.faithStore.getApplicationCount(p.id);
     const form = activeForms[p.id];
     return '<article class="ms-principle'+(open?' open':'')+'" id="ms-principle-'+p.id+'" data-principle-id="'+p.id+'">'+
       '<button type="button" class="ms-principle-toggle" data-ms-expand="'+p.id+'">'+
@@ -103,7 +119,7 @@
       (open ? '<div class="ms-principle-body">'+
         (p.detailBullets.length ? '<ul class="ms-bullets">'+p.detailBullets.map(b=>'<li>'+esc(b)+'</li>').join('')+'</ul>' : '')+
         (p.themeTags.length ? '<div class="ms-theme-tags">'+themeTagHtml(p.themeTags)+'</div>' : '')+
-        (faithStore.getApplicationsByPrinciple(p.id).length ? '<div class="ms-app-section"><span class="ms-label">Applications</span>'+renderApplicationTimeline(p.id)+'</div>' : '')+
+        (window.faithStore.getApplicationsByPrinciple(p.id).length ? '<div class="ms-app-section"><span class="ms-label">Applications</span>'+renderApplicationTimeline(p.id)+'</div>' : '')+
         '<div class="ms-principle-actions">'+
         '<button type="button" class="ms-text-btn" data-ms-work="'+p.id+'">Put to work</button>'+
         '<span class="ms-dot">·</span>'+
@@ -134,7 +150,7 @@
   }
 
   function renderPrincipleLibrary(mentorId){
-    const groups = faithStore.getPrinciplesGroupedByQuestion(mentorId);
+    const groups = window.faithStore.getPrinciplesGroupedByQuestion(mentorId);
     const keys = Object.keys(groups);
     if(!keys.length){
       return '<p class="dash-empty">No principles yet — mark a queued question as asked or import your notes.</p>';
@@ -154,8 +170,8 @@
   }
 
   function renderQuestionVault(mentorId){
-    const asked = faithStore.getAskedQuestions(mentorId);
-    const queued = faithStore.getQueuedQuestions(mentorId);
+    const asked = window.faithStore.getAskedQuestions(mentorId);
+    const queued = window.faithStore.getQueuedQuestions(mentorId);
     return '<div class="ms-vault-inner">'+
       '<div class="ms-vault-block"><span class="ms-label">Asked</span>'+
       (asked.length ? '<ul class="ms-plain-list">'+asked.map(q=>{
@@ -183,9 +199,9 @@
   }
 
   function renderSessionLog(mentorId){
-    const mentor = faithStore.getMentor(mentorId);
-    const sessions = faithStore.getSessionsByMentor(mentorId);
-    const prep = prepView ? faithStore.buildSessionPrepText(mentorId) : '';
+    const mentor = window.faithStore.getMentor(mentorId);
+    const sessions = window.faithStore.getSessionsByMentor(mentorId);
+    const prep = prepView ? window.faithStore.buildSessionPrepText(mentorId) : '';
     return '<div class="ms-session-inner">'+
       '<div class="ms-session-bar">'+
       '<label class="ms-check-label"><input type="checkbox" data-ms-prep-toggle'+(prepView?' checked':'')+'> Prep view</label>'+
@@ -200,14 +216,14 @@
   }
 
   function renderSessionCard(s){
-    const apps = (s.attachedApplicationIds||[]).map(id=> faithStore.data.applications.find(a=> a.id===id)).filter(Boolean);
-    const qs = (s.attachedQuestionIds||[]).map(id=> faithStore.data.queuedQuestions.find(q=> q.id===id)).filter(Boolean);
+    const apps = (s.attachedApplicationIds||[]).map(id=> window.faithStore.data.applications.find(a=> a.id===id)).filter(Boolean);
+    const qs = (s.attachedQuestionIds||[]).map(id=> window.faithStore.data.queuedQuestions.find(q=> q.id===id)).filter(Boolean);
     return '<article class="ms-session">'+
       '<div class="ms-session-date">'+esc(s.date)+'</div>'+
       (s.notes ? '<p class="ms-session-notes">'+esc(s.notes)+'</p>' : '')+
       (apps.length ? '<div class="ms-session-att"><span class="ms-label">Since last session</span>'+
         apps.map(a=>{
-          const p = faithStore.getPrinciple(a.principleId);
+          const p = window.faithStore.getPrinciple(a.principleId);
           return '<div class="ms-app-row"><span class="ms-app-date">'+esc(a.date)+'</span><span>'+esc(p?.title||'')+(a.note ? ' — '+esc(a.note) : '')+'</span></div>';
         }).join('')+'</div>' : '')+
       (qs.length ? '<div class="ms-session-att"><span class="ms-label">Questions asked</span><ul class="ms-plain-list compact">'+
@@ -216,9 +232,9 @@
   }
 
   function renderMentorPage(mentorId){
-    const m = faithStore.getMentor(mentorId);
+    const m = window.faithStore.getMentor(mentorId);
     if(!m) return '<p class="dash-empty">Mentor not found.</p>';
-    const stats = faithStore.getMentorStats(mentorId);
+    const stats = window.faithStore.getMentorStats(mentorId);
     return '<div class="ms-mentor-page" data-mentor-page="'+mentorId+'">'+
       '<header class="ms-page-head">'+
       '<div><h2 class="serif">'+esc(m.label)+'</h2>'+
@@ -239,7 +255,7 @@
   }
 
   function renderThreadsView(){
-    const threads = faithStore.getThreadsGrouped().filter(g=> g.tag !== 'untagged' || g.principles.length);
+    const threads = window.faithStore.getThreadsGrouped().filter(g=> g.tag !== 'untagged' || g.principles.length);
     if(!threads.length){
       return '<p class="dash-empty">No themed principles yet — tags appear as you import or add principles.</p>';
     }
@@ -248,8 +264,8 @@
         '<section class="ms-thread-group"><h3 class="serif ms-thread-title">'+esc(g.tag)+'</h3>'+
         '<ul class="ms-thread-list">'+
         g.principles.map(p=>{
-          const m = faithStore.getMentor(p.mentorId);
-          const apps = faithStore.getApplicationCount(p.id);
+          const m = window.faithStore.getMentor(p.mentorId);
+          const apps = window.faithStore.getApplicationCount(p.id);
           return '<li><button type="button" class="ms-thread-item" data-ms-goto-principle="'+p.id+'" data-ms-goto-mentor="'+p.mentorId+'">'+
             '<span class="ms-thread-mentor">'+esc(m?.label||'?')+'</span>'+
             '<span class="ms-thread-principle">'+esc(p.title || p.sourceQuestion)+'</span>'+
@@ -262,23 +278,32 @@
 
   function renderMentorship(){
     const panel = document.getElementById('mentorshipPanel');
-    if(!panel || !faithStore) return;
-    MentorshipSeed?.ensureMentorshipReady(faithStore);
-    renderMentorshipNav();
-    const view = parseMentorshipView(viewMode);
-    if(!view){
-      panel.innerHTML = '<p class="dash-empty">Select a mentor.</p>';
+    if(!panel) return;
+    if(!window.faithStore){
+      panel.innerHTML = '<p class="dash-empty">Loading mentorship data…</p>';
       return;
     }
-    if(view.type === 'threads'){
-      panel.innerHTML = '<div class="page-head"><div><h2 class="serif">Threads</h2><p>Principles grouped by theme across mentors.</p></div></div>'+renderThreadsView();
-      return;
-    }
-    panel.innerHTML = renderMentorPage(view.mentorId);
-    const hash = location.hash.replace('#','');
-    if(hash.startsWith('ms-principle-')){
-      const el = document.getElementById(hash);
-      if(el){ expandedPrinciples.add(hash.replace('ms-principle-','')); el.scrollIntoView({ behavior:'smooth', block:'start' }); }
+    try {
+      MentorshipSeed?.ensureMentorshipReady(window.faithStore);
+      renderMentorshipNav();
+      const view = parseMentorshipView(getViewMode());
+      if(!view){
+        panel.innerHTML = '<p class="dash-empty">Select a mentor.</p>';
+        return;
+      }
+      if(view.type === 'threads'){
+        panel.innerHTML = '<div class="page-head"><div><h2 class="serif">Threads</h2><p>Principles grouped by theme across mentors.</p></div></div>'+renderThreadsView();
+        return;
+      }
+      panel.innerHTML = renderMentorPage(view.mentorId);
+      const hash = location.hash.replace('#','');
+      if(hash.startsWith('ms-principle-')){
+        const el = document.getElementById(hash);
+        if(el){ expandedPrinciples.add(hash.replace('ms-principle-','')); el.scrollIntoView({ behavior:'smooth', block:'start' }); }
+      }
+    } catch (err) {
+      console.error('[mentorship] render failed', err);
+      panel.innerHTML = '<p class="dash-empty">Could not load mentorship — try refreshing the page.</p>';
     }
   }
 
@@ -288,11 +313,11 @@
   }
 
   function showPrincipleHarvestPrompt(taskId){
-    const task = faithStore?.getTask(taskId);
+    const task = window.faithStore?.getTask(taskId);
     if(!task?.principleId) return;
     const existing = document.getElementById('msHarvestPrompt');
     if(existing) existing.remove();
-    const p = faithStore.getPrinciple(task.principleId);
+    const p = window.faithStore.getPrinciple(task.principleId);
     const div = document.createElement('div');
     div.id = 'msHarvestPrompt';
     div.className = 'ms-harvest-prompt';
@@ -305,8 +330,8 @@
     document.body.appendChild(div);
     document.getElementById('msHarvestSave').onclick = async ()=>{
       const note = document.getElementById('msHarvestNote')?.value.trim();
-      faithStore.completePrincipleHarvest(taskId, note || task.title);
-      await faithStore.save();
+      window.faithStore.completePrincipleHarvest(taskId, note || task.title);
+      await window.faithStore.save();
       div.remove();
       renderMentorship?.();
       renderDashboard?.();
@@ -317,21 +342,21 @@
   }
 
   function wrapCompleteTask(){
-    if(!faithStore || faithStore._principleWrapped) return;
-    const orig = faithStore.completeTask.bind(faithStore);
-    faithStore.completeTask = async function(id, opts){
+    if(!window.faithStore || window.faithStore._principleWrapped) return;
+    const orig = window.faithStore.completeTask.bind(window.faithStore);
+    window.faithStore.completeTask = async function(id, opts){
       const r = await orig(id, opts);
       if(r.needsPrincipleHarvest) showPrincipleHarvestPrompt(id);
       return r;
     };
-    faithStore._principleWrapped = true;
+    window.faithStore._principleWrapped = true;
   }
 
   function renderDangerMentorSuggestions(){
     const row = document.getElementById('dangerMentorSuggest');
-    if(!row || !faithStore || !dayData) return;
+    if(!row || !window.faithStore || !dayData) return;
     const danger = dayData.danger?.danger || '';
-    const matches = faithStore.matchPrinciplesForDanger(danger, 3);
+    const matches = window.faithStore.matchPrinciplesForDanger(danger, 3);
     if(!danger.trim() || !matches.length){
       row.hidden = true;
       row.innerHTML = '';
@@ -340,14 +365,14 @@
     row.hidden = false;
     row.innerHTML = '<span class="ms-borrow-label">Borrow from mentors:</span>'+
       matches.map(p=>{
-        const m = faithStore.getMentor(p.mentorId);
+        const m = window.faithStore.getMentor(p.mentorId);
         return '<button type="button" class="ms-borrow-chip" data-ms-borrow="'+p.id+'">'+
           esc(m?.label||'')+': '+esc(p.title)+'</button>';
       }).join('');
   }
 
   async function applyBorrowedPrinciple(principleId){
-    const p = faithStore.getPrinciple(principleId);
+    const p = window.faithStore.getPrinciple(principleId);
     if(!p || !dayData) return;
     const title = p.title || p.sourceQuestion;
     dayData.danger.thenWill = dayData.danger.thenWill
@@ -361,11 +386,11 @@
   }
 
   async function onGuardrailKept(checked){
-    if(!checked || !dayData?.danger?.borrowedPrincipleId || !faithStore) return;
+    if(!checked || !dayData?.danger?.borrowedPrincipleId || !window.faithStore) return;
     const pid = dayData.danger.borrowedPrincipleId;
     const note = 'Guardrail kept — ' + (dayData.danger.thenWill || '');
-    faithStore.logPrincipleApplication(pid, { note, date: iso(dayOf(dayOffset)) });
-    await faithStore.save();
+    window.faithStore.logPrincipleApplication(pid, { note, date: iso(dayOf(dayOffset)) });
+    await window.faithStore.save();
     dayData.danger.borrowedPrincipleId = null;
     renderMentorship?.();
     markDirty?.();
@@ -377,9 +402,9 @@
     wrapCompleteTask();
 
     document.getElementById('mentorAddBtn')?.addEventListener('click', async ()=>{
-      if(!faithStore) return;
-      faithStore.createMentor({ label:'M'+(faithStore.getMentors().length+1), role:'', name:'' });
-      await faithStore.save();
+      if(!window.faithStore) return;
+      window.faithStore.createMentor({ label:'M'+(window.faithStore.getMentors().length+1), role:'', name:'' });
+      await window.faithStore.save();
       renderMentorSettings();
       renderMentorshipNav();
       markDirty?.();
@@ -389,10 +414,10 @@
       if(e.target.closest('[data-mentor-rm]')){
         const row = e.target.closest('[data-mentor-row]');
         const idx = +row?.dataset.mentorIdx;
-        const m = faithStore.getMentors()[idx];
+        const m = window.faithStore.getMentors()[idx];
         if(m && confirm('Remove mentor “'+m.label+'” and all their principles?')){
-          faithStore.deleteMentor(m.id);
-          await faithStore.save();
+          window.faithStore.deleteMentor(m.id);
+          await window.faithStore.save();
           renderMentorSettings();
           renderMentorshipNav();
           markDirty?.();
@@ -418,17 +443,17 @@
       const target = e.target.closest('[data-ms-qid]');
       if(!target || !dragQuestionId || dragQuestionId === target.dataset.msQid) return;
       e.preventDefault();
-      const mid = parseMentorshipView(viewMode)?.mentorId;
+      const mid = parseMentorshipView(getViewMode())?.mentorId;
       if(!mid) return;
-      const qs = faithStore.getQueuedQuestions(mid);
+      const qs = window.faithStore.getQueuedQuestions(mid);
       const ids = qs.map(q=> q.id);
       const from = ids.indexOf(dragQuestionId);
       const to = ids.indexOf(target.dataset.msQid);
       if(from < 0 || to < 0) return;
       ids.splice(from, 1);
       ids.splice(to, 0, dragQuestionId);
-      faithStore.reorderQueuedQuestions(mid, ids);
-      await faithStore.save();
+      window.faithStore.reorderQueuedQuestions(mid, ids);
+      await window.faithStore.save();
       dragQuestionId = null;
       renderMentorship();
       markDirty?.();
@@ -480,8 +505,8 @@
       const date = form?.querySelector('[data-ms-work-date]')?.value;
       const slotBtn = form?.querySelector('.ms-slot-chip.on');
       const slot = slotBtn?.dataset.msWorkSlot || 'beforeWork';
-      faithStore.putPrincipleToWork(pid, { title, date, timeSlot: slot });
-      await faithStore.save();
+      window.faithStore.putPrincipleToWork(pid, { title, date, timeSlot: slot });
+      await window.faithStore.save();
       delete activeForms[pid];
       renderMentorship();
       renderDashboard?.();
@@ -495,8 +520,8 @@
       const form = document.getElementById('mentorshipPanel')?.querySelector('[data-ms-log-form="'+pid+'"]');
       const note = form?.querySelector('[data-ms-log-note]')?.value.trim();
       const date = form?.querySelector('[data-ms-log-date]')?.value;
-      faithStore.logPrincipleApplication(pid, { note, date });
-      await faithStore.save();
+      window.faithStore.logPrincipleApplication(pid, { note, date });
+      await window.faithStore.save();
       delete activeForms[pid];
       expandedPrinciples.add(pid);
       renderMentorship();
@@ -513,8 +538,8 @@
 
     const markAsked = e.target.closest('[data-ms-mark-asked]');
     if(markAsked){
-      faithStore.markQuestionAsked(markAsked.dataset.msMarkAsked);
-      await faithStore.save();
+      window.faithStore.markQuestionAsked(markAsked.dataset.msMarkAsked);
+      await window.faithStore.save();
       renderMentorship();
       markDirty?.();
       return;
@@ -522,8 +547,8 @@
 
     const qDel = e.target.closest('[data-ms-q-del]');
     if(qDel){
-      faithStore.deleteQueuedQuestion(qDel.dataset.msQDel);
-      await faithStore.save();
+      window.faithStore.deleteQueuedQuestion(qDel.dataset.msQDel);
+      await window.faithStore.save();
       renderMentorship();
       markDirty?.();
       return;
@@ -535,8 +560,8 @@
       const inp = document.getElementById('mentorshipPanel')?.querySelector('[data-ms-q-add="'+mid+'"]');
       const text = inp?.value.trim();
       if(text){
-        faithStore.createQueuedQuestion({ mentorId: mid, text });
-        await faithStore.save();
+        window.faithStore.createQueuedQuestion({ mentorId: mid, text });
+        await window.faithStore.save();
         inp.value = '';
         renderMentorship();
         markDirty?.();
@@ -546,15 +571,15 @@
 
     const qUp = e.target.closest('[data-ms-q-up]');
     if(qUp){
-      const mid = parseMentorshipView(viewMode)?.mentorId;
+      const mid = parseMentorshipView(getViewMode())?.mentorId;
       if(mid){
-        const qs = faithStore.getQueuedQuestions(mid);
+        const qs = window.faithStore.getQueuedQuestions(mid);
         const idx = qs.findIndex(q=> q.id === qUp.dataset.msQUp);
         if(idx > 0){
           const ids = qs.map(q=> q.id);
           [ids[idx-1], ids[idx]] = [ids[idx], ids[idx-1]];
-          faithStore.reorderQueuedQuestions(mid, ids);
-          await faithStore.save();
+          window.faithStore.reorderQueuedQuestions(mid, ids);
+          await window.faithStore.save();
           renderMentorship();
         }
       }
@@ -563,15 +588,15 @@
 
     const qDown = e.target.closest('[data-ms-q-down]');
     if(qDown){
-      const mid = parseMentorshipView(viewMode)?.mentorId;
+      const mid = parseMentorshipView(getViewMode())?.mentorId;
       if(mid){
-        const qs = faithStore.getQueuedQuestions(mid);
+        const qs = window.faithStore.getQueuedQuestions(mid);
         const idx = qs.findIndex(q=> q.id === qDown.dataset.msQDown);
         if(idx >= 0 && idx < qs.length - 1){
           const ids = qs.map(q=> q.id);
           [ids[idx], ids[idx+1]] = [ids[idx+1], ids[idx]];
-          faithStore.reorderQueuedQuestions(mid, ids);
-          await faithStore.save();
+          window.faithStore.reorderQueuedQuestions(mid, ids);
+          await window.faithStore.save();
           renderMentorship();
         }
       }
@@ -586,8 +611,8 @@
 
     const newSession = e.target.closest('[data-ms-new-session]');
     if(newSession){
-      faithStore.startNewSession(newSession.dataset.msNewSession, { notes: '' });
-      await faithStore.save();
+      window.faithStore.startNewSession(newSession.dataset.msNewSession, { notes: '' });
+      await window.faithStore.save();
       renderMentorship();
       markDirty?.();
       return;
@@ -595,7 +620,7 @@
 
     const copyPrep = e.target.closest('[data-ms-copy-prep]');
     if(copyPrep){
-      const text = faithStore.buildSessionPrepText(copyPrep.dataset.msCopyPrep);
+      const text = window.faithStore.buildSessionPrepText(copyPrep.dataset.msCopyPrep);
       navigator.clipboard?.writeText(text);
       return;
     }
@@ -617,8 +642,8 @@
     }
     const nextDate = e.target.dataset?.msNextDate;
     if(nextDate){
-      faithStore.updateMentor(nextDate, { nextSessionDate: e.target.value });
-      faithStore.save();
+      window.faithStore.updateMentor(nextDate, { nextSessionDate: e.target.value });
+      window.faithStore.save();
       markDirty?.();
     }
   }

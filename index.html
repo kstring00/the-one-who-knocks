@@ -1025,7 +1025,7 @@ body.view-dashboard .idea-fab{display:none!important}
 body.view-dashboard #dailyBoard,body.view-dashboard #weeklyBoard,body.view-dashboard #monthlyBoard,
 body.view-dashboard #journalPanel,body.view-dashboard #ideasPanel,body.view-dashboard #prayerPanel,
 body.view-dashboard #calendarPanel,body.view-dashboard #tagLensPanel,body.view-dashboard #projectsPanel,
-body.view-dashboard #settingsPanel{display:none!important}
+body.view-dashboard #settingsPanel,body.view-dashboard #mentorshipPanel{display:none!important}
 #calendarPanel .cal-page-layout{display:block}
 #calendarPanel .cal-agenda-panel{display:none!important}
 .cal-grid-wrap.full-width{border:1px solid var(--border-subtle);border-radius:14px;padding:12px;background:var(--bg-card)}
@@ -1644,8 +1644,8 @@ body.faithfulness-app #dailyBoard .ff-progress{color:var(--gold)}
 </div><!-- /.app-shell -->
 
 <script src="faithfulness-store.js"></script>
-<script src="mentorship-seed.js"></script>
-<script src="mentorship-ui.js"></script>
+<script src="mentorship-seed.js?v=6"></script>
+<script src="mentorship-ui.js?v=6"></script>
 <script src="tags-ui.js"></script>
 <script src="projects-ui.js"></script>
 <script src="journal-ui.js"></script>
@@ -3160,6 +3160,8 @@ function setNested(obj, path, val){
 }
 
 let viewMode='dashboard', dayOffset=0, weekOffset=0, monthOffset=0;
+window.viewMode = viewMode;
+function syncViewModeBridge(){ window.viewMode = viewMode; }
 let dayData=null, weekData=null, monthData=null, journal={body:'',gratitude:['','',''],updated:null};
 let globals={researchNotes:'',motives:null,prayers:[],thoughtJournal:'',ideas:[],ideasHub:null,myWeek:null};
 window.globals = globals;
@@ -4370,12 +4372,14 @@ async function setMode(mode){
   const already = viewMode===mode;
   if(!already && dirty) await save();
   viewMode=mode;
+  syncViewModeBridge();
   await loadCurrent();
   if(mode==='ideas') loadIdeas();
 }
 function openTagView(tag){
   if(typeof setActiveTag === 'function') setActiveTag(tag);
   viewMode='tag';
+  syncViewModeBridge();
   loadCurrent();
 }
 function updateSidebarNav(){
@@ -4390,6 +4394,7 @@ function updateSidebarNav(){
   document.getElementById('navMentorshipToggle')?.setAttribute('aria-expanded', msOpen ? 'true' : 'false');
 }
 function updateViewUI(){
+  syncViewModeBridge();
   ['daily','weekly','monthly','journal','ideas','prayer'].forEach(m=>{
     document.getElementById('mode'+m.charAt(0).toUpperCase()+m.slice(1))?.classList.toggle('on', viewMode===m);
   });
@@ -4448,6 +4453,9 @@ function updateViewUI(){
   if(isIdeas() && typeof loadIdeasHub === 'function'){
     requestAnimationFrame(function(){ loadIdeasHub(); });
   }
+  if(isMentorship() && typeof loadMentorship === 'function'){
+    requestAnimationFrame(function(){ loadMentorship(); });
+  }
 }
 async function loadCurrent(){
   updateViewUI();
@@ -4474,6 +4482,7 @@ async function loadCurrent(){
   if(isIdeas()) loadIdeas();
   else if(isPrayer()) loadPrayer();
   else if(isDashboard()) loadDashboard();
+  else if(isMentorship()) loadMentorship?.();
 }
 async function loadDaily(){
   const isSat = isSaturdayRecovery();
@@ -4566,6 +4575,7 @@ async function resetAll(){
   await initAuth();
   const vm = await window.storage.get('view-mode');
   if(vm?.value && (['dashboard','daily','weekly','monthly','journal','ideas','prayer','projects','settings','calendar','tag'].includes(vm.value) || vm.value.startsWith('mentorship-'))) viewMode = vm.value;
+  syncViewModeBridge();
   const g = await getJSON('fs-globals');
   if(g){ globals = {...globals,...g}; window.globals = globals; }
   ensureMotives();
@@ -4585,6 +4595,7 @@ async function resetAll(){
   bindTagEvents?.();
   bindMentorshipEvents?.();
   renderMentorshipNav?.();
+  if(isMentorship()) loadMentorship?.();
   document.querySelectorAll('[data-nav]').forEach(btn=>{
     if(btn.closest('.sidebar-nav')) return;
     btn.addEventListener('click', ()=> setMode(btn.dataset.nav));

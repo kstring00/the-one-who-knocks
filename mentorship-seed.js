@@ -324,6 +324,9 @@
   function ensureMentorshipReady(store){
     if(!store) return;
     store.ensureDefaultMentors();
+    if(!store.data.principles?.length){
+      seedInitialMentorshipNotes(store);
+    }
   }
 
   root.MentorshipSeed = {
