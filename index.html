@@ -617,6 +617,10 @@ body.ih-ws-open.focus-mode .ih-workspace{width:min(720px,100vw)}
 .ih-cl-row,.ih-step-row{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
 .ih-cl-row span,.ih-step-row span{font-size:11px;font-weight:600;color:var(--text-secondary)}
 .ih-cl-row textarea,.ih-inp{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg-card-2);color:var(--text-primary);font-family:inherit;font-size:13px}
+.ih-ws-develop .ih-hint{margin:0 0 10px;font-size:12px;color:var(--text-secondary);line-height:1.45}
+.ih-dev-notes{width:100%;min-height:140px;padding:12px 14px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--text-primary);font-family:inherit;font-size:13px;line-height:1.55;resize:vertical}
+.ih-dev-notes:focus{outline:none;border-color:var(--gold-border-soft)}
+.ih-dev-notes::placeholder{color:var(--text-secondary);opacity:.75}
 .ih-growth{text-align:center;padding:16px;background:var(--bg-card-2);border-radius:14px}
 .ih-growth img{width:80px;height:80px;object-fit:contain}
 .ih-growth-fallback{font-size:48px;display:block}
@@ -1645,7 +1649,7 @@ body.faithfulness-app #dailyBoard .ff-progress{color:var(--gold)}
 <script src="tags-ui.js"></script>
 <script src="projects-ui.js"></script>
 <script src="journal-ui.js"></script>
-<script src="ideas-hub.js?v=4" onerror="(function(){var p=document.getElementById('ihPipeline');if(p)p.innerHTML='<p class=&quot;ih-load-error&quot;>Failed to load ideas-hub.js — hard-refresh the page.</p>';})()"></script>
+<script src="ideas-hub.js?v=5" onerror="(function(){var p=document.getElementById('ihPipeline');if(p)p.innerHTML='<p class=&quot;ih-load-error&quot;>Failed to load ideas-hub.js — hard-refresh the page.</p>';})()"></script>
 <script src="dashboard-ui.js"></script>
 <script>
 

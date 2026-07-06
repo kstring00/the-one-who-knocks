@@ -45,6 +45,7 @@
       steps: { ...blankSteps(), ...(r.steps || {}) },
       schedule: { ...blankSchedule(), ...(r.schedule || {}) },
       firstAction: String(r.firstAction || r.flow?.firstAction || ''),
+      developmentNotes: String(r.developmentNotes || r.development || ''),
       mustDoToday: r.mustDoToday != null ? !!r.mustDoToday : (r.flow?.addMustDo !== false),
       timeSpentMinutes: typeof r.timeSpentMinutes === 'number' ? r.timeSpentMinutes : 0,
       position: r.position && typeof r.position.x === 'number' ? { x:r.position.x, y:r.position.y } : null,

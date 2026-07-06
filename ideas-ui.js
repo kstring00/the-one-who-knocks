@@ -300,6 +300,10 @@
       clarifyField('What problem does this solve?','ihClProblem', d.clarification?.problemSolved)+
       clarifyField('What would make this worth building?','ihClWorth', d.clarification?.worthBuilding)+
       '</section>'+
+      '<section class="ih-ws-section ih-ws-develop"><h4>How it\'s developing</h4>'+
+      '<p class="ih-hint">In your own words — what\'s changed, what you\'re learning, where it\'s going. No wrong format.</p>'+
+      '<textarea id="ihDevelopment" class="ih-dev-notes" rows="7" placeholder="Started as a rough thought about… Now I\'m seeing… Next I want to…">'+esc(d.developmentNotes||'')+'</textarea>'+
+      '</section>'+
       '<section class="ih-ws-section ih-ws-growth">'+growthVisual(d.status)+'</section>'+
       '<section class="ih-ws-section"><h4>Three Faithful Steps</h4>'+
       stepField('Step 1','ihStep1', d.steps?.step1)+
@@ -343,6 +347,7 @@
       problemSolved: document.getElementById('ihClProblem')?.value.trim()||'',
       worthBuilding: document.getElementById('ihClWorth')?.value.trim()||''
     };
+    d.developmentNotes = document.getElementById('ihDevelopment')?.value.trim()||'';
     d.steps = {
       step1: document.getElementById('ihStep1')?.value.trim()||'',
       step2: document.getElementById('ihStep2')?.value.trim()||'',
