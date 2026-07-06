@@ -375,121 +375,136 @@ body.view-prayer .site-foot,body.view-journal .site-foot{display:none}
 @media(max-width:560px){.prayer-grid{grid-template-columns:1fr}}
 .prayer-empty{text-align:center;padding:24px;color:var(--mist);font-size:13px;font-style:italic}
 
-/* Idea Vault */
+/* Ideas — Flow, Seedbed, Calendar */
+.ideas-panel{max-width:1100px;margin:0 auto;padding-bottom:48px}
+.ideas-section{margin-bottom:36px}
+.ideas-section-head{margin-bottom:16px}
+.ideas-section-head h2{font-family:"Cormorant Garamond",serif;font-size:26px;color:var(--navy);margin:0 0 4px}
+.ideas-section-head p{margin:0;font-size:13px;color:var(--mist);line-height:1.45}
 .idea-fab{position:fixed;bottom:22px;right:22px;z-index:45;border:1.5px solid var(--gold);background:var(--gold-bg);
   color:var(--navy);border-radius:999px;padding:10px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;
   box-shadow:0 2px 12px rgba(27,42,74,.12);display:flex;align-items:center;gap:6px}
 .idea-fab:hover{filter:brightness(1.03);background:rgba(184,149,74,.2)}
 .idea-fab .fab-icon{font-size:15px;color:var(--gold);line-height:1}
-.ideas-panel{max-width:900px;margin:0 auto}
-.idea-stats{font-size:12px;color:var(--mist);margin-bottom:14px;line-height:1.5;font-variant-numeric:tabular-nums}
-.idea-filters,.idea-cat-filters{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
-.idea-cat-filters{margin-bottom:14px}
-.idea-filter,.idea-cat-filter{border:1px solid var(--line-soft);background:var(--cream-raised);border-radius:999px;
-  padding:5px 11px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--mist)}
-.idea-filter.on,.idea-cat-filter.on{background:var(--navy);color:var(--cream-raised);border-color:var(--navy)}
-.idea-list{display:flex;flex-direction:column;gap:10px}
-.idea-card{border:1px solid var(--line-soft);border-radius:10px;padding:12px 14px;background:var(--cream-raised)}
-.idea-card.promoted{border-left:3px solid var(--green)}
-.idea-card.resting{border-left:3px solid var(--mist)}
-.idea-card.released{opacity:.72;border-left:3px solid var(--line)}
-.idea-card-head{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px;align-items:flex-start}
-.idea-cat-badge{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;padding:3px 8px;border-radius:999px;
-  background:var(--gold-bg);color:var(--gold)}
-.idea-card-text{font-size:13px;line-height:1.5;color:var(--ink);width:100%}
-.idea-card-meta{font-size:10px;color:var(--mist)}
-.idea-card-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
-.idea-act{border:1px solid var(--line-soft);background:var(--paper);border-radius:6px;padding:5px 10px;font-size:11px;
-  font-weight:600;cursor:pointer;font-family:inherit;color:var(--navy)}
-.idea-act:hover{border-color:var(--gold);background:var(--gold-bg)}
-.idea-act.gold{border-color:var(--gold);color:var(--gold)}
-.idea-act.muted{color:var(--mist)}
+.pipeline-wrap{position:relative;margin-bottom:28px}
+.pipeline-track{display:flex;align-items:stretch;gap:0;position:relative}
+.pipeline-connector{position:absolute;top:50%;left:0;right:0;height:2px;background:var(--gold);opacity:.35;transform:translateY(-50%);z-index:0;pointer-events:none}
+.pipeline-connector.shimmer::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  animation:pipeShimmer .9s ease}
+@keyframes pipeShimmer{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+.pipe-card{flex:1;min-width:0;position:relative;z-index:1;background:var(--cream-raised);border:1px solid var(--line-soft);
+  border-radius:12px;padding:14px 12px;transition:opacity .2s ease,box-shadow .2s ease,border-color .2s ease}
+.pipe-card.future{opacity:.45}
+.pipe-card.active{border-color:var(--gold);box-shadow:0 0 0 1px rgba(184,149,74,.15)}
+.pipe-card.locked .pipe-card-body{pointer-events:none;filter:grayscale(.2)}
+.pipe-card-num{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+.pipe-card-title{font-family:"Cormorant Garamond",serif;font-size:16px;color:var(--navy);margin:0 0 10px;line-height:1.2}
+.pipe-lock{font-size:11px;color:var(--mist);line-height:1.45;padding:8px 0;font-style:italic}
+.pipe-arrow{display:flex;align-items:center;justify-content:center;width:20px;flex:none;color:var(--gold);font-size:12px;opacity:.7;z-index:1}
+.pipe-inset{width:100%;border:1px solid transparent;background:var(--paper);border-radius:10px;padding:10px 12px;
+  font-size:14px;line-height:1.5;resize:vertical;min-height:72px;font-family:inherit;color:var(--ink);box-shadow:inset 0 1px 3px rgba(27,42,74,.06)}
+.pipe-inset:focus{outline:none;border-color:var(--gold);background:var(--cream-raised)}
+.pipe-select{width:100%;margin-top:10px;padding:7px 10px;border:1px solid var(--line-soft);border-radius:8px;
+  background:var(--paper);font-size:12px;font-family:inherit;color:var(--ink)}
+.pipe-step{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.pipe-step label{font-size:10px;font-weight:600;color:var(--mist);text-transform:uppercase;letter-spacing:.04em}
+.pipe-hint{font-size:11px;color:var(--mist);font-style:italic;margin:8px 0;line-height:1.45}
+.pipe-week{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:10px}
+.pipe-day{border:1px solid var(--line-soft);background:var(--paper);border-radius:8px;padding:6px 2px;text-align:center;
+  cursor:pointer;font-size:10px;font-family:inherit;color:var(--navy);transition:border-color .2s,background .2s}
+.pipe-day b{display:block;font-size:11px;font-weight:600}
+.pipe-day.on{background:var(--gold-bg);border-color:var(--gold)}
+.pipe-day.today{box-shadow:0 0 0 2px var(--gold)}
+.pipe-slots{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:8px}
+.pipe-slot{border:1px solid var(--line-soft);background:var(--paper);border-radius:8px;padding:7px 6px;font-size:10px;
+  font-weight:600;cursor:pointer;font-family:inherit;color:var(--navy);text-align:center;line-height:1.3}
+.pipe-slot.on{background:var(--gold-bg);border-color:var(--gold)}
+.pipe-confirm{font-size:11px;color:var(--green);line-height:1.45;margin-top:6px;min-height:1.2em}
+.pipe-check{display:flex;align-items:flex-start;gap:8px;margin:10px 0;font-size:11px;line-height:1.45;color:var(--ink)}
+.pipe-check input{accent-color:var(--green);width:14px;height:14px;margin-top:2px;flex:none}
+.pipe-text-btns{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+.pipe-text-btn{border:none;background:none;padding:0;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--navy);text-decoration:underline;text-underline-offset:3px}
+.pipe-text-btn.muted{color:var(--mist);font-weight:500}
+.seedbed{margin-bottom:36px}
+.seedbed-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:10px}
+.seedbed-head h3{font-family:"Cormorant Garamond",serif;font-size:18px;color:var(--navy);margin:0}
+.seedbed-shelf{display:flex;flex-wrap:wrap;gap:8px;min-height:36px;align-items:center}
+.seed-chip{display:inline-flex;align-items:center;gap:6px;max-width:220px;border:1px solid var(--line-soft);
+  background:var(--paper);border-radius:999px;padding:6px 12px 6px 10px;font-size:11px;cursor:pointer;font-family:inherit;
+  color:var(--ink);transition:border-color .2s,background .2s}
+.seed-chip:hover{border-color:var(--gold);background:var(--gold-bg)}
+.seed-chip .dot{width:7px;height:7px;border-radius:50%;flex:none;background:var(--mist)}
+.seed-chip .dot.gold{background:var(--gold)}
+.seed-chip .dot.harvest{background:var(--green)}
+.seed-chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.seed-empty{font-size:12px;color:var(--mist);font-style:italic}
+.seed-view-all{font-size:11px;color:var(--gold);font-weight:600;cursor:pointer;border:none;background:none;font-family:inherit;padding:0}
+.seed-list-view{display:none;margin-top:12px;border:1px solid var(--line-soft);border-radius:12px;padding:12px;background:var(--cream-raised)}
+.seed-list-view.open{display:block}
+.seed-list-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line-soft);font-size:12px}
+.seed-list-row:last-child{border-bottom:none}
+.idea-cal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.idea-cal-nav{display:flex;align-items:center;gap:8px}
+.idea-cal-nav button{border:1px solid var(--line-soft);background:var(--paper);border-radius:6px;width:28px;height:28px;cursor:pointer;font-family:inherit;color:var(--navy)}
+.idea-cal-month{font-family:"Cormorant Garamond",serif;font-size:20px;color:var(--navy);min-width:140px;text-align:center}
+.idea-cal-toggles{display:flex;gap:6px}
+.idea-cal-toggle{border:1px solid var(--line-soft);background:var(--paper);border-radius:999px;padding:5px 11px;font-size:10px;
+  font-weight:600;cursor:pointer;font-family:inherit;color:var(--mist)}
+.idea-cal-toggle.on{background:var(--navy);color:var(--cream-raised);border-color:var(--navy)}
+.idea-cal-edit{font-size:11px;color:var(--gold);font-weight:600;cursor:pointer;border:none;background:none;font-family:inherit;padding:0;margin-bottom:10px;display:block}
+.my-week-panel{border:1px solid var(--line-soft);border-radius:12px;padding:14px;margin-bottom:14px;background:var(--paper);display:none}
+.my-week-panel.open{display:block}
+.my-week-day{margin-bottom:10px}
+.my-week-day h4{font-size:11px;font-weight:600;color:var(--navy);margin:0 0 6px;text-transform:uppercase;letter-spacing:.04em}
+.my-week-block{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:4px;font-size:11px}
+.my-week-block input{border:1px solid var(--line-soft);border-radius:6px;padding:4px 6px;font-size:11px;font-family:inherit}
+.cal-layout{display:grid;grid-template-columns:1fr 280px;gap:16px;align-items:start}
+.cal-grid-wrap{border:1px solid var(--line-soft);border-radius:12px;padding:10px;background:var(--cream-raised)}
+.cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px}
+.cal-weekdays span{text-align:center;font-size:10px;font-weight:600;color:var(--mist);padding:4px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-cell{min-height:72px;border:1px solid var(--line-soft);border-radius:8px;padding:4px;background:var(--paper);
+  cursor:pointer;position:relative;transition:border-color .2s}
+.cal-cell.other{opacity:.4}
+.cal-cell.today{box-shadow:inset 0 0 0 2px var(--gold)}
+.cal-cell.selected{border-color:var(--gold);background:var(--gold-bg)}
+.cal-cell-num{font-size:10px;font-weight:600;color:var(--mist);margin-bottom:2px}
+.cal-recur{position:absolute;left:2px;right:2px;border-radius:3px;background:rgba(27,42,74,.06);font-size:8px;color:var(--mist);
+  padding:1px 3px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;pointer-events:none}
+.cal-events{display:flex;flex-direction:column;gap:2px;margin-top:2px}
+.cal-event{font-size:9px;line-height:1.25;padding:2px 4px;border-radius:4px;background:var(--gold-bg);color:var(--navy);
+  border-left:2px solid var(--gold);cursor:grab;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cal-event.done{opacity:.5;text-decoration:line-through}
+.cal-event.mustdo{border-left-color:var(--green);background:var(--green-bg)}
+.cal-day-panel{border:1px solid var(--line-soft);border-radius:12px;padding:14px;background:var(--cream-raised);position:sticky;top:12px}
+.cal-day-panel h3{font-family:"Cormorant Garamond",serif;font-size:18px;color:var(--navy);margin:0 0 4px}
+.cal-day-empty{font-size:12px;color:var(--mist);font-style:italic;margin:12px 0;line-height:1.45}
+.cal-cap-note{font-size:11px;color:var(--gold);line-height:1.45;margin-bottom:10px;padding:8px 10px;background:var(--gold-bg);border-radius:8px}
+.cal-slot-block{margin-bottom:12px}
+.cal-slot-block h4{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mist);margin:0 0 6px}
+.cal-slot-item{font-size:12px;padding:6px 8px;border-radius:6px;background:var(--paper);margin-bottom:4px;display:flex;align-items:flex-start;gap:6px}
+.cal-slot-item input{accent-color:var(--green);margin-top:2px;flex:none}
+.idea-toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--navy);color:var(--cream-raised);
+  padding:10px 18px;border-radius:999px;font-size:13px;z-index:100;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+.idea-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .idea-triage-item{border:1px dashed var(--gold);border-radius:10px;padding:12px 14px;margin-bottom:10px;background:var(--gold-bg)}
-.idea-triage-item .idea-card-text{margin-bottom:8px}
-.modal-backdrop{position:fixed;inset:0;background:rgba(27,42,74,.28);z-index:90;opacity:0;pointer-events:none;transition:opacity .2s}
-.modal-backdrop.open{opacity:1;pointer-events:auto}
-.idea-modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.96);width:min(400px,calc(100vw - 32px));
-  max-height:min(90vh,560px);overflow-y:auto;background:var(--cream-raised);border:1px solid var(--line-soft);border-radius:12px;
-  padding:18px 18px 16px;z-index:95;box-shadow:0 8px 32px rgba(27,42,74,.15);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;
-  box-sizing:border-box}
-.idea-modal.open{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
-.idea-flow-modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.98);width:min(560px,calc(100vw - 24px));
-  max-height:min(92vh,720px);overflow:hidden;display:flex;flex-direction:column;background:var(--cream-raised);
-  border:1px solid var(--line-soft);border-radius:14px;z-index:96;box-shadow:0 12px 40px rgba(27,42,74,.18);
-  opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;box-sizing:border-box}
-.idea-flow-modal .idea-modal-close{position:absolute;top:12px;right:12px;z-index:2}
-.idea-flow-modal.open{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
-.idea-flow-inner{overflow-y:auto;padding:20px 20px 18px;flex:1}
-.idea-flow-stepper{display:flex;align-items:center;justify-content:center;gap:4px;padding:14px 16px 10px;
-  border-bottom:1px solid var(--line-soft);background:var(--paper);flex:none;flex-wrap:wrap;font-size:10px;font-weight:600;
-  letter-spacing:.03em;text-transform:uppercase;color:var(--mist)}
-.idea-flow-stepper .step{display:flex;align-items:center;gap:4px}
-.idea-flow-stepper .step.on{color:var(--navy)}
-.idea-flow-stepper .step.done{color:var(--green)}
-.idea-flow-stepper .dot{width:6px;height:6px;border-radius:50%;background:var(--line-soft)}
-.idea-flow-stepper .step.on .dot,.idea-flow-stepper .step.done .dot{background:var(--gold)}
-.idea-flow-stepper .arr{color:var(--line);font-size:9px}
-.flow-stage{margin-bottom:14px;overflow:hidden;transition:max-height .2s ease,opacity .2s ease, margin .2s ease}
-.flow-stage-head{font-family:"Cormorant Garamond",serif;font-size:18px;color:var(--navy);margin:0 0 8px}
-.flow-stage-prompt{font-size:12px;color:var(--mist);margin:0 0 12px;line-height:1.45}
-.flow-summary{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border:1px solid var(--line-soft);
-  border-radius:8px;background:var(--paper);cursor:pointer;margin-bottom:10px}
-.flow-summary:hover{border-color:var(--gold);background:var(--gold-bg)}
-.flow-summary-text{flex:1;font-size:13px;line-height:1.45;color:var(--ink)}
-.flow-summary-meta{font-size:10px;color:var(--mist);margin-top:2px}
-.flow-summary-edit{font-size:10px;color:var(--gold);font-weight:600;flex:none;margin-top:2px}
-.flow-capture-ta{min-height:88px;font-size:15px;line-height:1.5;resize:vertical;width:100%}
-.flow-step-fields{display:flex;flex-direction:column;gap:8px}
-.flow-stage-panel{max-height:0;opacity:0;overflow:hidden;transition:max-height .2s ease,opacity .2s ease,padding .2s ease;padding-top:0}
-.flow-stage-panel.open{max-height:900px;opacity:1;padding-top:4px}
-.flow-hint{font-size:11px;color:var(--mist);font-style:italic;margin:6px 0 10px;line-height:1.45}
-.flow-date-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
-.flow-date-chip{border:1px solid var(--line-soft);background:var(--paper);border-radius:999px;padding:6px 12px;
-  font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--navy)}
-.flow-date-chip.on{background:var(--gold-bg);border-color:var(--gold);color:var(--navy)}
-.flow-slot-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
-.flow-slot{border:1px solid var(--line-soft);background:var(--paper);border-radius:8px;padding:8px 10px;
-  font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--navy);flex:1;min-width:calc(50% - 6px);text-align:center}
-.flow-slot.on{background:var(--gold-bg);border-color:var(--gold)}
-.flow-confirm{font-size:12px;color:var(--green);background:var(--green-bg);padding:10px 12px;border-radius:8px;
-  line-height:1.45;margin-top:8px}
-.flow-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;align-items:center}
-.flow-actions .gobtn{flex:1;min-width:140px}
-.flow-actions .idea-act{flex:1;min-width:120px;text-align:center;padding:8px 12px}
-.flow-mustdo{display:flex;align-items:flex-start;gap:8px;margin-top:12px;font-size:12px;line-height:1.45;color:var(--ink)}
-.flow-mustdo input{accent-color:var(--green);width:15px;height:15px;margin-top:2px;flex:none}
-.flow-success{text-align:center;padding:28px 12px 16px}
-.flow-success-icon{font-size:32px;color:var(--gold);line-height:1;margin-bottom:12px}
-.flow-success h3{font-family:"Cormorant Garamond",serif;font-size:22px;color:var(--navy);margin:0 0 8px}
-.flow-success p{font-size:13px;color:var(--mist);margin:0 0 16px;line-height:1.5}
-.flow-success-card{text-align:left;border:1px solid var(--line-soft);border-left:3px solid var(--gold);
-  border-radius:10px;padding:12px 14px;background:var(--paper);margin-bottom:16px}
-@media(max-width:640px){
-  .idea-flow-modal{inset:0;left:0;top:0;transform:translateY(100%);width:100%;max-height:100%;height:100%;border-radius:0;border:none}
-  .idea-flow-modal.open{transform:translateY(0)}
-  .flow-slot{min-width:100%}
-}
-.idea-modal h3{margin:0 0 4px;font-family:"Cormorant Garamond",serif;font-size:20px;color:var(--navy)}
-.idea-modal .modal-sub{margin:0 0 14px;font-size:12px;color:var(--mist);line-height:1.45}
-.idea-modal-foot{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
-.idea-modal-close{position:absolute;top:10px;right:10px;border:none;background:var(--line-soft);width:28px;height:28px;
-  border-radius:6px;cursor:pointer;font-size:16px;color:var(--mist)}
-.idea-cat-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
-.idea-cat-pick{border:1px solid var(--line-soft);background:var(--paper);border-radius:999px;padding:4px 9px;font-size:10px;
-  cursor:pointer;font-family:inherit;color:var(--mist)}
-.idea-cat-pick.on{background:var(--gold-bg);border-color:var(--gold);color:var(--navy);font-weight:600}
-.promote-type{display:flex;gap:8px;margin-bottom:10px}
-.promote-type label{flex:1;border:1px solid var(--line-soft);border-radius:8px;padding:8px 10px;font-size:11px;cursor:pointer;text-align:center;display:block}
-.promote-type input{display:none}
-.promote-type label:has(input:checked){border-color:var(--gold);background:var(--gold-bg);font-weight:600}
-.rest-picks{display:flex;gap:8px;margin-bottom:8px}
-.rest-pick{flex:1;border:1px solid var(--line-soft);background:var(--paper);border-radius:8px;padding:10px;cursor:pointer;
-  font-size:12px;font-weight:600;font-family:inherit;color:var(--navy);text-align:center}
-.rest-pick:hover{border-color:var(--gold);background:var(--gold-bg)}
-.guard-msg{padding:12px;border-left:2px solid var(--gold);background:var(--gold-bg);font-size:12px;line-height:1.55;color:var(--navy);
-  border-radius:0 8px 8px 0;margin-top:10px}
+.guard-msg{padding:10px;border-left:2px solid var(--gold);background:var(--gold-bg);font-size:11px;line-height:1.5;color:var(--navy);
+  border-radius:0 8px 8px 0;margin-bottom:10px}
 body.view-ideas .daily-layout,body.view-ideas .weekly-board,body.view-ideas .monthly-board,body.view-ideas .journal-panel,body.view-ideas .prayer-panel{display:none}
 body.view-ideas .site-foot{display:none}
+@media(max-width:900px){
+  .cal-layout{grid-template-columns:1fr}
+  .cal-day-panel{position:fixed;inset:auto 0 0 0;max-height:55vh;overflow-y:auto;border-radius:12px 12px 0 0;z-index:50;
+    transform:translateY(100%);transition:transform .2s ease;box-shadow:0 -8px 24px rgba(27,42,74,.12)}
+  .cal-day-panel.open{transform:translateY(0)}
+}
+@media(max-width:760px){
+  .pipeline-track{flex-direction:column;gap:0;padding-left:14px;border-left:2px solid rgba(184,149,74,.35)}
+  .pipeline-connector{display:none}
+  .pipe-arrow{transform:rotate(90deg);width:auto;height:16px;margin:2px 0 2px -22px}
+  .pipe-card.future{opacity:.55}
+  .pipe-slots{grid-template-columns:1fr}
+}
 
 /* Thought journal — sidebar card above Today's Flow */
 .thought-journal .thought-journal-head{padding:0}
@@ -648,151 +663,122 @@ body.view-ideas .site-foot{display:none}
 <div class="board ideas-panel" id="ideasPanel" hidden>
   <div class="page-head">
     <div>
-      <h2>Idea Vault</h2>
-      <p>Capture freely. Act deliberately. Steward ideas — don't hoard them.</p>
+      <h2>Ideas</h2>
+      <p>Capture on the page. Plant on the calendar. One scroll, no popups.</p>
     </div>
   </div>
-  <p class="idea-stats" id="ideaStats"></p>
-  <div class="card-soft idea-add">
-    <h3>Idea Flow</h3>
-    <p class="modal-sub" style="margin-bottom:12px">Capture, plan, schedule, and commit — one guided path when you're ready.</p>
-    <button type="button" class="gobtn" id="ideaStartFlowBtn">Start idea flow</button>
-  </div>
-  <div class="idea-filters" role="tablist" id="ideaStatusFilters">
-    <button type="button" class="idea-filter on" data-idea-status="active">Active</button>
-    <button type="button" class="idea-filter" data-idea-status="resting">Resting</button>
-    <button type="button" class="idea-filter" data-idea-status="promoted">In motion</button>
-    <button type="button" class="idea-filter" data-idea-status="released">Released</button>
-    <button type="button" class="idea-filter" data-idea-status="all">All</button>
-  </div>
-  <div class="idea-cat-filters" id="ideaCatFilters"></div>
-  <div class="idea-list" id="ideaList"></div>
-</div>
 
-<button type="button" class="idea-fab" id="ideaFab" hidden aria-label="Capture an idea"><span class="fab-icon">✦</span> Idea</button>
-
-<div class="modal-backdrop" id="ideaModalBackdrop"></div>
-<div class="idea-flow-modal" id="ideaFlowModal" role="dialog" aria-labelledby="ideaFlowTitle" hidden>
-  <button type="button" class="idea-modal-close" id="ideaFlowClose" aria-label="Close">×</button>
-  <div class="idea-flow-stepper" id="ideaFlowStepper" aria-hidden="true">
-    <span class="step on" data-flow-step="1"><span class="dot"></span>Capture</span>
-    <span class="arr">→</span>
-    <span class="step" data-flow-step="2"><span class="dot"></span>Plan</span>
-    <span class="arr">→</span>
-    <span class="step" data-flow-step="3"><span class="dot"></span>Schedule</span>
-    <span class="arr">→</span>
-    <span class="step" data-flow-step="4"><span class="dot"></span>First Step</span>
-  </div>
-  <div class="idea-flow-inner">
-    <div id="ideaFlowSuccess" hidden>
-      <div class="flow-success">
-        <div class="flow-success-icon">✓</div>
-        <h3>Planted.</h3>
-        <p id="ideaFlowSuccessLine">See you soon.</p>
-        <div class="flow-success-card" id="ideaFlowSuccessCard"></div>
-        <button type="button" class="gobtn" id="ideaFlowDoneBtn">Done</button>
+  <section class="ideas-section" id="ideasFlowSection">
+    <div class="ideas-section-head">
+      <h2>The Flow</h2>
+      <p>Four steps, always visible — one thing at a time.</p>
+    </div>
+    <div class="pipeline-wrap">
+      <div class="pipeline-connector" id="pipelineConnector"></div>
+      <div class="pipeline-track" id="pipelineTrack">
+        <div class="pipe-card active" data-pipe="1" id="pipeCard1">
+          <div class="pipe-card-num">1 · Capture</div>
+          <h3 class="pipe-card-title">What's the idea?</h3>
+          <div class="pipe-card-body">
+            <textarea id="pipeIdeaText" class="pipe-inset" rows="3" placeholder="A seed worth saving…"></textarea>
+            <label class="q q-compact" for="pipeLifeArea" style="margin-top:10px">Life area</label>
+            <select id="pipeLifeArea" class="pipe-select">
+              <option value="ministry">Ministry</option><option value="career">Career</option>
+              <option value="content">Content</option><option value="health">Health</option>
+              <option value="income">Income</option><option value="other" selected>Other</option>
+            </select>
+            <div class="pipe-text-btns">
+              <button type="button" class="pipe-text-btn muted" id="pipeSaveLater">Save for later</button>
+              <button type="button" class="pipe-text-btn" id="pipeKeepGoing">Keep going →</button>
+            </div>
+          </div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-card future" data-pipe="2" id="pipeCard2">
+          <div class="pipe-card-num">2 · Plan</div>
+          <h3 class="pipe-card-title">Three faithful steps</h3>
+          <div class="pipe-card-body">
+            <div id="pipePlanLock" class="pipe-lock" hidden>Two ideas are already growing. Save this one to the Seedbed.</div>
+            <div class="pipe-step"><label for="pipeStep1">Step 1</label><input type="text" class="inp-sm" id="pipeStep1" placeholder="First move"></div>
+            <div class="pipe-step"><label for="pipeStep2">Step 2</label><input type="text" class="inp-sm" id="pipeStep2" placeholder="Next"></div>
+            <div class="pipe-step"><label for="pipeStep3">Step 3</label><input type="text" class="inp-sm" id="pipeStep3" placeholder="Finish"></div>
+            <p class="pipe-hint">Small is faithful. Three steps max.</p>
+            <label class="q q-compact" for="pipeDoneDef">Done looks like…</label>
+            <input type="text" class="inp-sm" id="pipeDoneDef" placeholder="Optional — what finished looks like">
+          </div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-card future" data-pipe="3" id="pipeCard3">
+          <div class="pipe-card-num">3 · Schedule</div>
+          <h3 class="pipe-card-title">When does Step 1 happen?</h3>
+          <div class="pipe-card-body">
+            <div class="pipe-week" id="pipeWeekStrip"></div>
+            <div class="pipe-slots" id="pipeSlots">
+              <button type="button" class="pipe-slot on" data-slot="beforeWork">Before Work</button>
+              <button type="button" class="pipe-slot" data-slot="duringWork">During Work</button>
+              <button type="button" class="pipe-slot" data-slot="afterWork">After Work</button>
+              <button type="button" class="pipe-slot" data-slot="eveningShutdown">Evening Shutdown</button>
+            </div>
+            <div class="pipe-confirm" id="pipeScheduleConfirm"></div>
+          </div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-card future" data-pipe="4" id="pipeCard4">
+          <div class="pipe-card-num">4 · First Step</div>
+          <h3 class="pipe-card-title">The 10-minute version</h3>
+          <div class="pipe-card-body">
+            <label class="q q-compact" for="pipeFirstAction">What's the very first physical action?</label>
+            <input type="text" class="inp-sm" id="pipeFirstAction" placeholder="Set up the tripod">
+            <label class="pipe-check"><input type="checkbox" id="pipeMustDo" checked>
+              <span id="pipeMustDoLabel">Make it a Must-Do that day</span></label>
+            <button type="button" class="gobtn" id="pipePlantBtn" style="width:100%;margin-top:10px">Plant it</button>
+          </div>
+        </div>
       </div>
     </div>
-    <div id="ideaFlowBody">
-      <h3 id="ideaFlowTitle" style="margin:0 0 4px;font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--navy)">Idea Flow</h3>
-      <p class="modal-sub" style="margin-bottom:16px">Capture freely. Act when you're ready.</p>
-      <div id="ideaFlowGuard" class="guard-msg" hidden></div>
-      <section class="flow-stage" id="flowStageCapture">
-        <div id="flowCaptureExpanded">
-          <label class="q q-compact" for="flowCaptureText">What's the idea?</label>
-          <textarea id="flowCaptureText" class="ta-sm flow-capture-ta" rows="4" placeholder="A seed worth saving…"></textarea>
-          <label class="q q-compact" style="margin-top:12px">Category</label>
-          <div class="idea-cat-row" id="flowCaptureCats"></div>
-          <div class="flow-actions">
-            <button type="button" class="idea-act" id="flowJustSave">Just save it</button>
-            <button type="button" class="idea-act gold" id="flowBuildPlan">Build the plan →</button>
-          </div>
-        </div>
-        <div id="flowCaptureSummary" class="flow-summary" hidden>
-          <div><div class="flow-summary-text" id="flowCaptureSummaryText"></div>
-          <div class="flow-summary-meta" id="flowCaptureSummaryMeta"></div></div>
-          <span class="flow-summary-edit">Edit</span>
-        </div>
-      </section>
-      <section class="flow-stage" id="flowStagePlan">
-        <div class="flow-stage-panel" id="flowPlanPanel">
-          <h4 class="flow-stage-head">Plan of Action</h4>
-          <p class="flow-stage-prompt">What would faithful progress look like?</p>
-          <div class="flow-step-fields">
-            <div><label class="q q-compact" for="flowStep1">Step 1</label><input type="text" class="inp-sm" id="flowStep1" placeholder="First meaningful move"></div>
-            <div><label class="q q-compact" for="flowStep2">Step 2</label><input type="text" class="inp-sm" id="flowStep2" placeholder="What comes next"></div>
-            <div><label class="q q-compact" for="flowStep3">Step 3</label><input type="text" class="inp-sm" id="flowStep3" placeholder="Finish strong"></div>
-          </div>
-          <p class="flow-hint">Three steps is enough. You can always add more later.</p>
-          <label class="q q-compact" for="flowDoneDef">Definition of done <span class="hint" style="display:inline;margin:0">(optional)</span></label>
-          <input type="text" class="inp-sm" id="flowDoneDef" placeholder="What finished looks like…">
-        </div>
-        <div id="flowPlanSummary" class="flow-summary" hidden>
-          <div><div class="flow-summary-text" id="flowPlanSummaryText"></div></div>
-          <span class="flow-summary-edit">Edit</span>
-        </div>
-      </section>
-      <section class="flow-stage" id="flowStageSchedule">
-        <div class="flow-stage-panel" id="flowSchedulePanel">
-          <h4 class="flow-stage-head">Schedule</h4>
-          <p class="flow-stage-prompt">When does Step 1 happen?</p>
-          <div class="flow-date-chips" id="flowDateChips">
-            <button type="button" class="flow-date-chip on" data-flow-date="today">Today</button>
-            <button type="button" class="flow-date-chip" data-flow-date="tomorrow">Tomorrow</button>
-            <button type="button" class="flow-date-chip" data-flow-date="weekend">This Weekend</button>
-            <button type="button" class="flow-date-chip" data-flow-date="pick">Pick a date</button>
-          </div>
-          <input type="date" id="flowPickDate" class="inp-sm" hidden>
-          <p class="flow-stage-prompt" style="margin-top:12px">Which Execute block?</p>
-          <div class="flow-slot-row" id="flowSlotRow">
-            <button type="button" class="flow-slot on" data-flow-slot="beforeWork">Before Work</button>
-            <button type="button" class="flow-slot" data-flow-slot="duringWork">During Work</button>
-            <button type="button" class="flow-slot" data-flow-slot="afterWork">After Work</button>
-            <button type="button" class="flow-slot" data-flow-slot="eveningShutdown">Evening Shutdown</button>
-          </div>
-          <div class="flow-confirm" id="flowScheduleConfirm" hidden></div>
-        </div>
-        <div id="flowScheduleSummary" class="flow-summary" hidden>
-          <div><div class="flow-summary-text" id="flowScheduleSummaryText"></div></div>
-          <span class="flow-summary-edit">Edit</span>
-        </div>
-      </section>
-      <section class="flow-stage" id="flowStageCommit">
-        <div class="flow-stage-panel" id="flowCommitPanel">
-          <h4 class="flow-stage-head">First Step Commitment</h4>
-          <p class="flow-stage-prompt">What's the very first physical action — something under 10 minutes?</p>
-          <input type="text" class="inp-sm" id="flowFirstAction" placeholder="Set up phone tripod · Open CapCut and create project…">
-          <label class="flow-mustdo"><input type="checkbox" id="flowAddMustDo" checked>
-            <span id="flowMustDoLabel">Add this as a Must-Do for the selected day</span></label>
-          <div class="flow-actions" style="margin-top:16px">
-            <button type="button" class="gobtn" id="flowCommitBtn">Commit</button>
-          </div>
-        </div>
-      </section>
+  </section>
+
+  <section class="seedbed ideas-section" id="ideasSeedbedSection">
+    <div class="seedbed-head">
+      <h3>The Seedbed</h3>
+      <button type="button" class="seed-view-all" id="seedViewAllBtn" hidden>View all</button>
     </div>
-  </div>
+    <div class="seedbed-shelf" id="seedbedShelf"><span class="seed-empty">No seeds waiting. Capture one above.</span></div>
+    <div class="seed-list-view" id="seedListView"></div>
+  </section>
+
+  <section class="ideas-section" id="ideasCalendarSection">
+    <div class="ideas-section-head">
+      <h2>The Calendar</h2>
+      <p>Ideas, Must-Dos, and your weekly rhythm — one view.</p>
+    </div>
+    <button type="button" class="idea-cal-edit" id="myWeekToggle">Edit my week</button>
+    <div class="my-week-panel" id="myWeekPanel"></div>
+    <div class="idea-cal-head">
+      <div class="idea-cal-nav">
+        <button type="button" id="ideaCalPrev" aria-label="Previous month">‹</button>
+        <div class="idea-cal-month" id="ideaCalMonthLabel"></div>
+        <button type="button" id="ideaCalNext" aria-label="Next month">›</button>
+      </div>
+      <div class="idea-cal-toggles">
+        <button type="button" class="idea-cal-toggle on" data-cal-view="month">Month</button>
+        <button type="button" class="idea-cal-toggle" data-cal-view="week">Week</button>
+      </div>
+    </div>
+    <div class="cal-layout">
+      <div class="cal-grid-wrap" id="ideaCalGridWrap"></div>
+      <aside class="cal-day-panel" id="ideaCalDayPanel">
+        <h3 id="ideaCalDayTitle">Select a day</h3>
+        <p class="cal-day-empty" id="ideaCalDayEmpty">Open space is not wasted space.</p>
+        <div id="ideaCalDayCapNote" hidden class="cal-cap-note"></div>
+        <div id="ideaCalDaySlots"></div>
+      </aside>
+    </div>
+  </section>
 </div>
-<div class="idea-modal" id="ideaRestModal" role="dialog">
-  <button type="button" class="idea-modal-close" data-close-modal aria-label="Close">×</button>
-  <h3>Let it rest</h3>
-  <p class="modal-sub">Not now — and that's faithful too. Hide until you're ready.</p>
-  <div class="rest-picks">
-    <button type="button" class="rest-pick" data-rest-days="7">7 days</button>
-    <button type="button" class="rest-pick" data-rest-days="30">30 days</button>
-    <button type="button" class="rest-pick" data-rest-days="90">90 days</button>
-  </div>
-</div>
-<div class="idea-modal" id="ideaReleaseModal" role="dialog">
-  <button type="button" class="idea-modal-close" data-close-modal aria-label="Close">×</button>
-  <h3>Release this idea</h3>
-  <p class="modal-sub">Letting go is also stewardship.</p>
-  <label class="q q-compact" for="ideaReleaseNote">Why? <span class="hint" style="display:inline;margin:0">(optional)</span></label>
-  <input type="text" class="inp-sm" id="ideaReleaseNote" placeholder="Not the season · merged elsewhere · no longer aligned…">
-  <div class="idea-modal-foot">
-    <button type="button" class="idea-act muted" data-close-modal>Cancel</button>
-    <button type="button" class="gobtn" id="ideaReleaseConfirm">Release</button>
-  </div>
-</div>
+
+<button type="button" class="idea-fab" id="ideaFab" hidden aria-label="Go to Ideas"><span class="fab-icon">✦</span> Idea</button>
+<div class="idea-toast" id="ideaToast" role="status"></div>
 
 <footer class="site-foot">
   <div class="foot-actions"><button type="button" class="danger" id="clearPeriod">Clear this period</button></div>
@@ -1105,573 +1091,589 @@ async function signOut(){
   updateSaveState(dirty ? 'dirty' : 'saved');
 }
 
-const IDEA_CATEGORIES = [
-  {id:'ministry', label:'Ministry'},{id:'career', label:'Career'},{id:'content', label:'Content / YouTube'},
-  {id:'health', label:'Health'},{id:'income', label:'Income'},{id:'other', label:'Other'}
+const IDEA_AREAS = [
+  {id:'ministry',label:'Ministry'},{id:'career',label:'Career'},{id:'content',label:'Content'},
+  {id:'health',label:'Health'},{id:'income',label:'Income'},{id:'other',label:'Other'}
 ];
-const IDEA_STATUS_LABELS = {active:'Active', resting:'Resting', promoted:'In motion', released:'Released'};
-function ensureIdeas(){
-  if(!Array.isArray(globals.ideas)) globals.ideas = [];
+const PIPE_SLOT_LABELS = {beforeWork:'Before Work',duringWork:'During Work',afterWork:'After Work',eveningShutdown:'Evening Shutdown'};
+const PIPE_SLOT_FIELDS = {beforeWork:'beforeWork',duringWork:'duringWork',afterWork:'afterWork',eveningShutdown:'eveningShutdown'};
+const PIPE_PLACEHOLDERS = ['Set up the tripod','Open the doc','Send the text'];
+const WEEKDAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MY_WEEK_DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+let pipeStage = 1;
+let pipeEditingId = null;
+let pipeScheduleDate = null;
+let pipeScheduleSlot = 'beforeWork';
+let pipePlaceholderIdx = 0;
+let ideaCalMonthOffset = 0;
+let ideaCalView = 'month';
+let ideaCalSelectedDay = null;
+let ideaCalDayCache = {};
+let seedbedListOpen = false;
+let dragIdeaId = null;
+
+function ensureIdeas(){ if(!Array.isArray(globals.ideas)) globals.ideas = []; }
+function ensureMyWeek(){
+  if(!globals.myWeek || typeof globals.myWeek !== 'object') globals.myWeek = {0:[],1:[],2:[],3:[],4:[],5:[],6:[]};
+  for(let i=0;i<7;i++) if(!Array.isArray(globals.myWeek[i])) globals.myWeek[i] = [];
+}
+function migrateIdeaStatus(s){
+  if(s==='active') return 'seedbed';
+  if(s==='promoted') return 'growing';
+  return s;
 }
 function normalizeIdea(raw){
   const today = iso(dayOf(0));
+  let status = migrateIdeaStatus(raw.status||'seedbed');
   const o = {
-    id: raw.id||uid(),
-    text: raw.text||'',
-    category: raw.category||'other',
-    status: raw.status||'active',
-    createdAt: raw.createdAt||new Date().toISOString(),
-    updatedAt: raw.updatedAt||null,
-    snoozedUntil: raw.snoozedUntil||null,
-    releaseNote: raw.releaseNote||'',
-    promotedTo: raw.promotedTo||null,
-    flow: raw.flow||null
+    id: raw.id||uid(), text: raw.text||'', category: raw.category||'other', status,
+    createdAt: raw.createdAt||new Date().toISOString(), updatedAt: raw.updatedAt||null,
+    snoozedUntil: raw.snoozedUntil||null, releaseNote: raw.releaseNote||'',
+    flow: raw.flow ? {...raw.flow} : null
   };
-  if(o.status==='resting' && o.snoozedUntil && o.snoozedUntil <= today){
-    o.status = 'active';
-    o.snoozedUntil = null;
-  }
+  if(!o.flow) o.flow = {stage:1,steps:['','',''],doneDef:'',scheduleDate:'',scheduleSlot:'beforeWork',firstAction:'',addMustDo:true,stepsDone:[false,false,false],mustDoId:null};
+  if(!Array.isArray(o.flow.steps)) o.flow.steps = ['','',''];
+  if(!Array.isArray(o.flow.stepsDone)) o.flow.stepsDone = [false,false,false];
+  if(o.status==='resting' && o.snoozedUntil && o.snoozedUntil <= today){ o.status='seedbed'; o.snoozedUntil=null; }
   return o;
 }
-function ideaCategoryLabel(id){
-  return IDEA_CATEGORIES.find(c=>c.id===id)?.label || 'Other';
-}
-function addDaysStr(dateStr, days){
-  const d = new Date(dateStr+'T12:00:00');
-  d.setDate(d.getDate()+days);
-  return iso(d);
-}
-function countPromotedIdeas(excludeId){
+function countGrowingIdeas(excludeId){
   ensureIdeas();
-  return globals.ideas.filter(i=>{
-    const n = normalizeIdea(i);
-    return n.status==='promoted' && n.id !== excludeId;
-  }).length;
+  return globals.ideas.filter(i=> normalizeIdea(i).status==='growing' && i.id!==excludeId).length;
 }
-function ideaMonthStats(){
-  ensureIdeas();
-  const prefix = monthKey(0);
-  const monthStart = prefix+'-01';
-  const next = new Date(monthOf(0)); next.setMonth(next.getMonth()+1);
-  const monthEnd = iso(new Date(next.getTime()-86400000));
-  let captured=0, promoted=0, released=0;
-  globals.ideas.forEach(raw=>{
-    const i = normalizeIdea(raw);
-    const created = i.createdAt.slice(0,10);
-    if(created >= monthStart && created <= monthEnd) captured++;
-    const upd = (i.updatedAt||i.createdAt).slice(0,10);
-    if(i.status==='promoted' && upd >= monthStart && upd <= monthEnd) promoted++;
-    if(i.status==='released' && upd >= monthStart && upd <= monthEnd) released++;
-  });
-  return {captured, promoted, released};
+function pipeBlocked(){ return countGrowingIdeas(pipeEditingId) >= 2; }
+function mondayOf(d){ const x=new Date(d); const day=x.getDay(); x.setDate(x.getDate()-(day===0?6:day-1)); return x; }
+function pipeWeekDates(){
+  const mon = mondayOf(dayOf(0));
+  return Array.from({length:7},(_,i)=>{ const d=new Date(mon); d.setDate(mon.getDate()+i); return iso(d); });
 }
-function ideaMatchesFilters(idea){
-  const i = normalizeIdea(idea);
-  if(ideaCatFilter !== 'all' && i.category !== ideaCatFilter) return false;
-  if(ideaStatusFilter === 'all') return true;
-  if(ideaStatusFilter === 'active') return i.status === 'active';
-  if(ideaStatusFilter === 'resting') return i.status === 'resting' && i.snoozedUntil && i.snoozedUntil > iso(dayOf(0));
-  return i.status === ideaStatusFilter;
-}
-function getUntouchedIdeas(limit){
-  ensureIdeas();
-  return globals.ideas.map(normalizeIdea)
-    .filter(i=> i.status==='active')
-    .sort((a,b)=> (a.createdAt||'').localeCompare(b.createdAt||''))
-    .slice(0, limit||3);
-}
-function formatIdeaWhen(isoStr){
-  if(!isoStr) return '';
-  try{
-    return new Date(isoStr).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
-  }catch{ return isoStr; }
-}
-function openIdeaModal(id){
-  document.getElementById('ideaModalBackdrop')?.classList.add('open');
-  document.getElementById(id)?.classList.add('open');
-}
-function closeIdeaModals(){
-  document.getElementById('ideaModalBackdrop')?.classList.remove('open');
-  document.querySelectorAll('.idea-modal.open').forEach(m=> m.classList.remove('open'));
-  ideaModalTarget = null;
-}
-function thisWeekendDate(){
-  const d = dayOf(0);
-  const dow = d.getDay();
-  if(dow === 0 || dow === 6) return iso(d);
-  const sat = new Date(d);
-  sat.setDate(sat.getDate() + (6 - dow));
-  return iso(sat);
-}
-function flowDateFromPreset(preset){
-  const today = iso(dayOf(0));
-  if(preset === 'today') return today;
-  if(preset === 'tomorrow') return addDaysStr(today, 1);
-  if(preset === 'weekend') return thisWeekendDate();
-  return document.getElementById('flowPickDate')?.value || today;
-}
-function formatFlowDay(dateStr){
+function formatCalDay(dateStr){
   if(!dateStr) return 'that day';
-  const d = new Date(dateStr+'T12:00:00');
-  const today = iso(dayOf(0));
-  if(dateStr === today) return 'today';
-  if(dateStr === addDaysStr(today, 1)) return 'tomorrow';
-  return d.toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'});
+  const d=new Date(dateStr+'T12:00:00');
+  return d.toLocaleDateString('en-US',{weekday:'long'});
 }
-function blankIdeaFlowState(idea){
-  const f = idea?.flow || {};
+function formatShortDay(dateStr){
+  const d=new Date(dateStr+'T12:00:00');
+  return d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+}
+function showIdeaToast(msg){
+  const t=document.getElementById('ideaToast');
+  if(!t) return;
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(showIdeaToast._t);
+  showIdeaToast._t=setTimeout(()=> t.classList.remove('show'), 3200);
+}
+function triggerPipeShimmer(){
+  const c=document.getElementById('pipelineConnector');
+  if(!c) return;
+  c.classList.remove('shimmer');
+  void c.offsetWidth;
+  c.classList.add('shimmer');
+  setTimeout(()=> c.classList.remove('shimmer'), 900);
+}
+function readPipeForm(){
   return {
-    id: idea?.id || null,
-    text: idea?.text || '',
-    category: idea?.category || 'other',
-    maxStage: f.maxStage || 1,
-    datePreset: f.datePreset || 'today',
-    steps: [f.steps?.[0]||'', f.steps?.[1]||'', f.steps?.[2]||''],
-    doneDef: f.doneDef || '',
-    scheduleDate: f.scheduleDate || flowDateFromPreset(f.datePreset || 'today'),
-    scheduleSlot: f.scheduleSlot || 'beforeWork',
-    firstAction: f.firstAction || '',
-    addMustDo: f.addMustDo !== false
+    text: document.getElementById('pipeIdeaText')?.value.trim()||'',
+    category: document.getElementById('pipeLifeArea')?.value||'other',
+    steps: [0,1,2].map(i=> document.getElementById('pipeStep'+(i+1))?.value.trim()||''),
+    doneDef: document.getElementById('pipeDoneDef')?.value.trim()||'',
+    firstAction: document.getElementById('pipeFirstAction')?.value.trim()||'',
+    addMustDo: !!document.getElementById('pipeMustDo')?.checked,
+    scheduleDate: pipeScheduleDate,
+    scheduleSlot: pipeScheduleSlot
   };
 }
-function inferFlowResumeStage(st){
-  if(st.maxStage >= 4 || st.firstAction) return 4;
-  if(st.maxStage >= 3 || st.scheduleDate) return 3;
-  if(st.maxStage >= 2 || st.steps.some(s=>s.trim()) || st.doneDef) return 2;
+function writePipeForm(idea){
+  const f = idea?.flow||{};
+  document.getElementById('pipeIdeaText').value = idea?.text||'';
+  document.getElementById('pipeLifeArea').value = idea?.category||'other';
+  document.getElementById('pipeStep1').value = f.steps?.[0]||'';
+  document.getElementById('pipeStep2').value = f.steps?.[1]||'';
+  document.getElementById('pipeStep3').value = f.steps?.[2]||'';
+  document.getElementById('pipeDoneDef').value = f.doneDef||'';
+  document.getElementById('pipeFirstAction').value = f.firstAction||'';
+  document.getElementById('pipeMustDo').checked = f.addMustDo !== false;
+  pipeScheduleDate = f.scheduleDate || iso(dayOf(0));
+  pipeScheduleSlot = f.scheduleSlot || 'beforeWork';
+  pipeStage = Math.max(1, f.stage||inferPipeStage(f));
+  pipeEditingId = idea?.id||null;
+  renderPipeWeekStrip();
+  document.querySelectorAll('#pipeSlots .pipe-slot').forEach(b=> b.classList.toggle('on', b.dataset.slot===pipeScheduleSlot));
+  rotatePipePlaceholder(true);
+  updatePipelineUI();
+}
+function inferPipeStage(f){
+  if(f.firstAction) return 4;
+  if(f.scheduleDate && f.steps?.[0]) return 4;
+  if(f.steps?.[0]) return 3;
+  if(f.steps?.some((s,i)=> i>0 && s) || f.doneDef) return 2;
   return 1;
 }
-function readIdeaFlowFromDOM(){
-  if(!ideaFlowState) ideaFlowState = blankIdeaFlowState();
-  ideaFlowState.text = document.getElementById('flowCaptureText')?.value.trim() || '';
-  ideaFlowState.category = document.querySelector('#flowCaptureCats .idea-cat-pick.on')?.dataset.cat || 'other';
-  ideaFlowState.steps = [
-    document.getElementById('flowStep1')?.value.trim() || '',
-    document.getElementById('flowStep2')?.value.trim() || '',
-    document.getElementById('flowStep3')?.value.trim() || ''
-  ];
-  ideaFlowState.doneDef = document.getElementById('flowDoneDef')?.value.trim() || '';
-  ideaFlowState.firstAction = document.getElementById('flowFirstAction')?.value.trim() || '';
-  ideaFlowState.addMustDo = !!document.getElementById('flowAddMustDo')?.checked;
-  const presetBtn = document.querySelector('#flowDateChips .flow-date-chip.on');
-  ideaFlowState.datePreset = presetBtn?.dataset.flowDate || 'today';
-  if(ideaFlowState.datePreset === 'pick'){
-    ideaFlowState.scheduleDate = document.getElementById('flowPickDate')?.value || iso(dayOf(0));
-  } else {
-    ideaFlowState.scheduleDate = flowDateFromPreset(ideaFlowState.datePreset);
-  }
-  ideaFlowState.scheduleSlot = document.querySelector('#flowSlotRow .flow-slot.on')?.dataset.flowSlot || 'beforeWork';
-  return ideaFlowState;
+function resetPipeForm(){
+  pipeEditingId=null; pipeStage=1;
+  pipeScheduleDate=iso(dayOf(0)); pipeScheduleSlot='beforeWork';
+  document.getElementById('pipeIdeaText').value='';
+  document.getElementById('pipeLifeArea').value='other';
+  ['pipeStep1','pipeStep2','pipeStep3','pipeDoneDef','pipeFirstAction'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('pipeMustDo').checked=true;
+  renderPipeWeekStrip();
+  document.querySelectorAll('#pipeSlots .pipe-slot').forEach((b,i)=> b.classList.toggle('on', i===0));
+  rotatePipePlaceholder(true);
+  updatePipelineUI();
+  document.getElementById('pipeIdeaText')?.focus();
 }
-function writeIdeaFlowToDOM(st){
-  document.getElementById('flowCaptureText').value = st.text || '';
-  document.querySelectorAll('#flowCaptureCats .idea-cat-pick').forEach(b=>{
-    b.classList.toggle('on', b.dataset.cat === (st.category || 'other'));
-  });
-  document.getElementById('flowStep1').value = st.steps[0] || '';
-  document.getElementById('flowStep2').value = st.steps[1] || '';
-  document.getElementById('flowStep3').value = st.steps[2] || '';
-  document.getElementById('flowDoneDef').value = st.doneDef || '';
-  document.getElementById('flowFirstAction').value = st.firstAction || '';
-  document.getElementById('flowAddMustDo').checked = st.addMustDo !== false;
-  document.querySelectorAll('#flowDateChips .flow-date-chip').forEach(b=>{
-    b.classList.toggle('on', b.dataset.flowDate === (st.datePreset || 'today'));
-  });
-  const pick = document.getElementById('flowPickDate');
-  if(pick){
-    pick.hidden = st.datePreset !== 'pick';
-    pick.value = st.scheduleDate || iso(dayOf(0));
-  }
-  document.querySelectorAll('#flowSlotRow .flow-slot').forEach(b=>{
-    b.classList.toggle('on', b.dataset.flowSlot === (st.scheduleSlot || 'beforeWork'));
-  });
+function rotatePipePlaceholder(force){
+  const el=document.getElementById('pipeFirstAction');
+  if(!el) return;
+  if(force || !el.value) el.placeholder = PIPE_PLACEHOLDERS[pipePlaceholderIdx % PIPE_PLACEHOLDERS.length];
+  pipePlaceholderIdx++;
 }
-function syncIdeaFlowDraft(){
-  readIdeaFlowFromDOM();
-  if(!ideaFlowState.text) return null;
+function renderPipeWeekStrip(){
+  const row=document.getElementById('pipeWeekStrip');
+  if(!row) return;
+  const today=iso(dayOf(0));
+  if(!pipeScheduleDate) pipeScheduleDate=today;
+  row.innerHTML = pipeWeekDates().map(d=>{
+    const dt=new Date(d+'T12:00:00');
+    return '<button type="button" class="pipe-day'+(d===pipeScheduleDate?' on':'')+(d===today?' today':'')+'" data-pdate="'+d+'">'+
+      WEEKDAY_NAMES[dt.getDay()]+'<b>'+dt.getDate()+'</b></button>';
+  }).join('');
+}
+function updatePipelineUI(){
+  const blocked = pipeBlocked() && pipeStage >= 2;
+  const lock=document.getElementById('pipePlanLock');
+  if(lock) lock.hidden = !blocked;
+  [1,2,3,4].forEach(n=>{
+    const card=document.getElementById('pipeCard'+n);
+    if(!card) return;
+    card.classList.toggle('active', pipeStage===n);
+    card.classList.toggle('future', pipeStage < n);
+    card.classList.toggle('locked', blocked && n===2);
+  });
+  const keep=document.getElementById('pipeKeepGoing');
+  if(keep){ keep.disabled=!readPipeForm().text; keep.style.opacity=keep.disabled?'.5':''; }
+  const plant=document.getElementById('pipePlantBtn');
+  const f=readPipeForm();
+  if(plant) plant.disabled = !f.text || !f.steps[0] || !f.firstAction || !f.scheduleDate || blocked;
+  const conf=document.getElementById('pipeScheduleConfirm');
+  if(conf){
+    if(pipeStage>=3 && f.steps[0] && f.scheduleDate && f.scheduleSlot){
+      conf.textContent = 'Step 1 → '+formatCalDay(f.scheduleDate)+', '+PIPE_SLOT_LABELS[f.scheduleSlot];
+    } else conf.textContent='';
+  }
+  const mustLabel=document.getElementById('pipeMustDoLabel');
+  if(mustLabel) mustLabel.textContent='Make it a Must-Do for '+formatCalDay(f.scheduleDate||iso(dayOf(0)));
+}
+function upsertPipeDraft(status){
+  const f=readPipeForm();
+  if(!f.text) return null;
   ensureIdeas();
   let idea;
-  if(ideaFlowState.id){
-    idea = globals.ideas.find(x=>x.id===ideaFlowState.id);
-  }
+  if(pipeEditingId) idea=globals.ideas.find(x=>x.id===pipeEditingId);
   if(!idea){
-    idea = normalizeIdea({
-      id: uid(), text: ideaFlowState.text, category: ideaFlowState.category,
-      status:'active', createdAt: new Date().toISOString()
-    });
+    idea=normalizeIdea({id:uid(),text:f.text,category:f.category,status:status||'seedbed',createdAt:new Date().toISOString()});
     globals.ideas.unshift(idea);
-    ideaFlowState.id = idea.id;
+    pipeEditingId=idea.id;
   }
-  idea.text = ideaFlowState.text;
-  idea.category = ideaFlowState.category;
-  if(idea.status !== 'promoted'){
-    idea.status = 'active';
-  }
-  idea.flow = {
-    maxStage: ideaFlowState.maxStage,
-    steps: [...ideaFlowState.steps],
-    doneDef: ideaFlowState.doneDef,
-    datePreset: ideaFlowState.datePreset,
-    scheduleDate: ideaFlowState.scheduleDate,
-    scheduleSlot: ideaFlowState.scheduleSlot,
-    firstAction: ideaFlowState.firstAction,
-    addMustDo: ideaFlowState.addMustDo
-  };
-  idea.updatedAt = new Date().toISOString();
+  idea.text=f.text; idea.category=f.category;
+  if(status) idea.status=status;
+  idea.flow={...idea.flow, stage:pipeStage, steps:[...f.steps], doneDef:f.doneDef, scheduleDate:f.scheduleDate||'',
+    scheduleSlot:f.scheduleSlot||'beforeWork', firstAction:f.firstAction, addMustDo:f.addMustDo};
+  idea.updatedAt=new Date().toISOString();
   markDirty();
   return idea;
 }
-function flowGuardBlocked(){
-  return countPromotedIdeas(ideaFlowState?.id) >= 2;
+function pipeSaveLater(){
+  if(!readPipeForm().text) return;
+  upsertPipeDraft('seedbed');
+  resetPipeForm();
+  renderSeedbed();
+  showIdeaToast('Saved to the Seedbed.');
 }
-function updateIdeaFlowUI(){
-  if(!ideaFlowState) return;
-  readIdeaFlowFromDOM();
-  const st = ideaFlowState;
-  const blocked = flowGuardBlocked();
-  const guard = document.getElementById('ideaFlowGuard');
-  const buildBtn = document.getElementById('flowBuildPlan');
-  if(guard){
-    guard.hidden = !blocked;
-    if(blocked){
-      guard.textContent = 'Two ideas are already in motion. Finish or release one first — faithfulness in a few things before many things. (Matthew 25:21) You can still just save this to the vault.';
-    }
+function pipeKeepGoing(){
+  if(!readPipeForm().text || pipeBlocked()) return;
+  pipeStage=Math.max(pipeStage,2);
+  upsertPipeDraft('seedbed');
+  updatePipelineUI();
+  document.getElementById('pipeStep1')?.focus();
+}
+function onPipeStepInput(){
+  const f=readPipeForm();
+  if(f.steps[0] && pipeStage < 3){ pipeStage=3; updatePipelineUI(); }
+  if(pipeStage>=2) upsertPipeDraft('seedbed');
+  updatePipelineUI();
+}
+function onPipeSchedulePick(){
+  const f=readPipeForm();
+  if(f.scheduleDate && f.scheduleSlot && f.steps[0]){
+    pipeStage=Math.max(pipeStage,4);
+    upsertPipeDraft('seedbed');
   }
-  if(buildBtn){
-    buildBtn.disabled = blocked || !st.text.trim();
-    buildBtn.style.opacity = buildBtn.disabled ? '.55' : '';
-  }
-  document.querySelectorAll('#ideaFlowStepper .step').forEach(el=>{
-    const n = +el.dataset.flowStep;
-    el.classList.toggle('done', n < st.maxStage);
-    el.classList.toggle('on', n === Math.min(st.maxStage, 4));
-  });
-  const captureExpanded = document.getElementById('flowCaptureExpanded');
-  const captureSummary = document.getElementById('flowCaptureSummary');
-  const showCaptureSummary = st.maxStage >= 2 && st.text.trim() && ideaFlowEdit !== 1;
-  if(captureExpanded) captureExpanded.hidden = showCaptureSummary;
-  if(captureSummary){
-    captureSummary.hidden = !showCaptureSummary;
-    document.getElementById('flowCaptureSummaryText').textContent = st.text;
-    document.getElementById('flowCaptureSummaryMeta').textContent = ideaCategoryLabel(st.category);
-  }
-  const planPanel = document.getElementById('flowPlanPanel');
-  const planSummary = document.getElementById('flowPlanSummary');
-  const showPlan = st.maxStage >= 2 && !blocked;
-  const planDone = st.maxStage >= 3 && st.steps[0] && ideaFlowEdit !== 2;
-  if(planPanel) planPanel.classList.toggle('open', showPlan && (!planDone || ideaFlowEdit === 2));
-  if(planSummary){
-    planSummary.hidden = !(st.maxStage >= 3 && st.steps[0]) || ideaFlowEdit === 2;
-    const parts = st.steps.filter(Boolean);
-    document.getElementById('flowPlanSummaryText').textContent = parts.join(' → ') + (st.doneDef ? ' · Done: '+st.doneDef : '');
-  }
-  const schedPanel = document.getElementById('flowSchedulePanel');
-  const schedSummary = document.getElementById('flowScheduleSummary');
-  const showSched = st.maxStage >= 3 && st.steps[0] && !blocked;
-  const schedDone = st.maxStage >= 4 && st.scheduleDate && ideaFlowEdit !== 3;
-  if(schedPanel) schedPanel.classList.toggle('open', showSched && (!schedDone || ideaFlowEdit === 3));
-  if(schedSummary){
-    schedSummary.hidden = !(st.maxStage >= 4 && st.scheduleDate) || ideaFlowEdit === 3;
-    document.getElementById('flowScheduleSummaryText').textContent =
-      'Step 1 on '+formatFlowDay(st.scheduleDate)+' · '+FLOW_SLOT_LABELS[st.scheduleSlot];
-  }
-  const commitPanel = document.getElementById('flowCommitPanel');
-  if(commitPanel) commitPanel.classList.toggle('open', st.maxStage >= 4 && st.scheduleDate && !blocked);
-  const confirm = document.getElementById('flowScheduleConfirm');
-  if(confirm){
-    if(st.scheduleDate && st.steps[0] && st.maxStage >= 3){
-      confirm.hidden = false;
-      confirm.textContent = 'Step 1 will appear in your '+formatFlowDay(st.scheduleDate)+' Plan of Action under '+FLOW_SLOT_LABELS[st.scheduleSlot]+'.';
-    } else confirm.hidden = true;
-  }
-  const mustLabel = document.getElementById('flowMustDoLabel');
-  if(mustLabel) mustLabel.textContent = 'Add this as a Must-Do for '+formatFlowDay(st.scheduleDate || iso(dayOf(0)));
-  const commitBtn = document.getElementById('flowCommitBtn');
-  if(commitBtn) commitBtn.disabled = blocked || !st.firstAction.trim() || !st.steps[0];
+  updatePipelineUI();
 }
-function renderIdeaCatRow(containerId){
-  const row = document.getElementById(containerId);
-  if(!row || row.dataset.ready) return;
-  row.innerHTML = IDEA_CATEGORIES.map((c,i)=>
-    '<button type="button" class="idea-cat-pick'+(i===IDEA_CATEGORIES.length-1?' on':'')+'" data-cat="'+c.id+'">'+esc(c.label)+'</button>'
-  ).join('');
-  row.dataset.ready = '1';
-}
-function renderFlowCaptureCats(){ renderIdeaCatRow('flowCaptureCats'); }
-function openIdeaFlow(ideaId){
-  ensureIdeas();
-  ideaFlowEdit = null;
-  const existing = ideaId ? globals.ideas.find(x=>x.id===ideaId) : null;
-  ideaFlowState = blankIdeaFlowState(existing ? normalizeIdea(existing) : null);
-  if(existing){
-    ideaFlowState.id = existing.id;
-    ideaFlowState.maxStage = Math.max(ideaFlowState.maxStage, inferFlowResumeStage(ideaFlowState));
-  }
-  document.getElementById('ideaFlowSuccess').hidden = true;
-  document.getElementById('ideaFlowBody').hidden = false;
-  writeIdeaFlowToDOM(ideaFlowState);
-  updateIdeaFlowUI();
-  const modal = document.getElementById('ideaFlowModal');
-  modal.hidden = false;
-  document.getElementById('ideaModalBackdrop')?.classList.add('open');
-  requestAnimationFrame(()=> modal.classList.add('open'));
-  setTimeout(()=> document.getElementById('flowCaptureText')?.focus(), 100);
-}
-function closeIdeaFlow(saveDraft){
-  const modal = document.getElementById('ideaFlowModal');
-  if(saveDraft !== false){
-    readIdeaFlowFromDOM();
-    if(ideaFlowState?.text?.trim()) syncIdeaFlowDraft();
-  }
-  modal?.classList.remove('open');
-  document.getElementById('ideaModalBackdrop')?.classList.remove('open');
-  setTimeout(()=>{ if(modal) modal.hidden = true; }, 220);
-  ideaFlowState = null;
-  ideaFlowEdit = null;
-  renderIdeaList();
-  renderIdeaTriage();
-}
-function ideaFlowJustSave(){
-  readIdeaFlowFromDOM();
-  if(!ideaFlowState.text.trim()) return;
-  ideaFlowState.maxStage = Math.max(ideaFlowState.maxStage, 1);
-  syncIdeaFlowDraft();
-  closeIdeaFlow(false);
-}
-function ideaFlowExpandPlan(){
-  readIdeaFlowFromDOM();
-  if(!ideaFlowState.text.trim() || flowGuardBlocked()) return;
-  ideaFlowState.maxStage = Math.max(ideaFlowState.maxStage, 2);
-  ideaFlowEdit = null;
-  syncIdeaFlowDraft();
-  updateIdeaFlowUI();
-}
-function ideaFlowOnInput(){
-  readIdeaFlowFromDOM();
-  if(ideaFlowState.maxStage >= 2 && ideaFlowState.steps[0] && ideaFlowState.maxStage < 3){
-    ideaFlowState.maxStage = 3;
-    ideaFlowEdit = null;
-  }
-  updateIdeaFlowUI();
-}
-function ideaFlowEditStage(stage){
-  ideaFlowEdit = stage;
-  updateIdeaFlowUI();
-  if(stage === 1) document.getElementById('flowCaptureText')?.focus();
-  else if(stage === 2) document.getElementById('flowStep1')?.focus();
-  else if(stage === 3) document.getElementById('flowPickDate')?.focus();
-}
-async function ideaFlowCommit(){
-  readIdeaFlowFromDOM();
-  if(flowGuardBlocked() || !ideaFlowState.text.trim() || !ideaFlowState.steps[0] || !ideaFlowState.firstAction.trim()) return;
-  const idea = syncIdeaFlowDraft();
-  if(!idea) return;
-  const dateStr = ideaFlowState.scheduleDate || iso(dayOf(0));
-  const slot = ideaFlowState.scheduleSlot || 'beforeWork';
-  const field = FLOW_SLOT_FIELDS[slot];
-  const data = await getDayDataByDate(dateStr);
-  data.execute[field] = ideaFlowState.steps[0];
-  if(ideaFlowState.addMustDo){
-    if(!data.faithfulFew.mustDo.items) data.faithfulFew.mustDo.items = [];
-    data.faithfulFew.mustDo.items.push({id:uid(), text: ideaFlowState.firstAction, done:false});
-  }
-  await saveDayDataByDate(dateStr, data);
-  idea.status = 'promoted';
-  idea.promotedTo = {type:'flow', date: dateStr, slot};
-  idea.flow.maxStage = 4;
-  idea.updatedAt = new Date().toISOString();
-  markDirty();
-  document.getElementById('ideaFlowBody').hidden = true;
-  document.getElementById('ideaFlowSuccess').hidden = false;
-  document.getElementById('ideaFlowSuccessLine').textContent = 'Planted. See you '+formatFlowDay(dateStr)+'.';
-  document.getElementById('ideaFlowSuccessCard').innerHTML =
-    '<span class="idea-cat-badge">'+esc(ideaCategoryLabel(idea.category))+'</span>'+
-    '<div class="idea-card-text" style="margin-top:6px">'+esc(idea.text)+'</div>'+
-    '<div class="idea-card-meta" style="margin-top:6px">Step 1 → '+esc(FLOW_SLOT_LABELS[slot])+' · '+esc(ideaFlowState.firstAction)+'</div>';
-  if(isDaily() && iso(dayOf(dayOffset))===dateStr){
-    dayData = data;
-    renderFFLists();
-    populateFields(document.getElementById('dailyMain'), dayData);
-    updateScore();
-  }
-  renderIdeaList();
-  renderIdeaTriage();
-}
-function bindIdeaFlowEvents(){
-  if(document.body.dataset.ideaFlowBound) return;
-  document.body.dataset.ideaFlowBound = '1';
-  document.getElementById('ideaFab')?.addEventListener('click', ()=> openIdeaFlow());
-  document.getElementById('ideaStartFlowBtn')?.addEventListener('click', ()=> openIdeaFlow());
-  document.getElementById('ideaFlowClose')?.addEventListener('click', ()=> closeIdeaFlow(true));
-  document.getElementById('ideaFlowDoneBtn')?.addEventListener('click', ()=> closeIdeaFlow(false));
-  document.getElementById('flowJustSave')?.addEventListener('click', ideaFlowJustSave);
-  document.getElementById('flowBuildPlan')?.addEventListener('click', ideaFlowExpandPlan);
-  document.getElementById('flowCommitBtn')?.addEventListener('click', ideaFlowCommit);
-  document.getElementById('flowCaptureSummary')?.addEventListener('click', ()=> ideaFlowEditStage(1));
-  document.getElementById('flowPlanSummary')?.addEventListener('click', ()=> ideaFlowEditStage(2));
-  document.getElementById('flowScheduleSummary')?.addEventListener('click', ()=> ideaFlowEditStage(3));
-  ['flowCaptureText','flowStep1','flowStep2','flowStep3','flowDoneDef','flowFirstAction'].forEach(id=>{
-    document.getElementById(id)?.addEventListener('input', ideaFlowOnInput);
-  });
-  document.getElementById('flowAddMustDo')?.addEventListener('change', ideaFlowOnInput);
-  document.getElementById('flowCaptureCats')?.addEventListener('click', e=>{
-    const pick = e.target.closest('.idea-cat-pick');
-    if(!pick) return;
-    pick.closest('.idea-cat-row')?.querySelectorAll('.idea-cat-pick').forEach(b=> b.classList.toggle('on', b===pick));
-    ideaFlowOnInput();
-  });
-  document.getElementById('flowDateChips')?.addEventListener('click', e=>{
-    const chip = e.target.closest('.flow-date-chip');
-    if(!chip) return;
-    document.querySelectorAll('#flowDateChips .flow-date-chip').forEach(b=> b.classList.toggle('on', b===chip));
-    const pick = document.getElementById('flowPickDate');
-    if(pick) pick.hidden = chip.dataset.flowDate !== 'pick';
-    readIdeaFlowFromDOM();
-    ideaFlowState.maxStage = Math.max(ideaFlowState.maxStage, 4);
-    ideaFlowEdit = null;
-    syncIdeaFlowDraft();
-    updateIdeaFlowUI();
-  });
-  document.getElementById('flowPickDate')?.addEventListener('change', ()=>{
-    readIdeaFlowFromDOM();
-    ideaFlowState.maxStage = Math.max(ideaFlowState.maxStage, 4);
-    ideaFlowEdit = null;
-    updateIdeaFlowUI();
-  });
-  document.getElementById('flowSlotRow')?.addEventListener('click', e=>{
-    const slot = e.target.closest('.flow-slot');
-    if(!slot) return;
-    document.querySelectorAll('#flowSlotRow .flow-slot').forEach(b=> b.classList.toggle('on', b===slot));
-    readIdeaFlowFromDOM();
-    ideaFlowState.maxStage = Math.max(ideaFlowState.maxStage, 4);
-    ideaFlowEdit = null;
-    updateIdeaFlowUI();
-  });
-  document.getElementById('ideaModalBackdrop')?.addEventListener('click', ()=>{
-    if(document.getElementById('ideaFlowModal')?.classList.contains('open')) closeIdeaFlow(true);
-    else closeIdeaModals();
-  });
-}
-function renderIdeaCatFilters(){
-  const row = document.getElementById('ideaCatFilters');
-  if(!row) return;
-  let h = '<button type="button" class="idea-cat-filter'+(ideaCatFilter==='all'?' on':'')+'" data-idea-cat="all">All categories</button>';
-  IDEA_CATEGORIES.forEach(c=>{
-    h += '<button type="button" class="idea-cat-filter'+(ideaCatFilter===c.id?' on':'')+'" data-idea-cat="'+c.id+'">'+esc(c.label)+'</button>';
-  });
-  row.innerHTML = h;
-}
-function renderIdeaList(){
-  ensureIdeas();
-  renderIdeaCatFilters();
-  const list = document.getElementById('ideaList');
-  const stats = document.getElementById('ideaStats');
-  if(!list) return;
-  const ms = ideaMonthStats();
-  if(stats){
-    stats.textContent = 'This month: '+ms.captured+' captured · '+ms.promoted+' promoted · '+ms.released+' released. Ideas are seeds — not obligations.';
-  }
-  let items = globals.ideas.map(normalizeIdea).filter(ideaMatchesFilters);
-  items.sort((a,b)=> (b.createdAt||'').localeCompare(a.createdAt||''));
-  if(!items.length){
-    list.innerHTML = '<div class="prayer-empty">'+(ideaStatusFilter==='active'?'The vault is quiet. Capture a spark when it comes — no pressure.':'Nothing in this view yet.')+'</div>';
-    return;
-  }
-  list.innerHTML = items.map(i=>{
-    let meta = 'Captured '+formatIdeaWhen(i.createdAt);
-    if(i.status==='resting' && i.snoozedUntil) meta += ' · Resting until '+formatIdeaWhen(i.snoozedUntil+'T12:00:00');
-    if(i.status==='promoted' && i.promotedTo?.date) meta += ' · Promoted to '+i.promotedTo.date;
-    if(i.status==='released' && i.releaseNote) meta += ' · '+esc(i.releaseNote);
-    let actions = '';
-    if(i.status==='active'){
-      actions = '<button type="button" class="idea-act gold" data-idea-resume="'+i.id+'">Resume flow</button>'+
-        '<button type="button" class="idea-act" data-idea-rest="'+i.id+'">Let it Rest</button>'+
-        '<button type="button" class="idea-act muted" data-idea-release="'+i.id+'">Release</button>';
-    } else if(i.status==='resting'){
-      actions = '<button type="button" class="idea-act gold" data-idea-resume="'+i.id+'">Resume flow</button>'+
-        '<button type="button" class="idea-act muted" data-idea-release="'+i.id+'">Release</button>';
-    } else if(i.status==='promoted'){
-      actions = '<button type="button" class="idea-act muted" data-idea-release="'+i.id+'">Mark released</button>';
-    }
-    return '<div class="idea-card '+i.status+'" data-idea-id="'+i.id+'">'+
-      '<div class="idea-card-head"><span class="idea-cat-badge">'+esc(ideaCategoryLabel(i.category))+'</span>'+
-      '<div class="idea-card-text">'+esc(i.text)+'</div>'+
-      '<div class="idea-card-meta">'+meta+'</div></div>'+
-      (actions ? '<div class="idea-card-actions">'+actions+'</div>' : '')+'</div>';
-  }).join('');
-}
-function loadIdeas(){
-  ensureIdeas();
-  let changed = false;
-  globals.ideas = globals.ideas.map(raw=>{
-    const n = normalizeIdea(raw);
-    if(n.status !== raw.status || n.snoozedUntil !== raw.snoozedUntil) changed = true;
-    return n;
-  });
-  if(changed) markDirty();
-  renderIdeaList();
-}
-function captureIdea(text, category){
-  ensureIdeas();
-  globals.ideas.unshift(normalizeIdea({
-    id: uid(), text, category: category||'other', status:'active', createdAt: new Date().toISOString()
-  }));
-  markDirty();
-  renderIdeaList();
-  renderIdeaTriage();
-}
-async function getDayDataByDate(dateStr){
-  return normalizeDaily(await getJSON('fs-day:'+dateStr));
-}
-async function saveDayDataByDate(dateStr, data){
+async function getDayDataByDate(dateStr){ return normalizeDaily(await getJSON('fs-day:'+dateStr)); }
+async function saveDayDataByDate(dateStr,data){
   await window.storage.set('fs-day:'+dateStr, JSON.stringify(data));
   setLocalSyncAt('fs-day:'+dateStr, Date.now());
   scheduleCloudPush(['fs-day:'+dateStr]);
+  ideaCalDayCache[dateStr]=data;
 }
-function openPromoteModal(ideaId){ openIdeaFlow(ideaId); }
-function restIdea(ideaId, days){
-  const idea = globals.ideas.find(x=>x.id===ideaId);
+async function pipePlant(){
+  const f=readPipeForm();
+  if(!f.text||!f.steps[0]||!f.firstAction||!f.scheduleDate||pipeBlocked()) return;
+  const idea=upsertPipeDraft('growing');
   if(!idea) return;
-  idea.status = 'resting';
-  idea.snoozedUntil = addDaysStr(iso(dayOf(0)), days);
-  idea.updatedAt = new Date().toISOString();
+  const field=PIPE_SLOT_FIELDS[f.scheduleSlot];
+  const data=await getDayDataByDate(f.scheduleDate);
+  data.execute[field]=f.steps[0];
+  let mustDoId=null;
+  if(f.addMustDo){
+    if(!data.faithfulFew.mustDo.items) data.faithfulFew.mustDo.items=[];
+    mustDoId=uid();
+    data.faithfulFew.mustDo.items.push({id:mustDoId,text:f.firstAction,done:false});
+    idea.flow.mustDoId=mustDoId;
+  }
+  await saveDayDataByDate(f.scheduleDate,data);
+  idea.flow.stage=4;
+  idea.updatedAt=new Date().toISOString();
   markDirty();
-  closeIdeaModals();
-  renderIdeaList();
-  renderIdeaTriage();
+  const dayLabel=formatCalDay(f.scheduleDate);
+  triggerPipeShimmer();
+  showIdeaToast('Planted for '+dayLabel+'.');
+  resetPipeForm();
+  renderSeedbed();
+  renderIdeaCalendar();
+  if(isDaily() && iso(dayOf(dayOffset))===f.scheduleDate){
+    dayData=data; renderFFLists(); populateFields(document.getElementById('dailyMain'),dayData); updateScore();
+  }
 }
-function releaseIdea(ideaId, note){
-  const idea = globals.ideas.find(x=>x.id===ideaId);
+function loadSeedbedChip(ideaId){
+  const idea=globals.ideas.find(x=>x.id===ideaId);
   if(!idea) return;
-  idea.status = 'released';
-  idea.releaseNote = note||'';
-  idea.updatedAt = new Date().toISOString();
-  idea.snoozedUntil = null;
-  markDirty();
-  closeIdeaModals();
-  renderIdeaList();
-  renderIdeaTriage();
+  writePipeForm(normalizeIdea(idea));
+  document.getElementById('pipeIdeaText')?.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function seedbedIdeas(){
+  ensureIdeas();
+  return globals.ideas.map(normalizeIdea).filter(i=> ['seedbed','growing','resting'].includes(i.status) && i.status!=='harvested')
+    .sort((a,b)=>(b.updatedAt||b.createdAt).localeCompare(a.updatedAt||a.createdAt));
+}
+function renderSeedbed(){
+  const shelf=document.getElementById('seedbedShelf');
+  const viewBtn=document.getElementById('seedViewAllBtn');
+  const list=document.getElementById('seedListView');
+  if(!shelf) return;
+  const items=seedbedIdeas();
+  if(viewBtn) viewBtn.hidden = items.length <= 12;
+  const shown=items.slice(0,12);
+  if(!shown.length){
+    shelf.innerHTML='<span class="seed-empty">No seeds waiting. Capture one above.</span>';
+  } else {
+    shelf.innerHTML=shown.map(i=>{
+      const dot=i.status==='growing'?'gold':(i.status==='resting'?'':'');
+      return '<button type="button" class="seed-chip" data-seed="'+i.id+'"><span class="dot '+dot+'"></span><span>'+esc(i.text)+'</span></button>';
+    }).join('');
+  }
+  if(list && seedbedListOpen){
+    list.classList.add('open');
+    list.innerHTML=items.map(i=>'<div class="seed-list-row"><span>'+esc(i.text)+'</span><button type="button" class="pipe-text-btn" data-seed="'+i.id+'">Load</button></div>').join('')||'<div class="seed-empty">Nothing in the shelf.</div>';
+  } else if(list) list.classList.remove('open');
+}
+function ideaCalMonthDate(){
+  const d=monthOf(ideaCalMonthOffset);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+}
+async function loadIdeaCalCache(monthStr){
+  ideaCalDayCache={};
+  const [y,m]=monthStr.split('-').map(Number);
+  const days=new Date(y,m,0).getDate();
+  for(let d=1;d<=days;d++){
+    const ds=monthStr+'-'+String(d).padStart(2,'0');
+    ideaCalDayCache[ds]=normalizeDaily(await getJSON('fs-day:'+ds));
+  }
+}
+function ideaEventsForDay(dateStr){
+  const events=[];
+  ensureIdeas();
+  globals.ideas.forEach(raw=>{
+    const i=normalizeIdea(raw);
+    if(i.status==='growing' && i.flow?.scheduleDate===dateStr && i.flow.steps?.[0]){
+      events.push({type:'idea',id:'idea-'+i.id,ideaId:i.id,text:i.flow.steps[0],slot:i.flow.scheduleSlot,done:!!i.flow.stepsDone?.[0]});
+    }
+  });
+  const day=ideaCalDayCache[dateStr];
+  if(day?.faithfulFew?.mustDo?.items){
+    day.faithfulFew.mustDo.items.forEach(it=>{
+      events.push({type:'mustdo',id:'md-'+it.id,mustDoId:it.id,text:it.text,done:!!it.done,slot:null});
+    });
+  }
+  return events;
+}
+function recurringBandsForDay(dateStr){
+  ensureMyWeek();
+  const dow=new Date(dateStr+'T12:00:00').getDay();
+  return (globals.myWeek[dow]||[]).map(b=> esc(b.label||'Block')+(b.start?' '+b.start:'')+(b.end?'–'+b.end:''));
+}
+async function renderIdeaCalendar(){
+  const label=document.getElementById('ideaCalMonthLabel');
+  const wrap=document.getElementById('ideaCalGridWrap');
+  if(!wrap) return;
+  const monthStr=ideaCalMonthDate();
+  const monthDate=monthOf(ideaCalMonthOffset);
+  if(label) label.textContent=monthDate.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  await loadIdeaCalCache(monthStr);
+  const today=iso(dayOf(0));
+  if(ideaCalView==='week'){
+    const dates=pipeWeekDates();
+    wrap.innerHTML=buildCalGrid(dates, today, true);
+  } else {
+    const [y,m]=monthStr.split('-').map(Number);
+    const first=new Date(y,m-1,1);
+    const startPad=(first.getDay()+6)%7;
+    const daysInMonth=new Date(y,m,0).getDate();
+    const cells=[];
+    for(let i=0;i<startPad;i++) cells.push(null);
+    for(let d=1;d<=daysInMonth;d++) cells.push(monthStr+'-'+String(d).padStart(2,'0'));
+    wrap.innerHTML=buildCalGrid(cells, today, false);
+  }
+  if(ideaCalSelectedDay) renderCalDayPanel(ideaCalSelectedDay);
+}
+function buildCalGrid(dates,today,weekMode){
+  let h='<div class="cal-weekdays">'+['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(w=>'<span>'+w+'</span>').join('')+'</div><div class="cal-grid">';
+  dates.forEach(d=>{
+    if(!d){ h+='<div class="cal-cell other"></div>'; return; }
+    const dt=new Date(d+'T12:00:00');
+    const isToday=d===today;
+    const sel=d===ideaCalSelectedDay;
+    const events=ideaEventsForDay(d);
+    const bands=recurringBandsForDay(d);
+    h+='<div class="cal-cell'+(weekMode?'':'')+(isToday?' today':'')+(sel?' selected':'')+'" data-cdate="'+d+'" data-drop-day="'+d+'">'+
+      '<div class="cal-cell-num">'+dt.getDate()+'</div>';
+    bands.slice(0,2).forEach((b,i)=>{ h+='<div class="cal-recur" style="top:'+(14+i*12)+'px">'+b+'</div>'; });
+    h+='<div class="cal-events">';
+    events.slice(0,4).forEach(ev=>{
+      const drag = ev.type==='idea' ? ' draggable="true"' : '';
+      h+='<div class="cal-event'+(ev.done?' done':'')+(ev.type==='mustdo'?' mustdo':'')+'"'+drag+' data-ev="'+ev.id+'"'+(ev.ideaId?' data-idea-id="'+ev.ideaId+'"':'')+' title="'+esc(ev.text)+'">'+esc(ev.text)+'</div>';
+    });
+    h+='</div></div>';
+  });
+  return h+'</div>';
+}
+function renderCalDayPanel(dateStr){
+  const panel=document.getElementById('ideaCalDayPanel');
+  const title=document.getElementById('ideaCalDayTitle');
+  const empty=document.getElementById('ideaCalDayEmpty');
+  const cap=document.getElementById('ideaCalDayCapNote');
+  const slots=document.getElementById('ideaCalDaySlots');
+  if(!panel||!dateStr) return;
+  panel.classList.add('open');
+  if(title) title.textContent=formatShortDay(dateStr);
+  const day=ideaCalDayCache[dateStr] || {};
+  const mustCount=(day.faithfulFew?.mustDo?.items||[]).filter(x=>!x.done).length;
+  if(cap){
+    if(mustCount>=3){ cap.hidden=false; cap.textContent='This day is already full. Faithful means finishable.'; }
+    else cap.hidden=true;
+  }
+  const events=ideaEventsForDay(dateStr);
+  if(empty) empty.hidden = events.length > 0;
+  if(!slots) return;
+  const slotOrder=['beforeWork','duringWork','afterWork','eveningShutdown'];
+  slots.innerHTML=slotOrder.map(sk=>{
+    const exec=day.execute?.[PIPE_SLOT_FIELDS[sk]]||'';
+    const slotEv=events.filter(e=> e.slot===sk || (e.type==='idea' && e.slot===sk));
+    let inner='';
+    if(exec && !slotEv.some(e=> e.type==='idea' && e.text===exec)) inner+='<div class="cal-slot-item">'+esc(exec)+'</div>';
+    slotEv.forEach(ev=>{
+      inner+='<label class="cal-slot-item"><input type="checkbox" data-cal-done="'+ev.id+'"'+(ev.done?' checked':'')+'><span>'+esc(ev.text)+'</span></label>';
+    });
+    if(!inner) inner='<div class="cal-day-empty" style="margin:0">Open space is not wasted space.</div>';
+    return '<div class="cal-slot-block"><h4>'+PIPE_SLOT_LABELS[sk]+'</h4>'+inner+'</div>';
+  }).join('');
+}
+async function moveIdeaSchedule(ideaId,newDate){
+  const idea=globals.ideas.find(x=>x.id===ideaId);
+  if(!idea?.flow?.scheduleDate) return;
+  const oldDate=idea.flow.scheduleDate;
+  const slot=idea.flow.scheduleSlot||'beforeWork';
+  const field=PIPE_SLOT_FIELDS[slot];
+  const step=idea.flow.steps?.[0];
+  if(oldDate!==newDate){
+    const oldDay=await getDayDataByDate(oldDate);
+    if(oldDay.execute[field]===step) oldDay.execute[field]='';
+    await saveDayDataByDate(oldDate,oldDay);
+    const newDay=await getDayDataByDate(newDate);
+    newDay.execute[field]=step;
+    await saveDayDataByDate(newDate,newDay);
+    idea.flow.scheduleDate=newDate;
+    idea.updatedAt=new Date().toISOString();
+    markDirty();
+    renderIdeaCalendar();
+    renderSeedbed();
+  }
+}
+function syncIdeaFromMustDo(mustDoId,done){
+  ensureIdeas();
+  for(const raw of globals.ideas){
+    if(!raw.flow || raw.flow.mustDoId!==mustDoId) continue;
+    if(!Array.isArray(raw.flow.stepsDone)) raw.flow.stepsDone=[false,false,false];
+    raw.flow.stepsDone[0]=!!done;
+    if(done) checkIdeaHarvest(raw);
+    raw.updatedAt=new Date().toISOString();
+    markDirty();
+    if(isIdeas()){ renderSeedbed(); renderIdeaCalendar(); }
+  }
+}
+function checkIdeaHarvest(idea){
+  const steps=idea.flow.steps.map((s,i)=> s?.trim()?i:-1).filter(i=> i>=0);
+  if(!steps.length) return;
+  if(steps.every(i=> idea.flow.stepsDone[i])){
+    idea.status='harvested';
+    showIdeaToast('Harvested — faithful work completed.');
+  }
+}
+function renderMyWeekPanel(){
+  ensureMyWeek();
+  const panel=document.getElementById('myWeekPanel');
+  if(!panel) return;
+  panel.innerHTML=MY_WEEK_DAYS.map((name,i)=>{
+    const blocks=(globals.myWeek[i]||[]).map((b,bi)=>
+      '<div class="my-week-block" data-dow="'+i+'" data-bi="'+bi+'">'+
+      '<input type="text" data-mw-label value="'+esc(b.label||'')+'" placeholder="Label">'+
+      '<input type="time" data-mw-start value="'+(b.start||'')+'"><input type="time" data-mw-end value="'+(b.end||'')+'">'+
+      '<button type="button" class="pipe-text-btn muted" data-mw-rm>×</button></div>'
+    ).join('');
+    return '<div class="my-week-day"><h4>'+name+'</h4>'+blocks+
+      '<button type="button" class="pipe-text-btn" data-mw-add="'+i+'">+ Add block</button></div>';
+  }).join('');
+}
+function getUntouchedIdeas(limit){
+  ensureIdeas();
+  return globals.ideas.map(normalizeIdea).filter(i=> i.status==='seedbed' && (i.flow?.stage||1)===1)
+    .sort((a,b)=>(a.createdAt||'').localeCompare(b.createdAt||'')).slice(0,limit||3);
 }
 function renderIdeaTriage(){
-  const zone = document.getElementById('ideaTriageZone');
+  const zone=document.getElementById('ideaTriageZone');
   if(!zone) return;
-  const items = getUntouchedIdeas(3);
+  const items=getUntouchedIdeas(3);
   if(!items.length){
-    zone.innerHTML = '<section class="zone idea-triage-zone"><div class="zonehead compact"><div class="num">Idea Triage</div>'+
-      '<h2>Vault is clear</h2><p>No untouched ideas waiting — well stewarded.</p></div></section>';
+    zone.innerHTML='<section class="zone"><div class="zonehead compact"><div class="num">Idea Triage</div><h2>Seedbed is clear</h2><p>Well stewarded.</p></div></section>';
     return;
   }
-  let cards = items.map(i=>
-    '<div class="idea-triage-item"><span class="idea-cat-badge">'+esc(ideaCategoryLabel(i.category))+'</span>'+
-    '<div class="idea-card-text">'+esc(i.text)+'</div>'+
-    '<div class="idea-card-meta">Captured '+formatIdeaWhen(i.createdAt)+'</div>'+
-    '<div class="idea-card-actions">'+
-    '<button type="button" class="idea-act gold" data-idea-resume="'+i.id+'">Resume flow</button>'+
-    '<button type="button" class="idea-act" data-idea-rest="'+i.id+'">Rest</button>'+
-    '<button type="button" class="idea-act muted" data-idea-release="'+i.id+'">Release</button></div></div>'
-  ).join('');
-  zone.innerHTML = '<section class="zone idea-triage-zone"><div class="zonehead compact"><div class="num">Idea Triage</div>'+
-    '<h2>Oldest untouched ideas</h2><p>Promote, rest, or release — so the vault stays alive, not a graveyard.</p></div>'+
-    '<div class="zonebody compact">'+cards+'</div></section>';
+  zone.innerHTML='<section class="zone"><div class="zonehead compact"><div class="num">Idea Triage</div><h2>Oldest seeds</h2><p>Open the Ideas tab to continue the Flow.</p></div>'+
+    items.map(i=>'<div class="idea-triage-item"><div style="font-size:13px">'+esc(i.text)+'</div>'+
+    '<button type="button" class="gobtn" style="margin-top:8px" data-goto-ideas>Go to Ideas</button></div>').join('')+'</section>';
+}
+function loadIdeas(){
+  ensureIdeas(); ensureMyWeek();
+  globals.ideas=globals.ideas.map(raw=> normalizeIdea(raw));
+  if(!pipeEditingId) resetPipeForm();
+  else writePipeForm(normalizeIdea(globals.ideas.find(x=>x.id===pipeEditingId)));
+  renderSeedbed();
+  renderMyWeekPanel();
+  renderIdeaCalendar();
+}
+function bindIdeasPageEvents(){
+  if(document.body.dataset.ideasPageBound) return;
+  document.body.dataset.ideasPageBound='1';
+  document.getElementById('pipeSaveLater')?.addEventListener('click', pipeSaveLater);
+  document.getElementById('pipeKeepGoing')?.addEventListener('click', pipeKeepGoing);
+  document.getElementById('pipePlantBtn')?.addEventListener('click', pipePlant);
+  document.getElementById('pipeIdeaText')?.addEventListener('input', updatePipelineUI);
+  ['pipeStep1','pipeStep2','pipeStep3','pipeDoneDef'].forEach(id=> document.getElementById(id)?.addEventListener('input', onPipeStepInput));
+  document.getElementById('pipeWeekStrip')?.addEventListener('click', e=>{
+    const btn=e.target.closest('[data-pdate]');
+    if(!btn) return;
+    pipeScheduleDate=btn.dataset.pdate;
+    renderPipeWeekStrip();
+    onPipeSchedulePick();
+  });
+  document.getElementById('pipeSlots')?.addEventListener('click', e=>{
+    const btn=e.target.closest('[data-slot]');
+    if(!btn) return;
+    pipeScheduleSlot=btn.dataset.slot;
+    document.querySelectorAll('#pipeSlots .pipe-slot').forEach(b=> b.classList.toggle('on', b===btn));
+    onPipeSchedulePick();
+  });
+  document.getElementById('pipeFirstAction')?.addEventListener('focus', ()=> rotatePipePlaceholder(false));
+  document.getElementById('seedbedShelf')?.addEventListener('click', e=>{
+    const chip=e.target.closest('[data-seed]');
+    if(chip) loadSeedbedChip(chip.dataset.seed);
+  });
+  document.getElementById('seedListView')?.addEventListener('click', e=>{
+    const btn=e.target.closest('[data-seed]');
+    if(btn) loadSeedbedChip(btn.dataset.seed);
+  });
+  document.getElementById('seedViewAllBtn')?.addEventListener('click', ()=>{ seedbedListOpen=!seedbedListOpen; renderSeedbed(); });
+  document.getElementById('ideaCalPrev')?.addEventListener('click', ()=>{ ideaCalMonthOffset--; renderIdeaCalendar(); });
+  document.getElementById('ideaCalNext')?.addEventListener('click', ()=>{ ideaCalMonthOffset++; renderIdeaCalendar(); });
+  document.querySelectorAll('[data-cal-view]').forEach(btn=> btn.addEventListener('click', ()=>{
+    ideaCalView=btn.dataset.calView;
+    document.querySelectorAll('[data-cal-view]').forEach(b=> b.classList.toggle('on', b===btn));
+    renderIdeaCalendar();
+  }));
+  document.getElementById('myWeekToggle')?.addEventListener('click', ()=> document.getElementById('myWeekPanel')?.classList.toggle('open'));
+  document.getElementById('myWeekPanel')?.addEventListener('input', e=>{
+    const row=e.target.closest('[data-dow]');
+    if(!row) return;
+    const dow=+row.dataset.dow, bi=+row.dataset.bi;
+    ensureMyWeek();
+    const b=globals.myWeek[dow][bi]||(globals.myWeek[dow][bi]={});
+    if(e.target.dataset.mwLabel!==undefined) b.label=e.target.value;
+    if(e.target.dataset.mwStart!==undefined) b.start=e.target.value;
+    if(e.target.dataset.mwEnd!==undefined) b.end=e.target.value;
+    markDirty(); renderIdeaCalendar();
+  });
+  document.getElementById('myWeekPanel')?.addEventListener('click', e=>{
+    if(e.target.dataset.mwAdd!==undefined){
+      ensureMyWeek(); globals.myWeek[+e.target.dataset.mwAdd].push({label:'',start:'',end:''}); markDirty(); renderMyWeekPanel(); return;
+    }
+    const rm=e.target.closest('[data-mw-rm]');
+    if(rm){ const row=rm.closest('[data-dow]'); globals.myWeek[+row.dataset.dow].splice(+row.dataset.bi,1); markDirty(); renderMyWeekPanel(); renderIdeaCalendar(); }
+  });
+  document.getElementById('ideaCalGridWrap')?.addEventListener('click', e=>{
+    const cell=e.target.closest('[data-cdate]');
+    if(cell){ ideaCalSelectedDay=cell.dataset.cdate; renderIdeaCalendar(); renderCalDayPanel(ideaCalSelectedDay); }
+  });
+  document.getElementById('ideaCalGridWrap')?.addEventListener('dragstart', e=>{
+    const ev=e.target.closest('[data-idea-id]');
+    if(ev?.dataset.ideaId){ dragIdeaId=ev.dataset.ideaId; e.dataTransfer.setData('text/plain', dragIdeaId); }
+  });
+  document.getElementById('ideaCalGridWrap')?.addEventListener('dragover', e=>{ if(e.target.closest('[data-drop-day]')) e.preventDefault(); });
+  document.getElementById('ideaCalGridWrap')?.addEventListener('drop', e=>{
+    const cell=e.target.closest('[data-drop-day]');
+    if(cell && dragIdeaId){ moveIdeaSchedule(dragIdeaId, cell.dataset.dropDay); dragIdeaId=null; }
+  });
+  document.getElementById('ideaCalDaySlots')?.addEventListener('change', async e=>{
+    if(!e.target.dataset.calDone) return;
+    const id=e.target.dataset.calDone;
+    if(id.startsWith('idea-')){
+      const ideaId=id.slice(5);
+      const idea=globals.ideas.find(x=>x.id===ideaId);
+      if(idea?.flow){
+        if(!Array.isArray(idea.flow.stepsDone)) idea.flow.stepsDone=[false,false,false];
+        idea.flow.stepsDone[0]=e.target.checked;
+        if(e.target.checked) checkIdeaHarvest(idea);
+        idea.updatedAt=new Date().toISOString();
+        markDirty();
+        if(idea.flow.mustDoId && ideaCalSelectedDay){
+          const day=await getDayDataByDate(ideaCalSelectedDay);
+          const md=day.faithfulFew?.mustDo?.items?.find(x=>x.id===idea.flow.mustDoId);
+          if(md){ md.done=e.target.checked; await saveDayDataByDate(ideaCalSelectedDay,day); }
+        }
+        renderIdeaCalendar(); renderSeedbed();
+      }
+    } else if(id.startsWith('md-') && ideaCalSelectedDay){
+      const mustDoId=id.slice(3);
+      const day=await getDayDataByDate(ideaCalSelectedDay);
+      const md=day.faithfulFew?.mustDo?.items?.find(x=>x.id===mustDoId);
+      if(md){ md.done=e.target.checked; await saveDayDataByDate(ideaCalSelectedDay,day); syncIdeaFromMustDo(mustDoId,e.target.checked); renderIdeaCalendar(); }
+    }
+  });
+  document.getElementById('ideaFab')?.addEventListener('click', ()=>{ setMode('ideas'); setTimeout(()=> document.getElementById('pipeIdeaText')?.focus(), 200); });
+  document.addEventListener('click', e=>{
+    if(e.target.closest('[data-goto-ideas]')) setMode('ideas');
+  });
 }
 
 const VIRTUES = ['Diligence','Faithfulness','Service','Courage','Order','Excellence','Self-Control','Love for Neighbor'];
@@ -2006,13 +2008,8 @@ function setNested(obj, path, val){
 
 let viewMode='daily', dayOffset=0, weekOffset=0, monthOffset=0;
 let dayData=null, weekData=null, monthData=null, journal={body:'',updated:null};
-let globals={researchNotes:'',motives:null,prayers:[],thoughtJournal:'',ideas:[]};
+let globals={researchNotes:'',motives:null,prayers:[],thoughtJournal:'',ideas:[],myWeek:null};
 let prayerFilter = 'all';
-let ideaStatusFilter = 'active';
-let ideaCatFilter = 'all';
-let ideaModalTarget = null;
-let ideaFlowState = null;
-let ideaFlowEdit = null;
 const FLOW_SLOT_LABELS = {beforeWork:'Before Work',duringWork:'During Work',afterWork:'After Work',eveningShutdown:'Evening Shutdown'};
 const FLOW_SLOT_FIELDS = {beforeWork:'beforeWork',duringWork:'duringWork',afterWork:'afterWork',eveningShutdown:'eveningShutdown'};
 let dirty=false, saveTimer=null, saving=false;
@@ -2884,7 +2881,11 @@ function bindEvents(){
     }
     if(el.dataset.ffCheck && isDaily()){
       const it = dayData.faithfulFew[el.dataset.cat]?.items?.find(x=>x.id===el.dataset.id);
-      if(it){ it.done = el.checked; renderFFLists(); updateScore(); markDirty(); }
+      if(it){
+        it.done = el.checked;
+        if(el.dataset.cat==='mustDo') syncIdeaFromMustDo(el.dataset.id, el.checked);
+        renderFFLists(); updateScore(); markDirty();
+      }
       return;
     }
     if(el.dataset.motiveCheck && isDaily()){
@@ -2917,9 +2918,9 @@ function bindEvents(){
       e.preventDefault();
       document.getElementById('qcAdd')?.click();
     }
-    if(e.key==='Enter' && e.target.id==='flowCaptureText' && !e.shiftKey){
+    if(e.key==='Enter' && e.target.id==='pipeIdeaText' && !e.shiftKey){
       e.preventDefault();
-      document.getElementById('flowJustSave')?.click();
+      document.getElementById('pipeSaveLater')?.click();
     }
   });
   app.addEventListener('click', e=>{
@@ -2978,23 +2979,6 @@ function bindEvents(){
       document.querySelectorAll('.prayer-filter').forEach(b=> b.classList.toggle('on', b.dataset.pfilter===prayerFilter));
       renderPrayerList(); return;
     }
-    const isf = e.target.closest('[data-idea-status]');
-    if(isf){
-      ideaStatusFilter = isf.dataset.ideaStatus;
-      document.querySelectorAll('.idea-filter').forEach(b=> b.classList.toggle('on', b.dataset.ideaStatus===ideaStatusFilter));
-      renderIdeaList(); return;
-    }
-    const icf = e.target.closest('[data-idea-cat]');
-    if(icf){
-      ideaCatFilter = icf.dataset.ideaCat;
-      renderIdeaList(); return;
-    }
-    const ip = e.target.closest('[data-idea-resume]');
-    if(ip){ openIdeaFlow(ip.dataset.ideaResume); return; }
-    const ir = e.target.closest('[data-idea-rest]');
-    if(ir){ ideaModalTarget = ir.dataset.ideaRest; openIdeaModal('ideaRestModal'); return; }
-    const irel = e.target.closest('[data-idea-release]');
-    if(irel){ ideaModalTarget = irel.dataset.ideaRelease; document.getElementById('ideaReleaseNote').value=''; openIdeaModal('ideaReleaseModal'); return; }
     const rt = e.target.closest('[data-rating]');
     if(rt && isDaily()){
       setNested(dayData, rt.dataset.rating, +rt.dataset.v);
@@ -3081,18 +3065,7 @@ function bindEvents(){
     if(e.key==='Enter'){ e.preventDefault(); sendMagicLink(); }
   });
   document.getElementById('authSignOut')?.addEventListener('click', signOut);
-  bindIdeaFlowEvents();
-  document.getElementById('ideaReleaseConfirm')?.addEventListener('click', ()=>{
-    if(!ideaModalTarget) return;
-    releaseIdea(ideaModalTarget, document.getElementById('ideaReleaseNote')?.value.trim());
-  });
-  document.querySelectorAll('.rest-pick').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      if(!ideaModalTarget) return;
-      restIdea(ideaModalTarget, +btn.dataset.restDays);
-    });
-  });
-  document.querySelectorAll('[data-close-modal]').forEach(btn=> btn.addEventListener('click', closeIdeaModals));
+  bindIdeasPageEvents();
   document.getElementById('prevP').onclick = ()=>nav(-1);
   document.getElementById('nextP').onclick = ()=>nav(1);
   document.getElementById('modeDaily').onclick = ()=>setMode('daily');
@@ -3162,7 +3135,7 @@ function updateViewUI(){
   if(isJournal()||isDaily()) document.getElementById('periodLabel').textContent = dayLabelFor(dayOffset);
   else if(isWeekly()) document.getElementById('periodLabel').textContent = weekLabelFor(weekOffset);
   else if(isMonthly()) document.getElementById('periodLabel').textContent = monthLabelFor(monthOffset);
-  else if(isIdeas()) document.getElementById('periodLabel').textContent = 'Idea Vault';
+  else if(isIdeas()) document.getElementById('periodLabel').textContent = 'Ideas';
   else if(isPrayer()) document.getElementById('periodLabel').textContent = 'Prayer Log';
 }
 async function loadCurrent(){
@@ -3249,7 +3222,7 @@ async function resetAll(){
   clearTimeout(saveTimer);
   await window.storage.clearAll();
   dayData=null; weekData=null; monthData=null; journal={body:'',updated:null};
-  globals={researchNotes:'',motives:null,prayers:[],thoughtJournal:'',ideas:[]}; dayOffset=0; weekOffset=0; monthOffset=0; viewMode='daily'; dirty=false;
+  globals={researchNotes:'',motives:null,prayers:[],thoughtJournal:'',ideas:[],myWeek:null}; dayOffset=0; weekOffset=0; monthOffset=0; viewMode='daily'; dirty=false;
   localStorage.removeItem('wsr:thoughtJournalCollapsed');
   await loadCurrent();
   loadThoughtJournal();
@@ -3280,7 +3253,7 @@ async function resetAll(){
   ensureMotives();
   ensurePrayers();
   ensureIdeas();
-  renderFlowCaptureCats();
+  ensureMyWeek();
   document.getElementById('researchNotes').value = globals.researchNotes||'';
   simpleMode = localStorage.getItem('wsr:simpleMode')==='1';
   await loadCurrent();
