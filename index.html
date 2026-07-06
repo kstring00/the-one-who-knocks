@@ -882,11 +882,27 @@ body.focus-mode .app-topbar .topbar-left .btn-ghost{display:none}
   .dash-grid .dash-row2-pri,.dash-grid .dash-row2-sched{grid-column:span 1}
 }
 @media(max-width:720px){.dash-grid{grid-template-columns:1fr}.dash-grid .dash-row2-pri,.dash-grid .dash-row2-sched{grid-column:span 1}.app-sidebar{position:fixed;left:0;transform:translateX(-100%)}}
-.dash-first-fruits{background:var(--gold-fill-06);border:1px solid var(--gold-border-soft);border-radius:10px;padding:10px 12px;margin-bottom:10px}
-.dash-first-label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--gold);font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.dash-first-icon{font-size:12px}
+.dash-first-fruits{background:linear-gradient(135deg,var(--gold-fill-06),transparent);border:1px solid var(--gold-border-soft);
+  border-radius:12px;padding:0;margin-bottom:12px;overflow:hidden}
+.dash-first-head{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--gold-border-soft);
+  background:color-mix(in srgb,var(--gold) 6%,transparent)}
+.dash-first-badge{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+  background:var(--gold-dim);color:var(--gold);font-size:14px;flex:none}
+.dash-first-meta{flex:1;min-width:0}
+.dash-first-title{display:block;font-family:"Cormorant Garamond",serif;font-size:15px;font-weight:600;color:var(--gold);line-height:1.2}
+.dash-first-hint{display:block;font-size:11px;color:var(--text-secondary);margin-top:1px}
+.dash-first-progress{font-size:11px;font-weight:600;color:var(--gold);background:var(--gold-dim);padding:3px 8px;border-radius:99px;flex:none}
+.dash-first-list{padding:4px 0}
+.dash-ff-item{border-bottom:1px solid var(--border)}
+.dash-ff-item:last-child{border-bottom:none}
+.dash-ff-row{display:flex;align-items:center;gap:10px;padding:8px 12px 8px 14px;cursor:pointer;font-size:13px;
+  border-left:3px solid var(--gold-border-soft);margin-left:0}
+.dash-ff-item.done .dash-ff-row{border-left-color:var(--green);opacity:.85}
+.dash-ff-row input{accent-color:var(--gold);width:16px;height:16px;flex:none}
+.dash-ff-text{flex:1;color:var(--text-primary)}
+.dash-ff-item.done .dash-ff-text{text-decoration:line-through;color:var(--text-secondary)}
+.dash-ff-dur{font-size:11px;color:var(--text-secondary);flex:none}
 .dash-pri-divider{height:1px;background:var(--border);margin:12px 0}
-.dash-tag.first-fruits{background:var(--gold-dim);color:var(--gold)}
 .dash-suggestions{margin-top:12px;display:flex;flex-direction:column;gap:8px}
 .dash-suggest-row{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;padding:8px 10px;background:var(--bg-hover);border-radius:8px;font-size:12px}
 .dash-suggest-text{flex:1;color:var(--text-secondary);line-height:1.4}
@@ -922,6 +938,9 @@ body.focus-mode .app-topbar .topbar-left .btn-ghost{display:none}
 .dash-task-text{flex:1}
 .dash-dur{font-size:11px;color:var(--text-secondary)}
 .dash-tag{font-size:10px;padding:2px 8px;border-radius:99px;background:var(--gold-dim);color:var(--gold);font-weight:600}
+.dash-tag.first-fruits,.dash-tag.tag-first-fruits{background:var(--gold-dim);color:var(--gold)}
+.dash-tag.hobby,.dash-tag.tag-hobby{background:color-mix(in srgb,#5b8def 16%,transparent);color:#5b8def}
+.dash-tag.skill,.dash-tag.tag-skill{background:var(--green-bg);color:var(--green)}
 .dash-tag.growth{background:var(--green-bg);color:var(--green)}
 .dash-tag.stewardship{background:var(--stewardship-bg);color:var(--stewardship-accent)}
 .dash-add-row{display:flex;gap:8px;margin-top:12px}
@@ -929,6 +948,37 @@ body.focus-mode .app-topbar .topbar-left .btn-ghost{display:none}
 .dash-add-row button{border:1px solid var(--gold-border-strong);background:transparent;color:var(--gold);
   padding:8px 12px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit}
 .dash-tl-row{display:flex;gap:12px;padding:6px 0;position:relative}
+.dash-sched-section{margin-bottom:12px}
+.dash-sched-section:last-child{margin-bottom:0}
+.dash-sched-section-label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-secondary);
+  font-weight:600;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--border)}
+.dash-sched-item{display:flex;align-items:center;gap:6px;padding:5px 0;font-size:12px;border-bottom:1px solid color-mix(in srgb,var(--border) 60%,transparent)}
+.dash-sched-item:last-child{border-bottom:none}
+.dash-sched-item.done .dash-sched-title{text-decoration:line-through;color:var(--text-secondary)}
+.dash-sched-check{display:flex;align-items:center;gap:8px;flex:1;min-width:0;cursor:pointer}
+.dash-sched-check input{accent-color:var(--gold);width:15px;height:15px;flex:none}
+.dash-sched-title{flex:1;min-width:0;color:var(--text-primary);font-size:13px}
+.dash-sched-time{font-size:11px;font-weight:600;color:var(--gold);width:72px;flex:none}
+.dash-sched-body{flex:1;min-width:0}
+.dash-sched-sub{font-size:10px;color:var(--text-secondary)}
+.dash-sched-block .dash-sched-title{font-weight:500}
+.dash-sched-slot-sel,.dash-sched-time-inp{font-size:11px;padding:3px 6px;border-radius:6px;border:1px solid var(--border);
+  background:var(--bg-card-2);color:var(--text-primary);font-family:inherit;max-width:110px}
+.dash-sched-ctrls{display:flex;gap:2px;flex:none}
+.dash-sched-btn{border:1px solid var(--border);background:transparent;color:var(--text-secondary);width:22px;height:22px;
+  border-radius:5px;cursor:pointer;font-size:11px;line-height:1;padding:0;font-family:inherit}
+.dash-sched-btn:hover{color:var(--gold);border-color:var(--gold-border-soft)}
+.dash-sched-del:hover{color:var(--red);border-color:color-mix(in srgb,var(--red) 40%,transparent)}
+.dash-sched-empty{font-size:11px;color:var(--text-secondary);margin:0;padding:4px 0 6px;font-style:italic}
+.dash-sched-add{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.dash-sched-add input[type=text]{flex:1;min-width:120px;font-size:12px;padding:7px 9px;border-radius:8px;border:1px solid var(--border);
+  background:var(--bg-card-2);color:var(--text-primary)}
+.dash-sched-add select,.dash-sched-add input[type=time]{font-size:11px;padding:7px 8px;border-radius:8px;border:1px solid var(--border);
+  background:var(--bg-card-2);color:var(--text-primary);font-family:inherit}
+.dash-sched-add input[type=time][hidden]{display:none}
+.dash-sched-add button{border:1px solid var(--gold-border-strong);background:transparent;color:var(--gold);
+  padding:7px 12px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
+.dash-grid .dash-row2-sched .dash-widget{min-height:280px}
 .dash-tl-row:not(:last-child)::after{content:"";position:absolute;left:5px;top:22px;bottom:-6px;width:1px;background:var(--gold-line)}
 .dash-tl-dot{width:11px;height:11px;border-radius:50%;background:var(--gold);flex:none;margin-top:4px;box-shadow:0 0 0 3px var(--gold-dim)}
 .dash-tl-time{font-size:11px;color:var(--gold);font-weight:600}
@@ -1001,6 +1051,76 @@ body.view-dashboard #settingsPanel{display:none!important}
 .cal-reschedule-row input,.cal-reschedule-row select{font-size:11px;padding:4px 6px;border-radius:6px;border:1px solid var(--border-subtle)}
 .cal-reschedule-row button{border:1px solid var(--gold-border-strong);background:var(--gold-dim);color:var(--gold);padding:4px 8px;border-radius:6px;font-size:10px;cursor:pointer;font-family:inherit}
 .anchor-row input{font-size:12px;padding:6px 8px;border-radius:6px;border:1px solid var(--border-subtle)}
+.mentor-settings{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.mentor-row{display:grid;grid-template-columns:64px 1fr 1fr auto;gap:8px;align-items:center;padding:10px;background:var(--bg-card-hover);border-radius:8px}
+.mentor-row input{font-size:12px;padding:6px 8px;border-radius:6px;border:1px solid var(--border-subtle)}
+#mentorshipPanel[hidden]{display:none!important}
+#mentorshipPanel{padding:0 4px 24px;max-width:920px}
+.ms-page-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+.ms-page-head h2{margin:0;font-size:26px}
+.ms-role{margin:4px 0 0;font-size:13px;color:var(--text-secondary)}
+.ms-stats{font-size:12px;color:var(--gold);background:var(--gold-dim);padding:6px 12px;border-radius:99px;white-space:nowrap}
+.ms-section{margin-bottom:28px}
+.ms-section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+.ms-section h3,.ms-section-head h3{margin:0 0 12px;font-size:20px}
+.ms-q-head{font-size:17px;color:var(--text-primary);margin:0 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.ms-question-group{margin-bottom:20px}
+.ms-principle-card{border:1px solid var(--border);border-radius:10px;margin-bottom:8px;background:var(--bg-card);overflow:hidden}
+.ms-principle-toggle{width:100%;display:flex;align-items:center;gap:8px;padding:10px 12px;border:none;background:transparent;color:inherit;font-family:inherit;font-size:13px;text-align:left;cursor:pointer}
+.ms-principle-title{flex:1;font-weight:500}
+.ms-chev{color:var(--text-secondary);font-size:16px}
+.ms-principle-body{padding:0 12px 12px;border-top:1px solid var(--border)}
+.ms-bullets{margin:10px 0;padding-left:18px;font-size:13px;color:var(--text-secondary);line-height:1.5}
+.ms-theme-tags{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0}
+.ms-theme-tag{font-size:10px;padding:2px 8px;border-radius:99px;background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold-border-soft)}
+.ms-app-section h5,.ms-session-att h5{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-secondary);margin:10px 0 6px}
+.ms-app-timeline{display:flex;flex-direction:column;gap:4px}
+.ms-app-row{display:flex;gap:8px;font-size:12px;padding:4px 0;border-bottom:1px solid color-mix(in srgb,var(--border) 50%,transparent)}
+.ms-app-date{color:var(--gold);font-weight:600;flex:none;width:88px}
+.ms-app-note{color:var(--text-primary);flex:1}
+.ms-principle-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.ms-inline-form{display:flex;flex-direction:column;gap:8px;margin-top:10px;padding:10px;background:var(--bg-hover);border-radius:8px}
+.ms-inline-form input,.ms-inline-form textarea{font-size:12px;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--bg-card-2);color:var(--text-primary);font-family:inherit}
+.ms-slot-chips{display:flex;flex-wrap:wrap;gap:4px}
+.ms-slot-chip{font-size:10px;padding:4px 8px;border-radius:99px;border:1px solid var(--border);background:transparent;color:var(--text-secondary);cursor:pointer;font-family:inherit}
+.ms-slot-chip.on{background:var(--gold-dim);color:var(--gold);border-color:var(--gold-border-soft)}
+.ms-leaf-badge{font-size:10px;color:var(--gold);background:var(--gold-dim);padding:2px 6px;border-radius:99px;flex:none}
+.ms-vault-col{margin-bottom:14px}
+.ms-vault-col h5{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-secondary);margin:0 0 8px}
+.ms-vault-link{display:block;width:100%;text-align:left;padding:8px 10px;margin-bottom:4px;border:1px solid var(--border);border-radius:8px;background:var(--bg-card);color:var(--text-primary);font-size:12px;cursor:pointer;font-family:inherit}
+.ms-vault-link:hover{border-color:var(--gold-border-soft);color:var(--gold)}
+.ms-queue-list{display:flex;flex-direction:column;gap:4px;margin-bottom:8px}
+.ms-queue-row{display:flex;align-items:center;gap:6px;padding:6px 8px;background:var(--bg-hover);border-radius:8px;font-size:12px}
+.ms-drag{cursor:grab;color:var(--text-secondary);font-size:10px;user-select:none}
+.ms-q-text{flex:1}
+.ms-queue-add{display:flex;gap:6px}
+.ms-queue-add input{flex:1;font-size:12px;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--bg-card-2);color:var(--text-primary)}
+.ms-muted{font-size:12px;color:var(--text-secondary);font-style:italic;margin:0}
+.ms-session-tools{display:flex;align-items:center;gap:12px}
+.ms-prep-toggle{font-size:12px;color:var(--text-secondary);display:flex;align-items:center;gap:6px}
+.ms-prep-box{background:var(--bg-hover);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:14px}
+.ms-prep-text{font-size:12px;line-height:1.5;white-space:pre-wrap;margin:0 0 8px;color:var(--text-primary);font-family:inherit}
+.ms-next-session{font-size:12px;color:var(--text-secondary);margin-bottom:12px}
+.ms-session-card{border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;background:var(--bg-card)}
+.ms-session-head{margin-bottom:6px;color:var(--gold)}
+.ms-session-notes{font-size:13px;line-height:1.5;margin-bottom:8px}
+.ms-threads{display:flex;flex-direction:column;gap:20px}
+.ms-thread-title{text-transform:capitalize}
+.ms-thread-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+.ms-thread-card{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--bg-card);cursor:pointer;text-align:left;font-family:inherit;color:inherit}
+.ms-thread-card:hover{border-color:var(--gold-border-soft)}
+.ms-thread-mentor{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--gold);font-weight:600}
+.ms-thread-principle{font-size:13px;color:var(--text-primary)}
+.ms-harvest-prompt{position:fixed;inset:0;background:color-mix(in srgb,#000 55%,transparent);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px}
+.ms-harvest-inner{background:var(--bg-card);border:1px solid var(--gold-border-soft);border-radius:14px;padding:20px;max-width:420px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.ms-harvest-inner textarea{width:100%;margin:10px 0;font-size:13px;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg-card-2);color:var(--text-primary);font-family:inherit}
+.ms-harvest-actions{display:flex;gap:8px;justify-content:flex-end}
+.danger-borrow-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:6px;padding:8px 10px;background:var(--bg-hover);border-radius:8px;font-size:12px}
+.danger-borrow-row[hidden]{display:none!important}
+.ms-borrow-label{color:var(--text-secondary);font-size:11px}
+.ms-borrow-chip{border:1px solid var(--gold-border-soft);background:var(--gold-dim);color:var(--gold);padding:4px 10px;border-radius:99px;font-size:11px;cursor:pointer;font-family:inherit}
+.ms-borrow-chip:hover{border-color:var(--gold-border-strong)}
+.ms-sched-btn{border:1px solid var(--border);background:transparent;color:var(--text-secondary);width:22px;height:22px;border-radius:5px;cursor:pointer;font-size:11px;padding:0;font-family:inherit}
 #projDetailPanel{margin-top:16px}
 @media(max-width:720px){.app-sidebar{position:fixed;left:0;transform:translateX(-100%)}}
 .ideas-cal-link-section{padding:8px 0 16px}
@@ -1012,7 +1132,13 @@ body.view-dashboard #settingsPanel{display:none!important}
 .tag-chip-rm:hover{color:var(--red)}
 .tag-chip,.tag-add-btn{border:1px solid var(--border);background:var(--chip-bg);color:var(--text-secondary);
   padding:2px 8px;border-radius:99px;font-size:10px;cursor:pointer;font-family:inherit}
+.tag-chip.tag-first-fruits{background:var(--gold-dim);color:var(--gold);border-color:var(--gold-border-soft)}
+.tag-chip.tag-hobby{background:color-mix(in srgb,#5b8def 16%,transparent);color:#5b8def;border-color:color-mix(in srgb,#5b8def 30%,transparent)}
+.tag-chip.tag-skill{background:var(--green-bg);color:var(--green);border-color:color-mix(in srgb,var(--green) 30%,transparent)}
 .tag-chip:hover,.tag-add-btn:hover{color:var(--text-primary);border-color:var(--gold-border-soft)}
+.tag-chip.tag-hobby:hover{border-color:color-mix(in srgb,#5b8def 45%,transparent)}
+.tag-chip.tag-skill:hover{border-color:color-mix(in srgb,var(--green) 45%,transparent)}
+.tag-chip.tag-first-fruits:hover{border-color:var(--gold-border-strong)}
 .tag-add-btn{color:var(--gold);border-style:dashed}
 .tag-editor{margin-top:6px}
 .tag-input{font-size:11px;padding:4px 8px;border-radius:6px;border:1px solid var(--border);width:100%;max-width:160px}
@@ -1058,6 +1184,15 @@ body.faithfulness-app #dailyBoard .ff-progress{color:var(--gold)}
         <button type="button" data-nav="daily"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></span><span>Daily</span></button>
         <button type="button" data-nav="weekly"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span><span>Weekly</span></button>
         <button type="button" data-nav="monthly"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v3M16 2v3M7 14h2M12 14h2M17 14h2M7 18h2M12 18h2"/></svg></span><span>Monthly</span></button>
+      </div>
+    </div>
+    <div class="nav-group">
+      <button type="button" class="nav-item nav-accordion" id="navMentorshipToggle" aria-expanded="false">
+        <span class="nav-item-inner"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M12 3l2.5 7.5H22l-6 4.5 2.5 7.5L12 18l-6.5 4.5 2.5-7.5-6-4.5h7.5z"/></svg></span><span class="nav-label">Mentorship</span></span>
+        <span class="chev">›</span>
+      </button>
+      <div class="nav-sub" id="navMentorshipSub">
+        <button type="button" data-nav="mentorship-threads"><span class="nav-icon" aria-hidden="true">◎</span><span>Threads</span></button>
       </div>
     </div>
     <button type="button" class="nav-item" data-nav="ideas">
@@ -1181,6 +1316,18 @@ body.faithfulness-app #dailyBoard .ff-progress{color:var(--gold)}
         <button type="button" class="dash-widget-link" data-dash-link="calendar">View Calendar →</button>
       </div>
       <div id="dashScheduleList"></div>
+      <div class="dash-sched-add">
+        <input type="text" id="dashSchedTitle" placeholder="Add to schedule…" aria-label="Schedule item">
+        <select id="dashSchedSlot" aria-label="Time slot">
+          <option value="beforeWork">Before Work</option>
+          <option value="duringWork">During Work</option>
+          <option value="afterWork">After Work</option>
+          <option value="eveningShutdown">Evening Shutdown</option>
+          <option value="timed">Specific time</option>
+        </select>
+        <input type="time" id="dashSchedTime" aria-label="Specific time" hidden>
+        <button type="button" id="dashSchedAdd">+ Add</button>
+      </div>
     </div>
     <div class="dash-widget">
       <div class="dash-widget-head">
@@ -1220,14 +1367,22 @@ body.faithfulness-app #dailyBoard .ff-progress{color:var(--gold)}
   <div id="projDetailPanel"></div>
 </section>
 
+<section id="mentorshipPanel" hidden aria-label="Mentorship"></section>
+
 <section id="settingsPanel" hidden aria-label="Settings">
-  <div class="page-head"><div><h2 class="serif">Settings</h2><p>Preferences and daily anchors.</p></div></div>
+  <div class="page-head"><div><h2 class="serif">Settings</h2><p>Preferences, anchors, and mentors.</p></div></div>
   <div class="settings-card">
     <p style="margin:0 0 8px;font-size:13px;color:var(--text-secondary)">Sync and reset live in the top bar.</p>
     <h4 class="serif" style="margin:16px 0 8px">Daily Anchors</h4>
     <p style="margin:0 0 10px;font-size:12px;color:var(--text-secondary)">First fruits tasks auto-seed each day at the top of priorities.</p>
     <div class="anchor-settings" id="anchorSettings"></div>
     <button type="button" class="btn-ghost" id="anchorAddBtn" style="margin-top:10px">+ Add anchor</button>
+  </div>
+  <div class="settings-card">
+    <h4 class="serif" style="margin:0 0 8px">Mentors</h4>
+    <p style="margin:0 0 10px;font-size:12px;color:var(--text-secondary)">Labels appear in the Mentorship sidebar. Add a fourth mentor anytime.</p>
+    <div class="mentor-settings" id="mentorSettings"></div>
+    <button type="button" class="btn-ghost" id="mentorAddBtn" style="margin-top:10px">+ Add mentor</button>
   </div>
 </section>
 
@@ -1459,6 +1614,8 @@ body.faithfulness-app #dailyBoard .ff-progress{color:var(--gold)}
 </div><!-- /.app-shell -->
 
 <script src="faithfulness-store.js"></script>
+<script src="mentorship-seed.js"></script>
+<script src="mentorship-ui.js"></script>
 <script src="tags-ui.js"></script>
 <script src="projects-ui.js"></script>
 <script src="journal-ui.js"></script>
@@ -2717,6 +2874,7 @@ function isCalendar(){ return viewMode==='calendar'; }
 function isTag(){ return viewMode==='tag'; }
 function isProjects(){ return viewMode==='projects'; }
 function isSettings(){ return viewMode==='settings'; }
+function isMentorship(){ return typeof viewMode==='string' && viewMode.startsWith('mentorship'); }
 function dashPeriodLabel(){
   const d = dayOf(dayOffset);
   const prefix = dayOffset===0 ? 'Today' : dayLabelFor(dayOffset);
@@ -2756,7 +2914,7 @@ async function saveAnchorSettingsFromDOM(){
   if(typeof renderDashboard==='function') renderDashboard();
   markDirty?.();
 }
-function loadSettings(){ renderAnchorSettings(); }
+function loadSettings(){ renderAnchorSettings(); renderMentorSettings?.(); }
 function currentKey(){
   if(isDaily()) return dayKeyFor(dayOffset);
   if(isWeekly()) return weekKeyFor(weekOffset);
@@ -2770,7 +2928,7 @@ function blankDaily(){
   return {
     posture:{virtues:[],motives:[],prayer:''},
     faithfulFew:ff,
-    danger:{danger:'',ifHappens:'',thenWill:'',why:'',guardrailKept:false},
+    danger:{danger:'',ifHappens:'',thenWill:'',why:'',guardrailKept:false,borrowedPrincipleId:null},
     execute:{beforeWork:'',duringWork:'',afterWork:'',eveningShutdown:'',
       studyBlock:{from:'',to:'',work:'',doneDef:'',done:false}},
     track:{ratings:{diligence:0,focus:0,followThrough:0,order:0,service:0},handledWell:'',neglected:'',happened:''},
@@ -2987,6 +3145,7 @@ async function initFaithStore(){
   window.faithStore = faithStore;
   await faithStore.load();
   await faithStore.migrateFromLegacy({ globals, getDayJSON: key => getJSON(key) });
+  if(faithStore.ensureDefaultMentors()) await faithStore.save();
   faithStore.onChange(()=>{ dirty = true; updateSaveState('dirty'); scheduleSave(); });
 }
 
@@ -3318,6 +3477,7 @@ function DangerPlanCard(compact){
     field('danger.danger',"Today's danger",{input:true,placeholder:'What could derail my faithfulness?'})+
     field('danger.ifHappens','If this happens…',{input:true})+
     field('danger.thenWill','Then I will…',{input:true})+
+    '<div class="danger-borrow-row" id="dangerMentorSuggest" hidden></div>'+
     field('danger.why','Why this matters',{short:true,placeholder:'Eternally and practically…'})+
     '<label class="motive-item" style="margin-top:8px"><input type="checkbox" data-field="danger.guardrailKept"> Guardrail kept today</label>'+
     '</div></section>';
@@ -4174,6 +4334,7 @@ function updateSidebarNav(){
   document.querySelectorAll('.sidebar-nav [data-nav]').forEach(btn=>{
     const nav = btn.dataset.nav;
     let on = viewMode===nav || (nav==='calendar' && isCalendar());
+    if(nav.startsWith('mentorship-')) on = viewMode === nav;
     btn.classList.toggle('on', on);
   });
 }
@@ -4187,6 +4348,7 @@ function updateViewUI(){
   document.getElementById('settingsPanel').hidden = viewMode!=='settings';
   document.getElementById('calendarPanel').hidden = viewMode!=='calendar';
   document.getElementById('tagLensPanel').hidden = viewMode!=='tag';
+  document.getElementById('mentorshipPanel').hidden = !isMentorship();
   document.getElementById('dailyBoard').hidden = viewMode!=='daily';
   document.body.classList.toggle('view-dashboard', viewMode==='dashboard');
   document.body.classList.toggle('view-daily', viewMode==='daily');
@@ -4203,7 +4365,7 @@ function updateViewUI(){
   const score = document.getElementById('score');
   score.style.display = viewMode==='daily' ? '' : 'none';
   const nav = document.querySelector('.app-topbar .navrow');
-  const hideNav = isPrayer() || isIdeas() || isProjects() || isSettings() || isCalendar() || isTag();
+  const hideNav = isPrayer() || isIdeas() || isProjects() || isSettings() || isCalendar() || isTag() || isMentorship();
   if(nav) nav.style.visibility = hideNav ? 'hidden' : 'visible';
   const calJump = document.getElementById('btnCalJump');
   if(calJump) calJump.hidden = !(isDashboard() || isDaily() || isJournal());
@@ -4229,8 +4391,13 @@ function updateViewUI(){
   else if(isSettings()) document.getElementById('periodLabel').textContent = 'Settings';
   else if(isCalendar()) document.getElementById('periodLabel').textContent = 'Calendar';
   else if(isTag()) document.getElementById('periodLabel').textContent = 'Tags';
+  else if(isMentorship()) document.getElementById('periodLabel').textContent = 'Mentorship';
   const foot = document.querySelector('.site-foot');
-  if(foot) foot.style.display = (isIdeas()||isPrayer()||isDashboard()||isCalendar()||isTag()) ? 'none' : '';
+  if(foot) foot.style.display = (isIdeas()||isPrayer()||isDashboard()||isCalendar()||isTag()||isMentorship()) ? 'none' : '';
+  if(isMentorship()){
+    document.getElementById('navMentorshipSub')?.classList.add('open');
+    document.getElementById('navMentorshipToggle')?.setAttribute('aria-expanded','true');
+  }
   if(isIdeas() && typeof loadIdeasHub === 'function'){
     requestAnimationFrame(function(){ loadIdeasHub(); });
   }
@@ -4247,6 +4414,7 @@ async function loadCurrent(){
   else if(isTag()) loadTagLens?.();
   else if(isCalendar()) loadCalendar();
   else if(isProjects()) loadProjects?.();
+  else if(isMentorship()) loadMentorship?.();
   else if(isSettings()) loadSettings();
   else if(isJournal()) await loadJournal();
   else if(isPrayer()) loadPrayer();
@@ -4271,7 +4439,7 @@ async function loadDaily(){
   if(!document.getElementById('sec-faithfulFew') || document.getElementById('sec-satRecovery')) renderDaily();
   populateFields(document.getElementById('dailyMain'), dayData);
   populateFields(document.getElementById('drawerGrowthTree'), dayData);
-  populateVirtues(); populateRatings(); renderFFLists(); renderQuickCaptureList(); updateDangerReminder();
+  populateVirtues(); populateRatings(); renderFFLists(); renderQuickCaptureList(); updateDangerReminder(); renderDangerMentorSuggestions?.();
   applyDailyPhase();
   if(isSat) updateSaturdayRecoveryUI();
   else clearSaturdayRecoveryUI();
@@ -4350,7 +4518,7 @@ async function resetAll(){
   renderDaily(); renderWeekly(); renderMonthly(); bindEvents(); bindFFAccordion();
   await initAuth();
   const vm = await window.storage.get('view-mode');
-  if(vm?.value && ['dashboard','daily','weekly','monthly','journal','ideas','prayer','projects','settings','calendar','tag'].includes(vm.value)) viewMode = vm.value;
+  if(vm?.value && (['dashboard','daily','weekly','monthly','journal','ideas','prayer','projects','settings','calendar','tag'].includes(vm.value) || vm.value.startsWith('mentorship-'))) viewMode = vm.value;
   const g = await getJSON('fs-globals');
   if(g){ globals = {...globals,...g}; window.globals = globals; }
   ensureMotives();
@@ -4368,6 +4536,8 @@ async function resetAll(){
   simpleMode = localStorage.getItem('wsr:simpleMode')==='1';
   bindDashboardEvents?.();
   bindTagEvents?.();
+  bindMentorshipEvents?.();
+  renderMentorshipNav?.();
   document.querySelectorAll('[data-nav]').forEach(btn=>{
     if(btn.closest('.sidebar-nav')) return;
     btn.addEventListener('click', ()=> setMode(btn.dataset.nav));

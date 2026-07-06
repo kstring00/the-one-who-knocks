@@ -34,6 +34,11 @@
       journalEntries: [],
       quickNotes: [],
       dailyAnchors: null,
+      mentors: [],
+      principles: [],
+      applications: [],
+      mentorshipSessions: [],
+      queuedQuestions: [],
       createdAt: nowIso(),
       updatedAt: nowIso()
     };
@@ -81,7 +86,10 @@
       createdAt: t.createdAt || nowIso(),
       updatedAt: t.updatedAt || t.createdAt || nowIso(),
       legacyMustDoId: t.legacyMustDoId || null,
-      anchorId: t.anchorId || null
+      anchorId: t.anchorId || null,
+      startTime: t.startTime || '',
+      sortOrder: typeof t.sortOrder === 'number' ? t.sortOrder : null,
+      principleId: t.principleId || null
     };
   }
 
@@ -169,6 +177,81 @@
     };
   }
 
+  const QUESTION_STATUSES = ['queued', 'asked'];
+
+  function normalizeMentor(raw){
+    const m = raw || {};
+    return {
+      id: m.id || uid(),
+      label: String(m.label || '').trim() || 'M',
+      role: String(m.role || '').trim(),
+      name: String(m.name || '').trim(),
+      nextSessionDate: m.nextSessionDate || '',
+      sortOrder: typeof m.sortOrder === 'number' ? m.sortOrder : 0
+    };
+  }
+
+  function normalizePrinciple(raw){
+    const p = raw || {};
+    return {
+      id: p.id || uid(),
+      mentorId: p.mentorId || '',
+      sourceQuestion: String(p.sourceQuestion || '').trim(),
+      title: String(p.title || '').trim(),
+      detailBullets: Array.isArray(p.detailBullets) ? p.detailBullets.map(b=> String(b||'').trim()).filter(Boolean) : [],
+      themeTags: normalizeTags(p.themeTags),
+      createdAt: p.createdAt || nowIso()
+    };
+  }
+
+  function normalizeApplication(raw){
+    const a = raw || {};
+    return {
+      id: a.id || uid(),
+      principleId: a.principleId || '',
+      taskId: a.taskId || null,
+      note: String(a.note || '').trim(),
+      date: a.date || todayIso(),
+      createdAt: a.createdAt || nowIso()
+    };
+  }
+
+  function normalizeSessionEntry(raw){
+    const s = raw || {};
+    return {
+      id: s.id || uid(),
+      mentorId: s.mentorId || '',
+      date: s.date || todayIso(),
+      notes: String(s.notes || ''),
+      attachedApplicationIds: Array.isArray(s.attachedApplicationIds) ? s.attachedApplicationIds : [],
+      attachedQuestionIds: Array.isArray(s.attachedQuestionIds) ? s.attachedQuestionIds : [],
+      createdAt: s.createdAt || nowIso()
+    };
+  }
+
+  function normalizeQueuedQuestion(raw){
+    const q = raw || {};
+    return {
+      id: q.id || uid(),
+      mentorId: q.mentorId || '',
+      text: String(q.text || '').trim(),
+      status: QUESTION_STATUSES.includes(q.status) ? q.status : 'queued',
+      askedInSessionId: q.askedInSessionId || null,
+      sortOrder: typeof q.sortOrder === 'number' ? q.sortOrder : 0,
+      createdAt: q.createdAt || nowIso()
+    };
+  }
+
+  const DEFAULT_MENTORS = [
+    { id: 'mentor-ed', label: 'ED', role: 'Executive Director', name: '', sortOrder: 0 },
+    { id: 'mentor-cd', label: 'CD', role: 'Clinical Director', name: '', sortOrder: 1 },
+    { id: 'mentor-doo', label: 'DOO', role: 'Director of Operations', name: '', sortOrder: 2 }
+  ];
+
+  function getDefaultMentors(){
+    return DEFAULT_MENTORS.map(m=> normalizeMentor({ ...m }));
+  }
+
   function normalizeCore(raw){
     const c = raw && typeof raw === 'object' ? raw : {};
     const base = blankCore();
@@ -184,6 +267,11 @@
       journalEntries: (c.journalEntries || []).map(normalizeJournalEntry),
       quickNotes: (c.quickNotes || []).map(normalizeQuickNote),
       dailyAnchors: (c.dailyAnchors || getDefaultDailyAnchors()).map(normalizeDailyAnchor),
+      mentors: (c.mentors || []).map(normalizeMentor),
+      principles: (c.principles || []).map(normalizePrinciple),
+      applications: (c.applications || []).map(normalizeApplication),
+      mentorshipSessions: (c.mentorshipSessions || []).map(normalizeSessionEntry),
+      queuedQuestions: (c.queuedQuestions || []).map(normalizeQueuedQuestion),
       updatedAt: c.updatedAt || base.updatedAt
     };
   }
@@ -239,6 +327,37 @@
 
     getTasksForDate(date){
       return this.data.tasks.filter(t=> t.date === date);
+    }
+
+    /** Tasks shown on the day schedule (excludes First Fruits anchors and Daily priorities). */
+    getScheduleTasksForDate(date){
+      return this.data.tasks.filter(t=> t.date === date && !t.anchorId && !t.legacyMustDoId && t.timeSlot);
+    }
+
+    _scheduleTaskSort(a, b){
+      const ao = a.sortOrder != null ? a.sortOrder : 999999;
+      const bo = b.sortOrder != null ? b.sortOrder : 999999;
+      if(ao !== bo) return ao - bo;
+      return (a.createdAt||'').localeCompare(b.createdAt||'');
+    }
+
+    moveScheduleTask(id, direction){
+      const task = this.getTask(id);
+      if(!task || !task.timeSlot) return false;
+      const peers = this.getScheduleTasksForDate(task.date)
+        .filter(t=> t.timeSlot === task.timeSlot)
+        .sort((a,b)=> this._scheduleTaskSort(a,b));
+      const idx = peers.findIndex(t=> t.id === id);
+      if(idx < 0) return false;
+      const swap = direction === 'up' ? idx - 1 : idx + 1;
+      if(swap < 0 || swap >= peers.length) return false;
+      const a = peers[idx];
+      const b = peers[swap];
+      const aOrder = a.sortOrder != null ? a.sortOrder : idx;
+      const bOrder = b.sortOrder != null ? b.sortOrder : swap;
+      this.updateTask(a.id, { sortOrder: bOrder });
+      this.updateTask(b.id, { sortOrder: aOrder });
+      return true;
     }
 
     /** Must-Do / Faithful Few priorities — excludes anchor tasks */
@@ -419,12 +538,16 @@
 
       let watering = null;
       let seedHarvested = false;
+      let needsPrincipleHarvest = false;
       if(task.seedId && !wasComplete){
         watering = this._waterOnTaskComplete(task, opts);
         seedHarvested = this._maybeHarvestSeed(task.seedId);
       }
+      if(task.principleId && !wasComplete && !opts?.skipPrincipleHarvest){
+        needsPrincipleHarvest = true;
+      }
       await this.save();
-      return { task: normalizeTask(task), watering, seedHarvested };
+      return { task: normalizeTask(task), watering, seedHarvested, needsPrincipleHarvest };
     }
 
     async uncompleteTask(id){
@@ -527,6 +650,20 @@
       return block;
     }
 
+    updateScheduleBlock(id, patch){
+      const b = this.data.scheduleBlocks.find(x=> x.id === id);
+      if(!b) return null;
+      Object.assign(b, patch, { updatedAt: nowIso() });
+      return normalizeScheduleBlock(b);
+    }
+
+    deleteScheduleBlock(id){
+      const i = this.data.scheduleBlocks.findIndex(x=> x.id === id);
+      if(i < 0) return false;
+      this.data.scheduleBlocks.splice(i, 1);
+      return true;
+    }
+
     getScheduleBlocksForDate(dateStr){
       const dow = new Date(dateStr+'T12:00:00').getDay();
       return this.data.scheduleBlocks.filter(b=>{
@@ -556,6 +693,313 @@
 
     getActiveProjects(){
       return this.data.projects.filter(p=> !p.archived);
+    }
+
+    // ——— Mentorship ———
+    ensureDefaultMentors(){
+      if(!this.data.mentors?.length){
+        this.data.mentors = getDefaultMentors();
+        return true;
+      }
+      return false;
+    }
+
+    getMentors(){
+      this.ensureDefaultMentors();
+      return this.data.mentors.slice().sort((a,b)=> (a.sortOrder||0) - (b.sortOrder||0));
+    }
+
+    getMentor(id){
+      return this.getMentors().find(m=> m.id === id) || null;
+    }
+
+    setMentorConfig(mentors){
+      this.data.mentors = (mentors || []).map(normalizeMentor);
+      return this.data.mentors;
+    }
+
+    createMentor(partial){
+      const m = normalizeMentor({ ...partial, id: uid(), sortOrder: this.data.mentors.length });
+      this.data.mentors.push(m);
+      return m;
+    }
+
+    updateMentor(id, patch){
+      const m = this.data.mentors.find(x=> x.id === id);
+      if(!m) return null;
+      Object.assign(m, patch);
+      return normalizeMentor(m);
+    }
+
+    deleteMentor(id){
+      const i = this.data.mentors.findIndex(x=> x.id === id);
+      if(i < 0) return false;
+      this.data.mentors.splice(i, 1);
+      this.data.principles = this.data.principles.filter(p=> p.mentorId !== id);
+      this.data.queuedQuestions = this.data.queuedQuestions.filter(q=> q.mentorId !== id);
+      this.data.mentorshipSessions = this.data.mentorshipSessions.filter(s=> s.mentorId !== id);
+      return true;
+    }
+
+    createPrinciple(partial){
+      const p = normalizePrinciple({ ...partial, id: uid(), createdAt: nowIso() });
+      this.data.principles.push(p);
+      return p;
+    }
+
+    updatePrinciple(id, patch){
+      const p = this.data.principles.find(x=> x.id === id);
+      if(!p) return null;
+      Object.assign(p, patch);
+      return normalizePrinciple(p);
+    }
+
+    deletePrinciple(id){
+      const i = this.data.principles.findIndex(x=> x.id === id);
+      if(i < 0) return false;
+      this.data.principles.splice(i, 1);
+      this.data.applications = this.data.applications.filter(a=> a.principleId !== id);
+      this.data.tasks.forEach(t=> { if(t.principleId === id) t.principleId = null; });
+      return true;
+    }
+
+    getPrinciple(id){
+      return this.data.principles.find(p=> p.id === id) || null;
+    }
+
+    getPrinciplesByMentor(mentorId){
+      return this.data.principles.filter(p=> p.mentorId === mentorId)
+        .sort((a,b)=> (a.createdAt||'').localeCompare(b.createdAt||''));
+    }
+
+    getPrinciplesGroupedByQuestion(mentorId){
+      const groups = {};
+      this.getPrinciplesByMentor(mentorId).forEach(p=>{
+        const key = p.sourceQuestion || '(Uncategorized)';
+        if(!groups[key]) groups[key] = [];
+        groups[key].push(p);
+      });
+      return groups;
+    }
+
+    getApplicationsByPrinciple(principleId){
+      return this.data.applications.filter(a=> a.principleId === principleId)
+        .sort((a,b)=> (b.date||'').localeCompare(a.date||'') || (b.createdAt||'').localeCompare(a.createdAt||''));
+    }
+
+    getApplicationCount(principleId){
+      return this.data.applications.filter(a=> a.principleId === principleId).length;
+    }
+
+    createApplication(partial){
+      const a = normalizeApplication({ ...partial, id: uid(), createdAt: nowIso() });
+      this.data.applications.push(a);
+      return a;
+    }
+
+    logPrincipleApplication(principleId, { note, date, taskId }){
+      return this.createApplication({
+        principleId,
+        note: note || '',
+        date: date || todayIso(),
+        taskId: taskId || null
+      });
+    }
+
+    putPrincipleToWork(principleId, { title, date, timeSlot, startTime }){
+      const principle = this.getPrinciple(principleId);
+      if(!principle) return null;
+      const task = this.createTask({
+        title: title || principle.title,
+        date: date || todayIso(),
+        timeSlot: timeSlot || 'beforeWork',
+        startTime: startTime || '',
+        tag: 'stewardship',
+        principleId
+      });
+      return task;
+    }
+
+    createSessionEntry(partial){
+      const s = normalizeSessionEntry({ ...partial, id: uid(), createdAt: nowIso() });
+      this.data.mentorshipSessions.push(s);
+      return s;
+    }
+
+    updateSessionEntry(id, patch){
+      const s = this.data.mentorshipSessions.find(x=> x.id === id);
+      if(!s) return null;
+      Object.assign(s, patch);
+      return normalizeSessionEntry(s);
+    }
+
+    getSessionsByMentor(mentorId){
+      return this.data.mentorshipSessions.filter(s=> s.mentorId === mentorId)
+        .sort((a,b)=> (b.date||'').localeCompare(a.date||''));
+    }
+
+    getLastSession(mentorId){
+      return this.getSessionsByMentor(mentorId)[0] || null;
+    }
+
+    getApplicationsSinceDate(mentorId, sinceDate){
+      const pids = new Set(this.getPrinciplesByMentor(mentorId).map(p=> p.id));
+      return this.data.applications.filter(a=> pids.has(a.principleId) && (!sinceDate || a.date > sinceDate))
+        .sort((a,b)=> (b.date||'').localeCompare(a.date||''));
+    }
+
+    startNewSession(mentorId, { date, notes }){
+      const last = this.getLastSession(mentorId);
+      const since = last?.date || '';
+      const apps = this.getApplicationsSinceDate(mentorId, since);
+      const askedToday = this.data.queuedQuestions.filter(q=>
+        q.mentorId === mentorId && q.status === 'asked' && q.askedInSessionId == null &&
+        (!since || (q.createdAt||'').slice(0,10) >= since)
+      );
+      return this.createSessionEntry({
+        mentorId,
+        date: date || todayIso(),
+        notes: notes || '',
+        attachedApplicationIds: apps.map(a=> a.id),
+        attachedQuestionIds: askedToday.map(q=> q.id)
+      });
+    }
+
+    buildSessionPrepText(mentorId){
+      const mentor = this.getMentor(mentorId);
+      const last = this.getLastSession(mentorId);
+      const since = last?.date || '';
+      const apps = this.getApplicationsSinceDate(mentorId, since);
+      const queued = this.getQueuedQuestions(mentorId);
+      const lines = [];
+      lines.push('Session prep — ' + (mentor?.label || '') + ' (' + (mentor?.role || '') + ')');
+      lines.push('Date: ' + todayIso());
+      lines.push('');
+      lines.push('What I practiced:');
+      if(!apps.length) lines.push('  (none logged since last session)');
+      apps.forEach(a=>{
+        const p = this.getPrinciple(a.principleId);
+        lines.push('  · ' + (p?.title || 'Principle') + ' — ' + a.date + (a.note ? ': ' + a.note : ''));
+      });
+      lines.push('');
+      lines.push('Questions for this session:');
+      if(!queued.length) lines.push('  (queue empty)');
+      queued.forEach(q=> lines.push('  · ' + q.text));
+      return lines.join('\n');
+    }
+
+    createQueuedQuestion(partial){
+      const qs = this.data.queuedQuestions.filter(q=> q.mentorId === partial.mentorId && q.status === 'queued');
+      const q = normalizeQueuedQuestion({
+        ...partial,
+        id: uid(),
+        sortOrder: qs.length,
+        createdAt: nowIso()
+      });
+      this.data.queuedQuestions.push(q);
+      return q;
+    }
+
+    updateQueuedQuestion(id, patch){
+      const q = this.data.queuedQuestions.find(x=> x.id === id);
+      if(!q) return null;
+      Object.assign(q, patch);
+      return normalizeQueuedQuestion(q);
+    }
+
+    deleteQueuedQuestion(id){
+      const i = this.data.queuedQuestions.findIndex(x=> x.id === id);
+      if(i < 0) return false;
+      this.data.queuedQuestions.splice(i, 1);
+      return true;
+    }
+
+    getQueuedQuestions(mentorId){
+      return this.data.queuedQuestions.filter(q=> q.mentorId === mentorId && q.status === 'queued')
+        .sort((a,b)=> (a.sortOrder||0) - (b.sortOrder||0));
+    }
+
+    getAskedQuestions(mentorId){
+      return this.data.queuedQuestions.filter(q=> q.mentorId === mentorId && q.status === 'asked')
+        .sort((a,b)=> (b.createdAt||'').localeCompare(a.createdAt||''));
+    }
+
+    reorderQueuedQuestions(mentorId, orderedIds){
+      orderedIds.forEach((id, i)=>{
+        const q = this.data.queuedQuestions.find(x=> x.id === id);
+        if(q && q.mentorId === mentorId) q.sortOrder = i;
+      });
+    }
+
+    markQuestionAsked(questionId, sessionId){
+      const q = this.data.queuedQuestions.find(x=> x.id === questionId);
+      if(!q) return null;
+      q.status = 'asked';
+      q.askedInSessionId = sessionId || null;
+      const principle = this.createPrinciple({
+        mentorId: q.mentorId,
+        sourceQuestion: q.text,
+        title: '',
+        detailBullets: [],
+        themeTags: []
+      });
+      return { question: normalizeQueuedQuestion(q), principle };
+    }
+
+    getMentorStats(mentorId){
+      const principles = this.getPrinciplesByMentor(mentorId);
+      const withApps = principles.filter(p=> this.getApplicationCount(p.id) > 0).length;
+      return { total: principles.length, practiced: withApps };
+    }
+
+    getPrinciplesByTheme(themeTag){
+      const tag = String(themeTag||'').trim().toLowerCase();
+      return this.data.principles.filter(p=>
+        p.themeTags.some(t=> t.toLowerCase() === tag)
+      );
+    }
+
+    getAllThemeTags(){
+      const set = new Set();
+      this.data.principles.forEach(p=> p.themeTags.forEach(t=> set.add(t)));
+      return [...set].sort();
+    }
+
+    getThreadsGrouped(){
+      const groups = {};
+      this.data.principles.forEach(p=>{
+        (p.themeTags.length ? p.themeTags : ['untagged']).forEach(tag=>{
+          const key = tag.toLowerCase();
+          if(!groups[key]) groups[key] = { tag, principles: [] };
+          groups[key].principles.push(p);
+        });
+      });
+      return Object.values(groups).sort((a,b)=> a.tag.localeCompare(b.tag));
+    }
+
+    matchPrinciplesForDanger(text, limit){
+      const q = String(text||'').toLowerCase();
+      if(!q.trim()) return [];
+      const words = q.split(/\W+/).filter(w=> w.length > 2);
+      if(!words.length) return [];
+      const scored = this.data.principles.map(p=>{
+        const hay = (p.title + ' ' + p.sourceQuestion + ' ' + p.themeTags.join(' ')).toLowerCase();
+        let score = 0;
+        words.forEach(w=> { if(hay.includes(w)) score++; });
+        return { principle: p, score };
+      }).filter(x=> x.score > 0);
+      scored.sort((a,b)=> b.score - a.score);
+      return scored.slice(0, limit || 3).map(x=> x.principle);
+    }
+
+    completePrincipleHarvest(taskId, note){
+      const task = this.getTask(taskId);
+      if(!task?.principleId) return null;
+      return this.logPrincipleApplication(task.principleId, {
+        note: note || task.title,
+        date: task.date,
+        taskId: task.id
+      });
     }
 
     getOldestUnwateredActiveSeed(){

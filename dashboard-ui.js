@@ -15,6 +15,26 @@
     'What grace did you receive today that you almost missed?'
   ];
   const TAG_LABELS = { project:'Project', growth:'Growth', stewardship:'Stewardship', none:'' };
+  const SCHEDULE_SLOTS = [
+    { id:'beforeWork', label:'Before Work' },
+    { id:'duringWork', label:'During Work' },
+    { id:'afterWork', label:'After Work' },
+    { id:'eveningShutdown', label:'Evening Shutdown' }
+  ];
+
+  function tagClassFor(tag){
+    if(typeof semanticTagClass === 'function') return semanticTagClass(tag);
+    const t = String(tag||'').toLowerCase();
+    if(t.includes('first fruit')) return 'tag-first-fruits';
+    if(t.includes('hobb')) return 'tag-hobby';
+    if(t.includes('skill')) return 'tag-skill';
+    return '';
+  }
+
+  function dashTagHtml(tag){
+    const cls = tagClassFor(tag);
+    return '<span class="dash-tag'+(cls ? ' '+cls.replace('tag-','') : '')+'">'+esc(tag)+'</span>';
+  }
 
   function dashDateStr(){ return iso(dayOf(typeof dayOffset==='number' ? dayOffset : 0)); }
 
@@ -121,16 +141,44 @@
     return out.slice(0, 4);
   }
 
-  function renderTaskRow(t){
+  function renderTaskRow(t, opts){
+    opts = opts || {};
+    const showFfTag = !opts.hideFirstFruitsTag && (t.tags||[]).includes('First Fruits');
+    const otherTags = (t.tags||[]).filter(x=> x !== 'First Fruits' || opts.hideFirstFruitsTag);
     return '<div class="dash-task-wrap'+(t.completed?' done':'')+'">'+
       '<label class="dash-task'+(t.completed?' done':'')+'">'+
       '<input type="checkbox" data-dash-task="'+t.id+'"'+(t.completed?' checked':'')+'>'+
       '<span class="dash-task-text">'+esc(t.title)+'</span>'+
       (t.durationMin ? '<span class="dash-dur">'+t.durationMin+'m</span>' : '')+
-      ((t.tags||[]).includes('First Fruits') ? '<span class="dash-tag first-fruits">First Fruits</span>' : '')+
+      (showFfTag ? dashTagHtml('First Fruits') : '')+
       '</label>'+
-      (typeof tagChipsHtml === 'function' ? tagChipsHtml(t.tags, { showAdd:true, entityType:'task', entityId:t.id }) : '')+
+      (typeof tagChipsHtml === 'function' && !opts.compact
+        ? tagChipsHtml(otherTags, { showAdd:true, entityType:'task', entityId:t.id }) : '')+
       '</div>';
+  }
+
+  function renderFirstFruitsSection(anchors){
+    if(!anchors.length) return '';
+    const done = anchors.filter(a=> a.completed).length;
+    return '<section class="dash-first-fruits" aria-label="First Fruits">'+
+      '<header class="dash-first-head">'+
+      '<span class="dash-first-badge" aria-hidden="true">✦</span>'+
+      '<div class="dash-first-meta">'+
+      '<strong class="dash-first-title">First Fruits</strong>'+
+      '<span class="dash-first-hint">Bible & prayer — start here</span>'+
+      '</div>'+
+      '<span class="dash-first-progress">'+done+'/'+anchors.length+'</span>'+
+      '</header>'+
+      '<div class="dash-first-list">'+
+      anchors.map(t=>
+        '<div class="dash-ff-item'+(t.completed?' done':'')+'">'+
+        '<label class="dash-ff-row">'+
+        '<input type="checkbox" data-dash-task="'+t.id+'"'+(t.completed?' checked':'')+'>'+
+        '<span class="dash-ff-text">'+esc(t.title)+'</span>'+
+        (t.durationMin ? '<span class="dash-ff-dur">'+t.durationMin+' min</span>' : '')+
+        '</label></div>'
+      ).join('')+
+      '</div></section>';
   }
 
   function renderSuggestions(suggestions){
@@ -146,19 +194,87 @@
     ).join('')+'</div>';
   }
 
-  function scheduleTimelineItems(dateStr){
-    if(!faithStore) return [];
-    const blocks = faithStore.getScheduleBlocksForDate(dateStr);
-    const tasks = faithStore.getTasksForDate(dateStr).filter(t=> t.timeSlot);
-    const items = blocks.map(b=>({ time: b.startTime || '—', title: b.label, sub: '' }));
-    const slotLabels = { beforeWork:'Before Work', duringWork:'During Work', afterWork:'After Work', eveningShutdown:'Evening Shutdown' };
-    ['beforeWork','duringWork','afterWork','eveningShutdown'].forEach(slot=>{
-      tasks.filter(t=> t.timeSlot===slot && t.title).forEach(t=>{
-        items.push({ time: slotLabels[slot], title: t.title, sub: t.completed ? 'Done' : '' });
-      });
-    });
-    return items;
+  function timeToMinutes(t){
+    if(!t || !t.includes(':')) return null;
+    const [h,m] = t.split(':').map(Number);
+    return h*60+m;
   }
+
+  function renderScheduleItemControls(kind, id){
+    let h = '<div class="dash-sched-ctrls">';
+    if(kind === 'task'){
+      h += '<button type="button" class="dash-sched-btn" data-sched-move="'+id+':up" title="Move up">↑</button>'+
+        '<button type="button" class="dash-sched-btn" data-sched-move="'+id+':down" title="Move down">↓</button>'+
+        '<button type="button" class="dash-sched-btn dash-sched-del" data-sched-del-task="'+id+'" title="Remove">×</button>';
+    } else {
+      h += '<button type="button" class="dash-sched-btn dash-sched-del" data-sched-del-block="'+id+'" title="Remove block">×</button>';
+    }
+    return h + '</div>';
+  }
+
+  function renderScheduleTaskRow(t, opts){
+    opts = opts || {};
+    const slotOpts = SCHEDULE_SLOTS.map(s=>
+      '<option value="'+s.id+'"'+(t.timeSlot===s.id?' selected':'')+'>'+s.label+'</option>'
+    ).join('') + '<option value="timed"'+(t.timeSlot==='timed'?' selected':'')+'>Specific time</option>';
+    return '<div class="dash-sched-item'+(t.completed?' done':'')+'" data-sched-task="'+t.id+'">'+
+      '<label class="dash-sched-check">'+
+      '<input type="checkbox" data-dash-sched-task="'+t.id+'"'+(t.completed?' checked':'')+'>'+
+      '<span class="dash-sched-title">'+esc(t.title)+'</span>'+
+      '</label>'+
+      '<select class="dash-sched-slot-sel" data-sched-slot="'+t.id+'" aria-label="Time slot">'+slotOpts+'</select>'+
+      (t.timeSlot === 'timed'
+        ? '<input type="time" class="dash-sched-time-inp" data-sched-time="'+t.id+'" value="'+(t.startTime||'')+'" aria-label="Time">'
+        : '')+
+      renderScheduleItemControls('task', t.id)+
+      '</div>';
+  }
+
+  function renderDashboardSchedule(dateStr){
+    if(!faithStore) return '<p class="dash-empty">Open space is not wasted space.</p>';
+    const blocks = faithStore.getScheduleBlocksForDate(dateStr)
+      .slice()
+      .sort((a,b)=> (timeToMinutes(a.startTime) ?? 9999) - (timeToMinutes(b.startTime) ?? 9999));
+    const tasks = faithStore.getScheduleTasksForDate(dateStr);
+    const timedTasks = tasks.filter(t=> t.timeSlot === 'timed')
+      .slice()
+      .sort((a,b)=> faithStore._scheduleTaskSort(a,b));
+    const slotTasks = slotId => tasks.filter(t=> t.timeSlot === slotId)
+      .slice()
+      .sort((a,b)=> faithStore._scheduleTaskSort(a,b));
+
+    let html = '';
+    const timedRows = blocks.map(b=>
+      '<div class="dash-sched-item dash-sched-block">'+
+      '<div class="dash-sched-time">'+esc(b.startTime ? formatTime(b.startTime) : '—')+'</div>'+
+      '<div class="dash-sched-body"><div class="dash-sched-title">'+esc(b.label)+'</div>'+
+      (b.endTime ? '<div class="dash-sched-sub">until '+esc(formatTime(b.endTime))+'</div>' : '')+
+      '</div>'+renderScheduleItemControls('block', b.id)+'</div>'
+    ).concat(timedTasks.map(t=>{
+      const row = renderScheduleTaskRow(t);
+      return row.replace('dash-sched-item', 'dash-sched-item dash-sched-timed');
+    }));
+
+    if(timedRows.length){
+      html += '<div class="dash-sched-section"><div class="dash-sched-section-label">At a time</div>'+
+        timedRows.join('')+'</div>';
+    }
+
+    SCHEDULE_SLOTS.forEach(slot=>{
+      const items = slotTasks(slot.id);
+      html += '<div class="dash-sched-section" data-sched-section="'+slot.id+'">'+
+        '<div class="dash-sched-section-label">'+slot.label+'</div>';
+      if(items.length){
+        html += items.map(t=> renderScheduleTaskRow(t)).join('');
+      } else {
+        html += '<p class="dash-sched-empty">Nothing here yet</p>';
+      }
+      html += '</div>';
+    });
+
+    return html;
+  }
+
 
   function syncDayForDash(){
     const dateStr = dashDateStr();
@@ -221,8 +337,7 @@
     if(pri){
       let html = '';
       if(anchors.length){
-        html += '<div class="dash-first-fruits"><div class="dash-first-label"><span class="dash-first-icon">✦</span> First fruits</div>'+
-          anchors.map(renderTaskRow).join('')+'</div>';
+        html += renderFirstFruitsSection(anchors);
         if(priorities.length) html += '<div class="dash-pri-divider"></div>';
       }
       html += priorities.map(renderTaskRow).join('');
@@ -233,13 +348,8 @@
     }
 
     const sched = document.getElementById('dashScheduleList');
-    const schedItems = scheduleTimelineItems(dateStr);
     if(sched){
-      sched.innerHTML = schedItems.length ? schedItems.map(it=>
-        '<div class="dash-tl-row"><div class="dash-tl-dot"></div><div class="dash-tl-body">'+
-        '<div class="dash-tl-time">'+esc(it.time)+'</div><div class="dash-tl-title">'+esc(it.title)+'</div>'+
-        (it.sub ? '<div class="dash-tl-sub">'+esc(it.sub)+'</div>' : '')+'</div></div>'
-      ).join('') : '<p class="dash-empty">Open space is not wasted space.</p>';
+      sched.innerHTML = renderDashboardSchedule(dateStr);
     }
 
     const proj = document.getElementById('dashProjects');
@@ -342,6 +452,88 @@
       await dashAddMustDo(text);
       document.getElementById('dashNewTask').value = '';
       renderDashboard(); markDirty();
+    });
+
+    async function dashAddScheduleItem(){
+      const title = document.getElementById('dashSchedTitle')?.value.trim();
+      if(!title || !faithStore) return;
+      const slot = document.getElementById('dashSchedSlot')?.value || 'beforeWork';
+      const time = document.getElementById('dashSchedTime')?.value || '';
+      const dateStr = dashDateStr();
+      if(time){
+        faithStore.createTask({ title, date: dateStr, timeSlot: 'timed', startTime: time, tag: 'none' });
+      } else if(slot === 'timed'){
+        showDashToast('Pick a time for a timed item.');
+        return;
+      } else {
+        faithStore.createTask({ title, date: dateStr, timeSlot: slot, tag: 'none' });
+      }
+      await faithStore.save();
+      document.getElementById('dashSchedTitle').value = '';
+      if(document.getElementById('dashSchedTime')) document.getElementById('dashSchedTime').value = '';
+      renderDashboard(); markDirty();
+    }
+
+    document.getElementById('dashSchedAdd')?.addEventListener('click', dashAddScheduleItem);
+    document.getElementById('dashSchedTitle')?.addEventListener('keydown', e=>{
+      if(e.key === 'Enter'){ e.preventDefault(); dashAddScheduleItem(); }
+    });
+    document.getElementById('dashSchedSlot')?.addEventListener('change', e=>{
+      const timeEl = document.getElementById('dashSchedTime');
+      if(timeEl) timeEl.hidden = e.target.value !== 'timed';
+    });
+
+    document.getElementById('dashScheduleList')?.addEventListener('change', async e=>{
+      const schedTask = e.target.dataset?.dashSchedTask;
+      if(schedTask && faithStore){
+        const task = faithStore.getTask(schedTask);
+        if(!task) return;
+        if(e.target.checked) await faithStore.completeTask(schedTask);
+        else await faithStore.uncompleteTask(schedTask);
+        await faithStore.save();
+        renderDashboard();
+        if(typeof renderCalendar === 'function') renderCalendar();
+        return;
+      }
+      const slotSel = e.target.dataset?.schedSlot;
+      if(slotSel && faithStore){
+        const slot = e.target.value;
+        const patch = { timeSlot: slot };
+        if(slot !== 'timed') patch.startTime = '';
+        await faithStore.updateTask(slotSel, patch);
+        await faithStore.save();
+        renderDashboard(); markDirty();
+        return;
+      }
+      const timeInp = e.target.dataset?.schedTime;
+      if(timeInp && faithStore){
+        await faithStore.updateTask(timeInp, { startTime: e.target.value, timeSlot: 'timed' });
+        await faithStore.save();
+        renderDashboard(); markDirty();
+      }
+    });
+
+    document.getElementById('dashScheduleList')?.addEventListener('click', async e=>{
+      const move = e.target.closest('[data-sched-move]');
+      if(move && faithStore){
+        const [id, dir] = move.dataset.schedMove.split(':');
+        faithStore.moveScheduleTask(id, dir);
+        await faithStore.save();
+        renderDashboard(); markDirty();
+        return;
+      }
+      const delTask = e.target.closest('[data-sched-del-task]');
+      if(delTask && faithStore){
+        await faithStore.deleteTaskAndSave(delTask.dataset.schedDelTask);
+        renderDashboard(); markDirty();
+        return;
+      }
+      const delBlock = e.target.closest('[data-sched-del-block]');
+      if(delBlock && faithStore){
+        faithStore.deleteScheduleBlock(delBlock.dataset.schedDelBlock);
+        await faithStore.save();
+        renderDashboard(); markDirty();
+      }
     });
 
     document.getElementById('dashSaveNote')?.addEventListener('click', async ()=>{

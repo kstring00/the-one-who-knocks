@@ -10,13 +10,23 @@
     return faithStore ? faithStore.getAllTags() : [];
   }
 
+  function semanticTagClass(tag){
+    const t = String(tag||'').trim().toLowerCase();
+    if(!t) return '';
+    if(t.includes('first fruit') || t === 'first fruits') return 'tag-first-fruits';
+    if(t === 'hobbies' || t === 'hobby' || t.includes('hobb')) return 'tag-hobby';
+    if(t === 'skills' || t === 'skill' || t.includes('skill')) return 'tag-skill';
+    return '';
+  }
+
   function tagChipsHtml(tags, opts){
     opts = opts || {};
     const list = (tags || []).filter(Boolean);
     if(!list.length && !opts.showAdd) return '';
     let h = '<span class="tag-chips">';
     list.forEach(t=>{
-      h += '<button type="button" class="tag-chip" data-tag-lens="'+esc(t)+'" title="View all tagged">'+esc(t)+'</button>';
+      const cls = semanticTagClass(t);
+      h += '<button type="button" class="tag-chip'+(cls ? ' '+cls : '')+'" data-tag-lens="'+esc(t)+'" title="View all tagged">'+esc(t)+'</button>';
     });
     if(opts.showAdd) h += '<button type="button" class="tag-add-btn" data-tag-add="'+opts.entityType+'" data-tag-id="'+opts.entityId+'">+ tag</button>';
     h += '</span>';
@@ -27,8 +37,11 @@
     const list = tags || [];
     const suggestions = allTags().filter(t=> !list.includes(t)).slice(0,8);
     return '<div class="tag-editor" data-tag-editor="'+entityType+'" data-tag-eid="'+entityId+'">'+
-      list.map(t=>'<span class="tag-chip-wrap"><button type="button" class="tag-chip" data-tag-lens="'+esc(t)+'">'+esc(t)+'</button>'+
-      '<button type="button" class="tag-chip-rm" data-tag-rm="'+esc(t)+'" aria-label="Remove">×</button></span>').join('')+
+      list.map(t=>{
+        const cls = semanticTagClass(t);
+        return '<span class="tag-chip-wrap"><button type="button" class="tag-chip'+(cls ? ' '+cls : '')+'" data-tag-lens="'+esc(t)+'">'+esc(t)+'</button>'+
+      '<button type="button" class="tag-chip-rm" data-tag-rm="'+esc(t)+'" aria-label="Remove">×</button></span>';
+      }).join('')+
       '<button type="button" class="tag-add-btn" data-tag-add="'+entityType+'" data-tag-id="'+entityId+'">+ tag</button>'+
       '<div class="tag-input-row"><input type="text" class="tag-input" list="tagSuggestions" placeholder="Add tag…" aria-label="Add tag">'+
       (suggestions.length ? '<datalist id="tagSuggestions">'+suggestions.map(t=>'<option value="'+esc(t)+'">').join('')+'</datalist>' : '')+
@@ -152,6 +165,7 @@
   }
 
   root.tagChipsHtml = tagChipsHtml;
+  root.semanticTagClass = semanticTagClass;
   root.tagEditorHtml = tagEditorHtml;
   root.openTagLens = openTagLens;
   root.renderTagLens = renderTagLens;
