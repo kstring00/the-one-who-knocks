@@ -4,7 +4,7 @@
 (function(root){
   'use strict';
 
-  const USER_NAME = 'Kevin';
+  const USER_NAME = 'Kyle';
   const JOURNAL_PROMPTS = [
     'What did you learn today about God, yourself, or your calling?',
     'Where did you notice faithfulness in small things today?',
