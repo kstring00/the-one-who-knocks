@@ -165,6 +165,11 @@
 
   function renderGrowthCategories(){
     const cats = getCategories();
+    if(!cats.length){
+      return '<section class="dl-section daily-section" data-phases="morning day" id="sec-growth">'+
+        '<h3 class="dl-section-head serif">Growth Categories</h3>'+
+        '<p class="dl-empty">No categories yet — add them under Settings → Daily Categories.</p></section>';
+    }
     const acc = cats.map((c,i)=>{
       const items = dayData?.faithfulFew?.[c.id]?.items || [];
       const preview = items.length
@@ -201,7 +206,7 @@
 
   function schedField(path, label){
     return '<div class="dl-plan-row"><span class="dl-plan-label">'+esc(label)+'</span>'+
-      '<input type="text" class="dl-hairline" data-field="'+path+'" placeholder="…"></div>';
+      '<input type="text" class="dl-hairline" data-field="'+path+'" placeholder="What happens in this window?" aria-label="'+esc(label)+' plan"></div>';
   }
 
   function renderPlanOfAction(){
@@ -349,7 +354,12 @@
       const items = getNonNegItems();
       nnList.innerHTML = items.length ? items.map(renderNonNegItem).join('') : '<p class="dl-empty">Add your non-negotiables for today.</p>';
     }
-    getCategories().forEach(c=>{
+    const cats = getCategories();
+    const growthSec = document.getElementById('sec-growth');
+    if(growthSec && growthSec.querySelectorAll('details[data-dl-cat]').length !== cats.length){
+      growthSec.outerHTML = renderGrowthCategories();
+    }
+    cats.forEach(c=>{
       const list = document.querySelector('[data-dl-growth-list="'+c.id+'"]');
       if(!list) return;
       const items = dayData?.faithfulFew?.[c.id]?.items || [];
@@ -484,7 +494,7 @@
     if(!el || !window.faithStore) return;
     const cats = window.faithStore.getDailyCategoryConfig();
     el.innerHTML = cats.map((c,i)=>
-      '<div class="anchor-row" data-cat-row="'+i+'">'+
+      '<div class="anchor-row anchor-row-cat" data-cat-row="'+i+'">'+
       '<input type="text" class="inp-sm" data-cat-icon value="'+esc(c.icon)+'" style="width:40px" aria-label="Icon">'+
       '<input type="text" class="inp-sm" data-cat-title value="'+esc(c.title)+'" placeholder="Name">'+
       '<input type="text" class="inp-sm" data-cat-hint value="'+esc(c.hint)+'" placeholder="Prompt">'+

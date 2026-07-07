@@ -363,7 +363,7 @@
   };
   const SLOT_TO_WINDOW = { beforeWork:'before_work', duringWork:'during_work', afterWork:'after_work', eveningShutdown:'evening_shutdown' };
   const WINDOW_TO_SLOT = { before_work:'beforeWork', during_work:'duringWork', after_work:'afterWork', evening_shutdown:'eveningShutdown' };
-  const STICKY_COLORS = ['#6b5b95','#4a7c9b','#c9a04a','#52966a','#9b6b6b','#7a8b6b'];
+  const STICKY_COLORS = ['#5d4f85','#3e6a86','#8a6a1f','#44775a','#8a5a5a','#66754f'];
 
   const hub = {
     tab:'all', search:'', searchOpen:false,
