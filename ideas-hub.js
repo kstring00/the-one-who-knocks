@@ -6,7 +6,6 @@
 
   const STORAGE_KEY = 'fs:ideas-hub';
   const ACTIVITY_KEY = 'fs:ideas-activity';
-  const FOCUS_KEY = 'fs:ideas-focus-minutes';
 
   const STATUSES = ['captured','clarified','planned','in_progress','completed'];
   const LIFE_AREAS = ['ministry','career','content','health','income','other'];
@@ -115,6 +114,9 @@
     });
   }
 
+  function pushCloud(key){
+    if(typeof root.scheduleCloudPush === 'function') root.scheduleCloudPush([key]);
+  }
   function saveRaw(ideas){
     try{
       const slim = stripHeavyAttachments(ideas);
@@ -127,6 +129,7 @@
         localStorage.setItem(STORAGE_KEY, JSON.stringify(slim));
       }catch(e2){ console.error('[IdeasStore] save fallback failed', e2); }
     }
+    pushCloud(STORAGE_KEY);
   }
 
   function isoLocal(d){
@@ -136,8 +139,10 @@
   function touchActivityDay(dateStr){
     try{
       const set = new Set(JSON.parse(localStorage.getItem(ACTIVITY_KEY) || '[]'));
+      if(set.has(dateStr)) return;
       set.add(dateStr);
       localStorage.setItem(ACTIVITY_KEY, JSON.stringify([...set].sort()));
+      pushCloud(ACTIVITY_KEY);
     }catch(e){}
   }
 
@@ -147,6 +152,12 @@
 
   const IdeasStore = {
     _ideas: null,
+
+    /** Re-read from localStorage (used after a cloud pull replaces fs:ideas-hub). */
+    reload(){
+      this._ideas = null;
+      return this.init([]);
+    },
 
     init(legacyGlobalsIdeas){
       if(this._ideas) return this._ideas;
@@ -393,10 +404,6 @@
   }
   function plural(n,s){ return n===1?s:s+'s'; }
 
-  function syncGlobalsIdeas(){
-    if(typeof root.globals === 'undefined') return;
-    root.globals.ideasHub = IdeasStore.getIdeas();
-  }
 
   function filteredIdeas(){
     let list = IdeasStore.searchIdeas(hub.search);
@@ -719,7 +726,6 @@
       IdeasStore.updateIdea(created.id, d);
       hub.draft = IdeasStore.getIdea(created.id);
     }
-    syncGlobalsIdeas();
     markDirty();
   }
 
@@ -763,7 +769,6 @@
       attachments: extra?.attachments || []
     });
     document.getElementById('ihInboxText').value = '';
-    syncGlobalsIdeas();
     markDirty();
     showToast('Idea captured.');
     renderHub();
@@ -790,7 +795,7 @@
             sourceType:'voice',
             attachments:[{ type:'audio', url: reader.result, name:'voice-note.webm' }]
           });
-          syncGlobalsIdeas(); markDirty(); showToast('Voice note saved.'); renderHub();
+          markDirty(); showToast('Voice note saved.'); renderHub();
         };
         reader.readAsDataURL(blob);
       };
@@ -817,7 +822,7 @@
         sourceType:'camera',
         attachments:[{ type:'image', url: reader.result, name: file.name }]
       });
-      syncGlobalsIdeas(); markDirty(); showToast('Photo captured.'); renderHub();
+      markDirty(); showToast('Photo captured.'); renderHub();
     };
     reader.readAsDataURL(file);
   }
@@ -828,7 +833,7 @@
       title:'New note', description:'', sourceType:'quick',
       position:{ x: 12 + (idx%3)*88, y: 12 + Math.floor(idx/3)*52 }
     });
-    syncGlobalsIdeas(); markDirty(); renderHub();
+    markDirty(); renderHub();
   }
 
   async function plantIdea(){
@@ -880,7 +885,6 @@
     }
 
     hub.draft = IdeasStore.getIdea(idea.id);
-    syncGlobalsIdeas();
     markDirty();
     showToast('Planted for '+formatIdeaDate(dateStr)+'.');
     renderWorkspace();
@@ -916,7 +920,7 @@
       IdeasStore.updateIdea(drag.id, {
         position:{ x: parseFloat(drag.note.style.left), y: parseFloat(drag.note.style.top) }
       });
-      syncGlobalsIdeas(); markDirty();
+      markDirty();
       drag = null;
     });
   }
@@ -966,13 +970,13 @@
       const open = e.target.closest('[data-ih-open]');
       if(open){ openWorkspace(open.dataset.ihOpen); return; }
       const fav = e.target.closest('[data-ih-fav]');
-      if(fav){ e.stopPropagation(); IdeasStore.toggleFavorite(fav.dataset.ihFav); syncGlobalsIdeas(); markDirty(); renderHub(); bindSparkDrag(); return; }
+      if(fav){ e.stopPropagation(); IdeasStore.toggleFavorite(fav.dataset.ihFav); markDirty(); renderHub(); bindSparkDrag(); return; }
       const pin = e.target.closest('[data-ih-pin]');
-      if(pin){ IdeasStore.pinIdea(pin.dataset.ihPin); syncGlobalsIdeas(); markDirty(); renderHub(); bindSparkDrag(); return; }
+      if(pin){ IdeasStore.pinIdea(pin.dataset.ihPin); markDirty(); renderHub(); bindSparkDrag(); return; }
       const del = e.target.closest('[data-ih-del]');
       if(del){
         if(confirm('Delete this idea?')){
-          IdeasStore.deleteIdea(del.dataset.ihDel); syncGlobalsIdeas(); markDirty(); renderHub(); bindSparkDrag();
+          IdeasStore.deleteIdea(del.dataset.ihDel); markDirty(); renderHub(); bindSparkDrag();
         }
         return;
       }
@@ -1021,7 +1025,7 @@
       }
       if(e.target.id === 'ihWsDelete'){
         if(confirm('Delete this idea?')){
-          IdeasStore.deleteIdea(hub.workspaceId); syncGlobalsIdeas(); markDirty(); closeWorkspace();
+          IdeasStore.deleteIdea(hub.workspaceId); markDirty(); closeWorkspace();
         }
         return;
       }
@@ -1072,7 +1076,6 @@
         if(typeof root.isIdeas === 'function' && root.isIdeas()){
           readDraftFromDom();
           if(hub.draft) persistDraft();
-          syncGlobalsIdeas();
         }
       }, true);
     }
@@ -1096,7 +1099,6 @@
       const legacy = (typeof root.globals !== 'undefined' && root.globals)
         ? (root.globals.ideasHub || root.globals.ideas) : [];
       IdeasStore.init(Array.isArray(legacy) ? legacy : []);
-      syncGlobalsIdeas();
       renderHub();
       bindHubEvents();
       bindSparkDrag();

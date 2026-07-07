@@ -2075,12 +2075,12 @@ body.faithfulness-app #dailyBoard .ff-progress{color:var(--gold-text)}
 <script src="mentorship-ui.js?v=7"></script>
 <script src="tags-ui.js"></script>
 <script src="projects-ui.js"></script>
-<script src="journal-ui.js"></script>
-<script src="ideas-hub.js?v=5" onerror="(function(){var p=document.getElementById('ihPipeline');if(p)p.innerHTML='<p class=&quot;ih-load-error&quot;>Failed to load ideas-hub.js — hard-refresh the page.</p>';})()"></script>
+<script src="journal-ui.js?v=2"></script>
+<script src="ideas-hub.js?v=6" onerror="(function(){var p=document.getElementById('ihPipeline');if(p)p.innerHTML='<p class=&quot;ih-load-error&quot;>Failed to load ideas-hub.js — hard-refresh the page.</p>';})()"></script>
 <script src="stewardship-store.js?v=1"></script>
 <script src="calendar-ui.js?v=2"></script>
 <script src="daily-ui.js?v=1"></script>
-<script src="dashboard-ui.js"></script>
+<script src="dashboard-ui.js?v=2"></script>
 <script>
 
 if (!window.storage) {
@@ -2121,6 +2121,7 @@ let sb = null;
 let authUser = null;
 let cloudPushTimer = null;
 let cloudPushKeys = new Set();
+let cloudPushDeadline = 0;
 
 function initSupabaseClient(){
   if(!window.supabase?.createClient) return null;
@@ -2128,9 +2129,25 @@ function initSupabaseClient(){
   return sb;
 }
 function isSyncableKey(key){
+  if(key.startsWith('fs:ideas-attach:')) return false;   // large data-URLs stay on-device
   return key.startsWith('fs-day:') || key.startsWith('journal:') ||
     key.startsWith('fs-week:') || key.startsWith('fs-month:') ||
-    key === 'fs-globals' || key === 'fs-core' || key === 'fs-stewardship';
+    key === 'fs-globals' || key === 'fs-core' || key === 'fs-stewardship' ||
+    key === 'fs:ideas-hub' || key === 'fs:ideas-activity' || key === 'fs:ideas-focus-minutes' ||
+    key === 'fs:journal-custom-prompts' || key.startsWith('fs:dismissed:');
+}
+/* `fs:*` keys are written by modules straight to localStorage (no wsr: prefix);
+   everything else goes through window.storage. These two helpers give the sync
+   layer one way to read/write either kind. */
+function isRawLocalKey(key){ return key.startsWith('fs:'); }
+async function getLocalValue(key){
+  if(isRawLocalKey(key)){ try{ return localStorage.getItem(key); }catch{ return null; } }
+  const r = await window.storage.get(key);
+  return r?.value ?? null;
+}
+async function setLocalValue(key, value){
+  if(isRawLocalKey(key)){ try{ localStorage.setItem(key, value); return true; }catch{ return false; } }
+  return window.storage.set(key, value);
 }
 function syncMetaKey(storageKey){ return 'sync-at:'+storageKey; }
 function getLocalSyncAt(storageKey){
@@ -2175,42 +2192,19 @@ function syncKeysForView(){
   const keys = [];
   if(isPrayer()) keys.push('fs-globals');
   else keys.push(currentKey());
-  if(!keys.includes('fs-globals')) keys.push('fs-globals');
-  if(!keys.includes('fs-core')) keys.push('fs-core');
-  keys.push('fs-stewardship');
-  return keys.filter(isSyncableKey);
-}
-async function syncPullKey(storageKey){
-  if(!authUser || !sb) return false;
-  try{
-    const { data, error } = await sb.from('entries')
-      .select('data, updated_at')
-      .eq('user_id', authUser.id)
-      .eq('date', storageKey)
-      .maybeSingle();
-    if(error) throw error;
-    if(!data) return false;
-    const cloudAt = new Date(data.updated_at).getTime();
-    const localAt = getLocalSyncAt(storageKey);
-    if(cloudAt > localAt){
-      await window.storage.set(storageKey, JSON.stringify(data.data));
-      setLocalSyncAt(storageKey, cloudAt);
-      return true;
-    }
-    return false;
-  }catch(e){
-    console.warn('Sync pull failed:', storageKey, e);
-    return null;
-  }
+  keys.push('fs-globals', 'fs-core', 'fs-stewardship',
+    'fs:ideas-hub', 'fs:ideas-activity', 'fs:ideas-focus-minutes',
+    'fs:journal-custom-prompts', 'fs:dismissed:'+iso(dayOf(0)));
+  return [...new Set(keys)].filter(isSyncableKey);
 }
 async function syncPushKey(storageKey, dataObj){
   if(!authUser || !sb) return false;
   try{
-    const { error } = await sb.from('entries').upsert({
+    const { error } = await sb.from('app_data').upsert({
       user_id: authUser.id,
-      date: storageKey,
+      key: storageKey,
       data: dataObj
-    }, { onConflict: 'user_id,date' });
+    }, { onConflict: 'user_id,key' });
     if(error) throw error;
     setLocalSyncAt(storageKey, Date.now());
     return true;
@@ -2219,14 +2213,39 @@ async function syncPushKey(storageKey, dataObj){
     return false;
   }
 }
+/** Apply one pulled cloud row locally (newest-wins), then refresh the store it feeds. */
+async function applyPulledRow(key, dataObj, updatedAt){
+  const cloudAt = new Date(updatedAt).getTime();
+  if(cloudAt <= getLocalSyncAt(key)) return false;
+  await setLocalValue(key, JSON.stringify(dataObj));
+  setLocalSyncAt(key, cloudAt);
+  if(key === 'fs-core' && faithStore) await faithStore.load();
+  if(key === 'fs-stewardship' && window.StewStore) await window.StewStore.load();
+  if(key === 'fs:ideas-hub' && window.IdeasStore?.reload){
+    window.IdeasStore.reload();
+    if(isIdeas() && typeof loadIdeasHub === 'function') loadIdeasHub();
+  }
+  return true;
+}
 async function syncPullForView(){
-  if(!authUser) return;
+  if(!authUser || !sb) return;
+  const keys = syncKeysForView();
+  let rows;
+  try{
+    const { data, error } = await sb.from('app_data')
+      .select('key, data, updated_at')
+      .eq('user_id', authUser.id)
+      .in('key', keys);
+    if(error) throw error;
+    rows = data || [];
+  }catch(e){
+    console.warn('Sync pull failed:', e);
+    return;
+  }
   let globalsPulled = false;
-  for(const key of syncKeysForView()){
-    const r = await syncPullKey(key);
-    if(r && key === 'fs-globals') globalsPulled = true;
-    if(r && key === 'fs-core' && faithStore) await faithStore.load();
-    if(r && key === 'fs-stewardship' && window.StewStore) await window.StewStore.load();
+  for(const row of rows){
+    const applied = await applyPulledRow(row.key, row.data, row.updated_at);
+    if(applied && row.key === 'fs-globals') globalsPulled = true;
   }
   if(globalsPulled){
     const g = await getJSON('fs-globals');
@@ -2245,20 +2264,26 @@ async function syncPullForView(){
 function scheduleCloudPush(keys){
   if(!authUser) return;
   keys.forEach(k=>{ if(isSyncableKey(k)) cloudPushKeys.add(k); });
+  if(!cloudPushKeys.size) return;
+  // Debounced 2s, but with a max-wait: continuous edits can delay the
+  // flush, never postpone it past 10s.
+  const now = Date.now();
+  if(!cloudPushDeadline) cloudPushDeadline = now + 10000;
   clearTimeout(cloudPushTimer);
-  cloudPushTimer = setTimeout(flushCloudPush, 2000);
+  cloudPushTimer = setTimeout(flushCloudPush, Math.min(2000, Math.max(100, cloudPushDeadline - now)));
 }
 async function flushCloudPush(){
+  cloudPushDeadline = 0;
   if(!authUser || !cloudPushKeys.size) return;
   const keys = [...cloudPushKeys];
   cloudPushKeys.clear();
   if(!dirty) updateSaveState('syncing');
   let allOk = true;
   for(const key of keys){
-    const raw = await window.storage.get(key);
-    if(!raw?.value) continue;
+    const raw = await getLocalValue(key);
+    if(raw == null || raw === '') continue;
     let data;
-    try{ data = JSON.parse(raw.value); }catch{ continue; }
+    try{ data = JSON.parse(raw); }catch{ continue; }
     if(!(await syncPushKey(key, data))) allOk = false;
   }
   if(!dirty){
@@ -2269,35 +2294,40 @@ async function flushCloudPush(){
     }
   }
 }
+/**
+ * One-time sweep after sign-in (re-runs once per user after the app_data
+ * upgrade, via the -v2 flag): every syncable key found locally — both the
+ * wsr:-wrapped keys and the raw fs:* module keys — is reconciled against
+ * app_data. Local-only data is uploaded; a newer cloud copy wins locally.
+ */
 async function migrateLocalToCloud(){
   if(!authUser || !sb) return;
-  const flag = 'wsr:migration-done';
+  const flag = 'wsr:migration-done-v2';
   if(localStorage.getItem(flag) === authUser.id) return;
-  const keys = [];
+  const keys = new Set();
   for(let i = 0; i < localStorage.length; i++){
     const full = localStorage.key(i);
-    if(!full?.startsWith('wsr:')) continue;
-    const key = full.slice(4);
-    if(isSyncableKey(key)) keys.push(key);
+    if(!full) continue;
+    const key = full.startsWith('wsr:') ? full.slice(4) : full;
+    if(isSyncableKey(key)) keys.add(key);
   }
   for(const key of keys){
-    const raw = localStorage.getItem('wsr:'+key);
-    if(!raw) continue;
+    const raw = await getLocalValue(key);
+    if(raw == null || raw === '') continue;
     let data;
     try{ data = JSON.parse(raw); }catch{ continue; }
     const localAt = getLocalSyncAt(key) || Date.now();
     try{
-      const { data: row, error } = await sb.from('entries')
+      const { data: row, error } = await sb.from('app_data')
         .select('data, updated_at')
         .eq('user_id', authUser.id)
-        .eq('date', key)
+        .eq('key', key)
         .maybeSingle();
       if(error) throw error;
       if(row){
         const cloudAt = new Date(row.updated_at).getTime();
         if(cloudAt >= localAt){
-          await window.storage.set(key, JSON.stringify(row.data));
-          setLocalSyncAt(key, cloudAt);
+          await applyPulledRow(key, row.data, row.updated_at);
           continue;
         }
       }
@@ -2693,7 +2723,6 @@ async function moveIdeaSchedule(ideaId,newDate){
         newDay.execute[field]=step;
         await saveDayDataByDate(newDate,newDay);
         IdeasStore.updateIdea(ideaId,{ schedule:{ ...idea.schedule, date:newDate } });
-        if(typeof globals !== 'undefined') globals.ideasHub=IdeasStore.getIdeas();
         markDirty(); window.renderCalendar?.();
         if(typeof loadIdeasHub==='function' && isIdeas()) loadIdeasHub();
       }
@@ -3214,7 +3243,10 @@ async function initFaithStore(){
     const seeded = MentorshipSeed.seedInitialMentorshipNotes(faithStore);
     if(seeded.created) await faithStore.save();
   }
-  faithStore.onChange(()=>{ dirty = true; updateSaveState('dirty'); scheduleSave(); });
+  // Ignore the echo emitted by faithStore.save() inside save() itself —
+  // otherwise every save marks dirty again and the app saves in a loop,
+  // perpetually resetting the cloud-push debounce.
+  faithStore.onChange(()=>{ if(saving) return; dirty = true; updateSaveState('dirty'); scheduleSave(); });
   return faithStore;
 }
 
@@ -3287,7 +3319,6 @@ async function save(){
   const savedKeys = ['fs-globals'];
   try{
     const S = window.storage;
-    if(typeof IdeasStore !== 'undefined') globals.ideasHub = IdeasStore.getIdeas();
     const ops = [S.set('view-mode', viewMode), S.set('fs-globals', JSON.stringify(globals))];
     if(isJournal()){ ops.push(S.set(journalKeyFor(dayOffset), JSON.stringify(journal))); savedKeys.push(journalKeyFor(dayOffset)); }
     else if(isDaily()){ ops.push(S.set(dayKeyFor(dayOffset), JSON.stringify(dayData))); savedKeys.push(dayKeyFor(dayOffset)); }

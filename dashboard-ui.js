@@ -44,7 +44,11 @@
   }
   function dismissSuggestion(id){
     const d = getDismissed();
-    if(!d.includes(id)){ d.push(id); localStorage.setItem(dismissedKey(), JSON.stringify(d)); }
+    if(!d.includes(id)){
+      d.push(id);
+      localStorage.setItem(dismissedKey(), JSON.stringify(d));
+      if(typeof window.scheduleCloudPush === 'function') window.scheduleCloudPush([dismissedKey()]);
+    }
   }
 
   function timeGreeting(){
@@ -570,7 +574,6 @@
       if(!text) return;
       if(typeof IdeasStore !== 'undefined'){
         IdeasStore.createIdea({ text, sourceType:'quick', lifeArea:'other' });
-        if(typeof globals !== 'undefined') globals.ideasHub = IdeasStore.getIdeas();
       } else if(typeof ensureIdeas === 'function'){
         ensureIdeas();
         globals.ideas.push(normalizeIdea({ text, status:'seedbed', category:'other' }));

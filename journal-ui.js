@@ -31,6 +31,7 @@
 
   function setCustomPrompts(list){
     localStorage.setItem(CUSTOM_PROMPTS_KEY, JSON.stringify(list));
+    if(typeof root.scheduleCloudPush === 'function') root.scheduleCloudPush([CUSTOM_PROMPTS_KEY]);
   }
 
   function getAllPrompts(){
