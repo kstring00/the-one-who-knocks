@@ -386,6 +386,8 @@
         '<button type="button" class="dash-note-promote" data-promote-seed="'+n.id+'">→ Seed</button></div>'
       ).join('') : '';
     }
+
+    root.renderProfileNudge?.();
   }
 
   async function saveSuggestion(id){

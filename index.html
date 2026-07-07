@@ -946,6 +946,42 @@ body.focus-mode .app-sidebar{transform:translateX(-100%);width:0;padding:0;borde
 body.focus-mode .app-topbar .topbar-right > *:not(#btnFocusMode){display:none}
 body.focus-mode .app-topbar .topbar-left .btn-ghost{display:none}
 #dashboardPanel[hidden]{display:none!important}
+.profile-panel{max-width:640px}
+.profile-intro{font-size:13px;color:var(--text-secondary);line-height:1.6;margin:0 0 32px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+.profile-section{margin-bottom:32px}
+.profile-section h3{font-size:20px;font-weight:600;margin:0 0 6px;color:var(--text-primary)}
+.profile-hint{font-size:11px;color:var(--text-muted);margin:0 0 12px;line-height:1.45}
+.profile-field{width:100%;border:none;border-bottom:1px solid var(--border);border-radius:0;padding:10px 2px;font:15px/1.5 inherit;color:var(--text-primary);background:transparent;transition:border-color .15s}
+.profile-field:focus{outline:none;border-bottom-color:var(--gold)}
+.profile-ta{resize:vertical;min-height:72px}
+.profile-list{list-style:none;margin:0 0 8px;padding:0;display:flex;flex-direction:column;gap:8px}
+.profile-list-item{display:flex;gap:8px;align-items:center}
+.profile-line{flex:1;border:none;border-bottom:1px solid var(--border);background:transparent;padding:8px 2px;font:14px/1.4 inherit;color:var(--text-primary)}
+.profile-line:focus{outline:none;border-bottom-color:var(--gold)}
+.profile-rm{border:none;background:none;color:var(--text-muted);cursor:pointer;font-size:18px;padding:4px;line-height:1;flex:none}
+.profile-rm:disabled{opacity:.35;cursor:not-allowed}
+.profile-rm:hover:not(:disabled){color:var(--text-secondary)}
+.profile-add{margin-top:4px;font-size:12px}
+.profile-nudge{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;margin-bottom:20px;background:var(--gold-dim);border:1px solid var(--gold-border-soft);border-radius:var(--radius-lg)}
+.profile-nudge-text{margin:0;font-size:13px;color:var(--text-primary);line-height:1.45;flex:1;min-width:200px}
+.profile-nudge-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.profile-nudge-dismiss{border:none;background:none;color:var(--text-secondary);font-size:12px;cursor:pointer;font-family:inherit;padding:6px 8px}
+.profile-nudge-dismiss:hover{color:var(--text-primary)}
+.privacy-doc{max-width:640px;padding-bottom:48px}
+.privacy-doc .privacy-lead{font-size:15px;line-height:1.65;color:var(--text-primary);margin:0 0 28px;padding-bottom:24px;border-bottom:1px solid var(--border)}
+.privacy-doc section{margin-bottom:28px}
+.privacy-doc h3{font-family:"Cormorant Garamond",serif;font-size:20px;font-weight:600;margin:0 0 10px;color:var(--text-primary)}
+.privacy-doc p{font-size:14px;line-height:1.65;color:var(--text-secondary);margin:0 0 12px}
+.privacy-doc ul{margin:0 0 12px;padding-left:1.25em;font-size:14px;line-height:1.6;color:var(--text-secondary)}
+.privacy-doc li{margin-bottom:6px}
+.privacy-doc li strong{color:var(--text-primary);font-weight:600}
+.privacy-doc code{font-size:12px;background:var(--bg-card);padding:1px 5px;border-radius:4px;color:var(--text-primary)}
+.privacy-doc a{color:var(--gold-text);text-decoration:underline;text-underline-offset:2px}
+.privacy-doc a:hover{color:var(--text-primary)}
+.privacy-doc .privacy-note{font-size:13px;color:var(--text-muted);font-style:italic;margin-top:16px}
+.privacy-link{font-size:12px;color:var(--text-secondary);margin:10px 0 0}
+.privacy-link button{border:none;background:none;padding:0;font:inherit;font-size:12px;color:var(--gold-text);cursor:pointer;text-decoration:underline}
+.privacy-link button:hover{color:var(--text-primary)}
 .dash-greeting{margin-bottom:20px}
 .dash-greeting h2{font-family:"Cormorant Garamond",serif;font-size:28px;font-weight:600;margin:0 0 6px;color:var(--text-primary)}
 .dash-greeting p{margin:0;font-size:13px;color:var(--text-secondary)}
@@ -1104,7 +1140,7 @@ body.view-dashboard .idea-fab{display:none!important}
 body.view-dashboard #dailyBoard,body.view-dashboard #weeklyBoard,body.view-dashboard #monthlyBoard,
 body.view-dashboard #journalPanel,body.view-dashboard #ideasPanel,body.view-dashboard #prayerPanel,
 body.view-dashboard #calendarPanel,body.view-dashboard #tagLensPanel,body.view-dashboard #projectsPanel,
-body.view-dashboard #settingsPanel,body.view-dashboard #mentorshipPanel{display:none!important}
+body.view-dashboard #settingsPanel,body.view-dashboard #mentorshipPanel,body.view-dashboard #profilePanel,body.view-dashboard #privacyPanel{display:none!important}
 /* ── Stewardship Calendar ─────────────────────────────────── */
 #calendarPanel{
   /* calm, muted category palette */
@@ -1689,8 +1725,14 @@ body.faithfulness-app #dailyBoard .ff-progress{color:var(--gold-text)}
     <button type="button" class="nav-item" data-nav="calendar">
       <span class="nav-item-inner"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg></span><span class="nav-label">Calendar</span></span>
     </button>
+    <button type="button" class="nav-item" data-nav="profile">
+      <span class="nav-item-inner"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M5 20c0-4 3-6 7-6s7 2 7 6"/></svg></span><span class="nav-label">Profile</span></span>
+    </button>
     <button type="button" class="nav-item" data-nav="settings">
       <span class="nav-item-inner"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></span><span class="nav-label">Settings</span></span>
+    </button>
+    <button type="button" class="nav-item" data-nav="privacy">
+      <span class="nav-item-inner"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span><span class="nav-label">Privacy</span></span>
     </button>
   </nav>
   <div class="sidebar-verse">
@@ -1733,6 +1775,7 @@ body.faithfulness-app #dailyBoard .ff-progress{color:var(--gold-text)}
     <h2 class="serif" id="dashGreeting">Good morning, Kyle</h2>
     <p id="dashSummary">Loading your day…</p>
   </div>
+  <div id="dashProfileNudge" hidden></div>
   <div class="dash-stat-row">
     <div class="dash-stat-card dash-row1-stat">
       <div class="dash-stat-label">Tasks Completed</div>
@@ -1822,6 +1865,87 @@ body.faithfulness-app #dailyBoard .ff-progress{color:var(--gold-text)}
 
 <section id="mentorshipPanel" hidden aria-label="Mentorship"></section>
 
+<section id="profilePanel" hidden aria-label="Profile">
+  <div class="page-head">
+    <div>
+      <h2 class="serif">Profile</h2>
+      <p>A quiet introduction — so coaching can meet you where you are.</p>
+    </div>
+  </div>
+  <div id="profileMain"></div>
+</section>
+
+<section id="privacyPanel" hidden aria-label="Privacy">
+  <div class="page-head">
+    <div>
+      <h2 class="serif">Privacy</h2>
+      <p>How your data is stored, synced, and kept yours.</p>
+    </div>
+  </div>
+  <article class="privacy-doc">
+    <p class="privacy-lead">The Faithfulness System is built local-first: your journal, calendar, prayers, profile, and daily notes live on your device first. Signing in is optional — it backs everything up and syncs across your phone, tablet, and computer. We do not sell your data, run ads, or track you across the web.</p>
+
+    <section>
+      <h3 class="serif">The short version</h3>
+      <p>You own what you write here. Without an account, it stays in your browser. With an account, a private copy is stored in a database tied only to you — so you can pick up on another device. Nobody else can read it. We built the app as plain HTML and JavaScript (no app store, no build step) and use Supabase only for sign-in and backup when you ask for it.</p>
+    </section>
+
+    <section>
+      <h3 class="serif">What lives on your device</h3>
+      <p>Everything you enter — daily ledger, weekly and monthly reviews, journal entries, prayer log, calendar, projects, ideas, mentorship notes, and your Profile — is saved in your browser’s local storage as you type. The app works fully offline. Edits autosave after a short pause; you’ll see <em>Saved</em> in the top bar when they’re written locally.</p>
+      <p>If you never sign in, your data never leaves your device unless you export it yourself or clear your browser data.</p>
+    </section>
+
+    <section>
+      <h3 class="serif">Optional cloud sync (Supabase)</h3>
+      <p>When you choose to sign in under Settings → Cloud sync, the app connects to <a href="https://supabase.com" target="_blank" rel="noopener noreferrer">Supabase</a> — an open-source backend that handles authentication and a small private database. Sign-in uses a magic link emailed to you; we never ask for or store a password in the app.</p>
+      <p>After you verify the link, your local data is merged with your cloud account. From then on, changes sync automatically: the app pushes JSON snapshots of your data to a table called <code>app_data</code>, keyed by your user ID. When you open the app on another signed-in device, it pulls the latest copies. If the same record was edited in two places, the newer timestamp wins.</p>
+      <p>Database access is locked down with Row Level Security: each row is tagged with your user ID, and Supabase only allows you to read or write rows that match the account you signed in with. Even with the app’s public connection key, another user cannot query your data.</p>
+    </section>
+
+    <section>
+      <h3 class="serif">What syncs — and what does not</h3>
+      <p>Synced when signed in:</p>
+      <ul>
+        <li><strong>Daily, weekly, and monthly records</strong> — ledger entries, reviews, scores</li>
+        <li><strong>Journal entries</strong> — body text, gratitude lists, custom prompts</li>
+        <li><strong>Calendar &amp; stewardship data</strong> — goals, projects, tasks, habits, schedule blocks, themes, reflections</li>
+        <li><strong>Prayer log, ideas hub, projects, mentorship notes</strong></li>
+        <li><strong>Profile</strong> — the personal context you enter for future coaching</li>
+        <li><strong>Settings</strong> — anchors, categories, and other app preferences stored in shared config keys</li>
+      </ul>
+      <p>Stays on this device only:</p>
+      <ul>
+        <li><strong>Large idea attachments</strong> — images or files attached to ideas (kept local so sync stays fast)</li>
+        <li><strong>UI preferences</strong> — a few display toggles that don’t need to follow you across devices</li>
+      </ul>
+    </section>
+
+    <section>
+      <h3 class="serif">Separate accounts, separate data</h3>
+      <p>Each email address is its own account. If two people sign in on the same browser, they see only their own cloud data. Signing out stops syncing but leaves your local copy on that device — useful if you want offline access without uploading further changes until you sign back in.</p>
+    </section>
+
+    <section>
+      <h3 class="serif">How the app is made</h3>
+      <p>The Faithfulness System is a single-page web app: HTML, CSS, and JavaScript files you can open in any modern browser. There is no npm install, no framework bundle, and no native app wrapper. Modules (<code>faithfulness-store.js</code>, <code>calendar-ui.js</code>, <code>profile-ui.js</code>, and others) each own a slice of the UI and talk to one shared storage layer.</p>
+      <p>That storage layer writes to <code>localStorage</code> on your machine. The optional sync layer watches the same keys and mirrors them to Supabase when you’re signed in. Fonts load from Google Fonts; Supabase’s client library loads from their CDN when you open the page. We do not embed analytics, ad pixels, or third-party tracking scripts.</p>
+    </section>
+
+    <section>
+      <h3 class="serif">Profile &amp; future coaching</h3>
+      <p>Your Profile (name, rhythms, goals, non-negotiables, coaching preferences) is stored like everything else — locally always, and in your cloud account when signed in. A future in-app coaching feature will read that context to personalize responses. That coaching has not shipped yet; when it does, it will use your Profile text only to tailor guidance inside the app, not to train external models on your identity.</p>
+    </section>
+
+    <section>
+      <h3 class="serif">Deleting your data</h3>
+      <p><strong>On this device:</strong> Settings → the ⋯ menu → <em>Reset all data</em> wipes local storage for the app (you’ll be asked to type RESET to confirm).</p>
+      <p><strong>In the cloud:</strong> Sign in, then sign out on each device if you wish. To remove server-side copies entirely, delete your Supabase auth user or contact whoever operates this deployment — cloud rows are tied to your auth user and go away when that user is removed.</p>
+      <p class="privacy-note">Last updated July 2026. This page describes how the app works today; if sync or coaching changes, this text will be updated to match.</p>
+    </section>
+  </article>
+</section>
+
 <section id="settingsPanel" hidden aria-label="Settings">
   <div class="page-head"><div><h2 class="serif">Settings</h2><p>Cloud sync, daily anchors, categories, and mentors.</p></div></div>
   <div id="authCard" class="auth-card settings-card">
@@ -1832,6 +1956,7 @@ body.faithfulness-app #dailyBoard .ff-progress{color:var(--gold-text)}
       <button type="button" id="authSendLink">Send sign-in link</button>
     </div>
     <div class="auth-msg" id="authMsg" aria-live="polite"></div>
+    <p class="privacy-link">How your data is handled → <button type="button" data-nav="privacy">Privacy</button></p>
   </div>
   <div class="settings-card">
     <h4 class="serif" style="margin:0 0 8px">Daily Anchors</h4>
@@ -2081,6 +2206,7 @@ body.faithfulness-app #dailyBoard .ff-progress{color:var(--gold-text)}
 <script src="calendar-ui.js?v=2"></script>
 <script src="daily-ui.js?v=1"></script>
 <script src="dashboard-ui.js?v=2"></script>
+<script src="profile-ui.js?v=1"></script>
 <script>
 
 if (!window.storage) {
@@ -2132,7 +2258,7 @@ function isSyncableKey(key){
   if(key.startsWith('fs:ideas-attach:')) return false;   // large data-URLs stay on-device
   return key.startsWith('fs-day:') || key.startsWith('journal:') ||
     key.startsWith('fs-week:') || key.startsWith('fs-month:') ||
-    key === 'fs-globals' || key === 'fs-core' || key === 'fs-stewardship' ||
+    key === 'fs-globals' || key === 'fs-core' || key === 'fs-stewardship' || key === 'fs-profile' ||
     key === 'fs:ideas-hub' || key === 'fs:ideas-activity' || key === 'fs:ideas-focus-minutes' ||
     key === 'fs:journal-custom-prompts' || key.startsWith('fs:dismissed:');
 }
@@ -2192,7 +2318,7 @@ function syncKeysForView(){
   const keys = [];
   if(isPrayer()) keys.push('fs-globals');
   else keys.push(currentKey());
-  keys.push('fs-globals', 'fs-core', 'fs-stewardship',
+  keys.push('fs-globals', 'fs-core', 'fs-stewardship', 'fs-profile',
     'fs:ideas-hub', 'fs:ideas-activity', 'fs:ideas-focus-minutes',
     'fs:journal-custom-prompts', 'fs:dismissed:'+iso(dayOf(0)));
   return [...new Set(keys)].filter(isSyncableKey);
@@ -2224,6 +2350,11 @@ async function applyPulledRow(key, dataObj, updatedAt){
   if(key === 'fs:ideas-hub' && window.IdeasStore?.reload){
     window.IdeasStore.reload();
     if(isIdeas() && typeof loadIdeasHub === 'function') loadIdeasHub();
+  }
+  if(key === 'fs-profile'){
+    window.userProfile = typeof normalizeProfile === 'function' ? normalizeProfile(dataObj) : dataObj;
+    if(isProfile() && typeof renderProfile === 'function') renderProfile();
+    if(typeof renderProfileNudge === 'function') renderProfileNudge();
   }
   return true;
 }
@@ -2956,6 +3087,8 @@ function isCalendar(){ return viewMode==='calendar'; }
 function isTag(){ return viewMode==='tag'; }
 function isProjects(){ return viewMode==='projects'; }
 function isSettings(){ return viewMode==='settings'; }
+function isProfile(){ return viewMode==='profile'; }
+function isPrivacy(){ return viewMode==='privacy'; }
 function isMentorship(){ return typeof viewMode==='string' && viewMode.startsWith('mentorship'); }
 function dashPeriodLabel(){
   const d = dayOf(dayOffset);
@@ -3325,6 +3458,10 @@ async function save(){
     else if(isWeekly()){ ops.push(S.set(weekKeyFor(weekOffset), JSON.stringify(weekData))); savedKeys.push(weekKeyFor(weekOffset)); }
     else if(isMonthly()){ ops.push(S.set(monthKeyFor(monthOffset), JSON.stringify(monthData))); savedKeys.push(monthKeyFor(monthOffset)); }
     if(faithStore){ await faithStore.save(); savedKeys.push('fs-core'); }
+    if(window.userProfile){
+      ops.push(S.set('fs-profile', JSON.stringify(window.userProfile)));
+      savedKeys.push('fs-profile');
+    }
     const ok = await Promise.all(ops);
     if(ok.every(Boolean)){
       dirty=false;
@@ -4527,6 +4664,8 @@ function updateViewUI(){
   document.getElementById('dashboardPanel').hidden = viewMode!=='dashboard';
   document.getElementById('projectsPanel').hidden = viewMode!=='projects';
   document.getElementById('settingsPanel').hidden = viewMode!=='settings';
+  document.getElementById('profilePanel').hidden = viewMode!=='profile';
+  document.getElementById('privacyPanel').hidden = viewMode!=='privacy';
   document.getElementById('calendarPanel').hidden = viewMode!=='calendar';
   document.getElementById('tagLensPanel').hidden = viewMode!=='tag';
   document.getElementById('mentorshipPanel').hidden = !isMentorship();
@@ -4547,7 +4686,7 @@ function updateViewUI(){
   const score = document.getElementById('score');
   score.style.display = viewMode==='daily' ? '' : 'none';
   const nav = document.querySelector('.app-topbar .navrow');
-  const hideNav = isPrayer() || isIdeas() || isProjects() || isSettings() || isCalendar() || isTag() || isMentorship();
+  const hideNav = isPrayer() || isIdeas() || isProjects() || isSettings() || isProfile() || isPrivacy() || isCalendar() || isTag() || isMentorship();
   if(nav) nav.style.visibility = hideNav ? 'hidden' : 'visible';
   const calJump = document.getElementById('btnCalJump');
   if(calJump) calJump.hidden = !(isDashboard() || isDaily() || isJournal());
@@ -4561,6 +4700,8 @@ function updateViewUI(){
   else if(isPrayer()) document.getElementById('periodLabel').textContent = 'Prayer Log';
   else if(isProjects()) document.getElementById('periodLabel').textContent = 'Projects';
   else if(isSettings()) document.getElementById('periodLabel').textContent = 'Settings';
+  else if(isProfile()) document.getElementById('periodLabel').textContent = 'Profile';
+  else if(isPrivacy()) document.getElementById('periodLabel').textContent = 'Privacy';
   else if(isCalendar()) document.getElementById('periodLabel').textContent = 'Calendar';
   else if(isTag()) document.getElementById('periodLabel').textContent = 'Tags';
   else if(isMentorship()) document.getElementById('periodLabel').textContent = 'Mentorship';
@@ -4587,6 +4728,7 @@ async function loadCurrent(){
   else if(isProjects()) loadProjects?.();
   else if(isMentorship()) loadMentorship?.();
   else if(isSettings()) loadSettings();
+  else if(isProfile()) await loadProfile?.();
   else if(isJournal()) await loadJournal();
   else if(isPrayer()) loadPrayer();
   else if(isIdeas()) loadIdeas();
@@ -4667,7 +4809,7 @@ function updateJournalMeta(){
 }
 function clearCurrent(){
   const labels = {daily:'this day',weekly:'this week',monthly:'this month'};
-  if(isJournal() || isPrayer() || isIdeas() || isDashboard() || isProjects() || isSettings() || isCalendar() || isTag()) return;
+  if(isJournal() || isPrayer() || isIdeas() || isDashboard() || isProjects() || isSettings() || isProfile() || isPrivacy() || isCalendar() || isTag()) return;
   if(!confirm('Clear everything for '+labels[viewMode]+'?')) return;
   if(isDaily()) dayData = blankDaily();
   else if(isWeekly()) weekData = blankWeekly();
@@ -4690,6 +4832,7 @@ async function resetAll(){
   await window.storage.clearAll();
   dayData=null; weekData=null; monthData=null; journal={body:'',gratitude:['','',''],updated:null};
   globals={researchNotes:'',motives:null,prayers:[],thoughtJournal:'',ideas:[],myWeek:null}; dayOffset=0; weekOffset=0; monthOffset=0; viewMode='dashboard'; dirty=false;
+  if(typeof blankProfile === 'function') window.userProfile = blankProfile();
   localStorage.removeItem('wsr:thoughtJournalCollapsed');
   await loadCurrent();
   loadThoughtJournal();
@@ -4699,7 +4842,7 @@ async function resetAll(){
 (async function init(){
   renderDaily(); renderWeekly(); renderMonthly(); bindEvents(); bindFFAccordion(); bindDailyEvents?.();
   const vm = await window.storage.get('view-mode');
-  if(vm?.value && (['dashboard','daily','weekly','monthly','journal','ideas','prayer','projects','settings','calendar','tag'].includes(vm.value) || vm.value.startsWith('mentorship-'))) viewMode = vm.value;
+  if(vm?.value && (['dashboard','daily','weekly','monthly','journal','ideas','prayer','projects','profile','privacy','settings','calendar','tag'].includes(vm.value) || vm.value.startsWith('mentorship-'))) viewMode = vm.value;
   syncViewModeBridge();
   const g = await getJSON('fs-globals');
   if(g){ globals = {...globals,...g}; window.globals = globals; }
@@ -4720,6 +4863,7 @@ async function resetAll(){
   document.getElementById('researchNotes').value = globals.researchNotes||'';
   simpleMode = localStorage.getItem('wsr:simpleMode')==='1';
   bindDashboardEvents?.();
+  bindProfileEvents?.();
   bindTagEvents?.();
   bindMentorshipEvents?.();
   renderMentorshipNav?.();
@@ -4728,6 +4872,7 @@ async function resetAll(){
     if(btn.closest('.sidebar-nav')) return;
     btn.addEventListener('click', ()=> setMode(btn.dataset.nav));
   });
+  await loadProfile?.();
   await loadCurrent();
   loadThoughtJournal();
   if(authUser && !dirty) updateSaveState('synced');
