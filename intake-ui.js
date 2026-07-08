@@ -1,14 +1,14 @@
 /**
  * Begin the Day — guided morning intake.
  *
- * A calm, hand-holding sequence (under 3 minutes) that composes the day:
- * Welcome → First Fruits → Focus → Big Three → The Shelf → Soul Check → Send-off.
- * Sundays (configurable) run a light version: Welcome → First Fruits → rest line → Send-off.
+ * A calm, hand-holding sequence (under 2 minutes) that composes the day:
+ * Welcome → Focus → Big Three → The Shelf → Send-off.
+ * On the user's configured rest day: Welcome → rest line → Send-off.
  *
  * Everything writes into EXISTING stores:
- *  - today's fs-day record (focus, soulCheck, must-do priorities)
- *  - faithStore (First Fruits anchors, priority tasks with slots/durations)
- *  - StewStore (shelf blocks as calendar events, Big Three mirroring, templates)
+ *  - today's fs-day record (focus)
+ *  - faithStore + faithfulFew.mustDo (Big Three priorities with slots/durations)
+ *  - StewStore (shelf blocks as calendar events, templates)
  *  - globals.myWeek (recurring rhythm offers) and globals.intake (launch state, prefs)
  */
 (function(root){
@@ -48,11 +48,11 @@
       timerHint: 'No hurry. This timer is a room, not a race.'
     },
     focus: {
-      title: 'What is today for?',
+      title: 'Focus of the day',
       why: 'A day without a focus gets spent by whoever asks loudest.\nNaming one thing decides in advance what today is for.',
       placeholder: 'One word or a short phrase…',
       suggestions: 'Or borrow one:',
-      cont: 'Set the focus'
+      cont: 'Continue'
     },
     bigThree: {
       title: 'Today’s Big Three',
@@ -88,8 +88,6 @@
     },
     sendoff: {
       title: 'The day is composed.',
-      ffKept: 'First fruits — kept',
-      ffOpen: 'First fruits — still open, whenever you’re ready',
       begin: 'Begin the day',
       empty: 'A light day. Walk it faithfully.'
     },
@@ -172,18 +170,23 @@
     return it;
   }
   function profileName(){
-    if(root.globals?.profileName) return root.globals.profileName;
     if(typeof root.normalizeProfile === 'function' && root.userProfile){
       const p = root.normalizeProfile(root.userProfile);
-      if(p?.name) return p.name;
+      if(p?.name?.trim()) return p.name.trim();
     }
-    if(root.userProfile?.name) return root.userProfile.name;
+    if(root.userProfile?.name?.trim()) return root.userProfile.name.trim();
     try{
       const raw = localStorage.getItem('wsr:fs-profile') || localStorage.getItem('fs-profile');
       const p = raw ? JSON.parse(raw) : null;
-      if(p?.name) return p.name;
+      if(p?.name?.trim()) return p.name.trim();
     }catch(e){}
     return '';
+  }
+  function intakeSeenToday(){
+    const it = ensureIntake();
+    if(!it) return false;
+    const today = todayStr();
+    return it.lastDate === today || it.lastCompletedDate === today;
   }
   function verseForToday(){
     const n = todayStr().split('-').reduce((a,b)=>a+parseInt(b,10),0);
@@ -299,8 +302,8 @@
   /* ── step machine ────────────────────────────────────────────── */
   function stepsFor(){
     return isRestDay()
-      ? ['welcome','firstfruits','restline','sendoff']
-      : ['welcome','firstfruits','focus','bigthree','shelf','soul','sendoff'];
+      ? ['welcome','restline','sendoff']
+      : ['welcome','focus','bigthree','shelf','sendoff'];
   }
   function launchIntake(manual){
     const it = ensureIntake();
@@ -318,12 +321,15 @@
   function maybeLaunchIntake(){
     const it = ensureIntake();
     if(!it) return;
-    if(it.lastDate === todayStr()) return;
-    if(root.isGuide?.()) return; // don't cover first-run Guide with the morning overlay
+    if(intakeSeenToday()) return;
+    if(root.isGuide?.()) return;
     launchIntake(false);
   }
   function closeIntake(goDashboard){
     clearInterval(timerHandle); timerHandle = null;
+    const it = ensureIntake();
+    if(it) it.lastDate = todayStr();
+    markDirty();
     st = null;
     const ov = document.getElementById('intakeOverlay');
     if(ov){ ov.hidden = true; ov.innerHTML = ''; }
@@ -388,8 +394,9 @@
     const name = profileName();
     const v = verseForToday();
     const dateLine = new Date().toLocaleDateString('en-US',{ weekday:'long', month:'long', day:'numeric' });
+    const greet = name ? COPY.welcome.greeting+', '+esc(name) : COPY.welcome.greeting;
     return '<div class="intake-center">'+
-      '<h1 class="intake-h serif">'+COPY.welcome.greeting+(name?', '+esc(name):'')+'.</h1>'+
+      '<h1 class="intake-h serif">'+greet+'</h1>'+
       '<p class="intake-date">'+dateLine+'</p>'+
       '<p class="intake-verse serif">“'+esc(v[0])+'”<cite>'+esc(v[1])+'</cite></p>'+
       '<button type="button" class="intake-btn-primary" data-in="next">'+COPY.welcome.begin+'</button>'+
@@ -434,19 +441,20 @@
   function focusSuggestions(){
     if(st.suggestions) return st.suggestions;
     const out = [];
-    (S()?.getGoals()||[]).slice(0,3).forEach(g=> out.push(g.title));
-    // yesterday's focus
+    (S()?.getGoals()||[]).slice(0,3).forEach(g=>{
+      if(g.title?.trim()) out.push(g.title.trim());
+    });
     st.suggestions = out.slice(0,3);
     root.getDayDataByDate?.(todayStr(-1)).then(day=>{
-      if(day?.focus && !st.suggestions.includes(day.focus)){
-        st.suggestions.unshift(day.focus);
+      const yFocus = day?.focus?.trim();
+      if(yFocus && !st.suggestions.includes(yFocus)){
+        st.suggestions.push(yFocus);
         st.suggestions = st.suggestions.slice(0,3);
         if(st.steps[st.i]==='focus') renderStep();
       }
     }).catch(()=>{});
-    // this week's top priorities (first line)
     root.getJSON?.(root.weekKeyFor?.(0)).then(w=>{
-      const line = (w?.planWeek?.top3||'').split('\n')[0].trim();
+      const line = (w?.planWeek?.top3||'').split('\n').map(s=>s.trim()).filter(Boolean)[0];
       if(line && !st.suggestions.includes(line)){
         st.suggestions.push(line);
         st.suggestions = st.suggestions.slice(0,3);
@@ -651,22 +659,20 @@
   }
 
   function renderSendoff(){
-    const ff = st.ff==='done' || st.ff==='timer' || ffDone();
     const pieces = [];
     if(st.focus) pieces.push('<div class="intake-so-focus serif settle-1">'+esc(st.focus)+'</div>');
-    pieces.push('<div class="intake-so-ff settle-2">'+(ff ? '✓ '+COPY.sendoff.ffKept : '○ '+COPY.sendoff.ffOpen)+'</div>');
     const slotRows = SLOTS.map(s=>{
       const items = st.picks.filter(p=>p.slot===s[0]).map(p=>'<strong>'+esc(p.title)+'</strong> · '+fmtDur(p.min))
         .concat(st.shelfAdds.filter(a=>a.slot===s[0]).map(a=>esc(a.title)+' · '+fmtDur(a.min)));
       if(!items.length) return '';
       return '<div class="intake-so-slot"><h4>'+s[1]+'</h4>'+items.map(x=>'<div class="intake-so-item">'+x+'</div>').join('')+'</div>';
     }).filter(Boolean).join('');
-    pieces.push(slotRows ? '<div class="intake-so-timeline settle-3">'+slotRows+'</div>'
-      : '<p class="intake-sub settle-3">'+COPY.sendoff.empty+'</p>');
+    pieces.push(slotRows ? '<div class="intake-so-timeline settle-2">'+slotRows+'</div>'
+      : '<p class="intake-sub settle-2">'+COPY.sendoff.empty+'</p>');
     return '<div class="intake-center">'+
       '<h2 class="intake-h serif">'+COPY.sendoff.title+'</h2>'+
       '<div class="intake-so">'+pieces.join('')+'</div>'+
-      '<button type="button" class="intake-btn-primary settle-4" data-in="finish">'+COPY.sendoff.begin+'</button>'+
+      '<button type="button" class="intake-btn-primary settle-3" data-in="finish">'+COPY.sendoff.begin+'</button>'+
       '</div>';
   }
 
@@ -691,16 +697,27 @@
     const it = ensureIntake();
     if(!it) return;
     const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const profile = typeof root.normalizeProfile === 'function'
+      ? root.normalizeProfile(root.userProfile)
+      : (root.userProfile || {});
     el.innerHTML =
       '<label class="q" for="intakeNameInput">Your name (for the morning greeting)</label>'+
-      '<input type="text" id="intakeNameInput" class="inp-sm" value="'+esc(root.globals?.profileName||'')+'" placeholder="Optional">'+
+      '<input type="text" id="intakeNameInput" class="inp-sm" value="'+esc(profile.name||'')+'" placeholder="Optional">'+
       '<label class="q" for="intakeRestDay" style="margin-top:10px">Rest day (light morning intake)</label>'+
       '<select id="intakeRestDay" class="inp-sm">'+
       '<option value="-1"'+(it.restDay===-1?' selected':'')+'>No rest day</option>'+
       days.map((d,i)=>'<option value="'+i+'"'+(it.restDay===i?' selected':'')+'>'+d+'</option>').join('')+
       '</select>';
     document.getElementById('intakeNameInput')?.addEventListener('input', e=>{
-      root.globals.profileName = e.target.value.trim(); markDirty();
+      if(!root.userProfile){
+        if(typeof root.blankProfile === 'function') root.userProfile = root.blankProfile();
+        else root.userProfile = { name:'', about:'', faith:'', goals:['','',''], rhythm:'', nonNegotiables:[''], coaching:'' };
+      }
+      if(root.userProfile){
+        root.userProfile.name = e.target.value.trim();
+        root.userProfile.updatedAt = new Date().toISOString();
+      }
+      markDirty();
     });
     document.getElementById('intakeRestDay')?.addEventListener('change', e=>{
       ensureIntake().restDay = parseInt(e.target.value, 10); markDirty();
@@ -856,5 +873,6 @@
   root.updateDashIntakeUI = updateDashIntakeUI;
   root.renderIntakeSettings = renderIntakeSettings;
   root.intakeCompletedToday = completedToday;
+  root.intakeSeenToday = intakeSeenToday;
 
 })(typeof window !== 'undefined' ? window : globalThis);
