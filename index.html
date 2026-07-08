@@ -945,7 +945,16 @@ body.faithfulness-app #periodLabel{color:var(--text-primary);font-weight:500;min
 body.focus-mode .app-sidebar{transform:translateX(-100%);width:0;padding:0;border:none;overflow:hidden}
 body.focus-mode .app-topbar .topbar-right > *:not(#btnFocusMode){display:none}
 body.focus-mode .app-topbar .topbar-left .btn-ghost{display:none}
-#dashboardPanel[hidden]{display:none!important}
+.home-band{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.home-greeting{flex:1;min-width:min(100%,220px)}
+.home-greeting h2{font-family:"Cormorant Garamond",serif;font-size:22px;font-weight:600;margin:0 0 2px;color:var(--text-primary)}
+.home-greeting p{margin:0;font-size:12px;color:var(--text-secondary);line-height:1.45}
+.home-capture{display:flex;align-items:center;gap:6px;flex:1;min-width:min(100%,260px);max-width:480px}
+.home-capture input{flex:1;min-width:0;border:1px solid var(--border);border-radius:8px;padding:6px 10px;font:12px/1.4 inherit;background:var(--bg-card);color:var(--text-primary)}
+.home-capture input:focus{outline:none;border-color:var(--gold)}
+.home-capture-btn{border:1px solid var(--border);background:var(--bg-card-2);border-radius:6px;padding:5px 9px;font-size:11px;cursor:pointer;color:var(--text-secondary);font-family:inherit;white-space:nowrap}
+.home-capture-btn:hover{color:var(--gold-text);border-color:var(--gold-border-soft)}
+@media(max-width:720px){.home-band{flex-direction:column;align-items:stretch}.home-capture{max-width:none}}
 .profile-panel{max-width:640px}
 .profile-intro{font-size:13px;color:var(--text-secondary);line-height:1.6;margin:0 0 32px;padding-bottom:20px;border-bottom:1px solid var(--border)}
 .profile-section{margin-bottom:32px}
@@ -982,72 +991,6 @@ body.focus-mode .app-topbar .topbar-left .btn-ghost{display:none}
 .privacy-link{font-size:12px;color:var(--text-secondary);margin:10px 0 0}
 .privacy-link button{border:none;background:none;padding:0;font:inherit;font-size:12px;color:var(--gold-text);cursor:pointer;text-decoration:underline}
 .privacy-link button:hover{color:var(--text-primary)}
-.dash-greeting{margin-bottom:20px}
-.dash-greeting h2{font-family:"Cormorant Garamond",serif;font-size:28px;font-weight:600;margin:0 0 6px;color:var(--text-primary)}
-.dash-greeting p{margin:0;font-size:13px;color:var(--text-secondary)}
-.dash-stat-row{display:grid;grid-template-columns:1fr 2fr;gap:16px;margin-bottom:16px}
-@media(max-width:900px){.dash-stat-row{grid-template-columns:1fr}}
-.dash-stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:18px 20px}
-.dash-stat-label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-secondary);margin-bottom:8px}
-.dash-stat-val{font-family:"Cormorant Garamond",serif;font-size:32px;font-weight:600;color:var(--text-primary)}
-.dash-stat-sub{font-size:12px;color:var(--text-secondary);margin-top:4px}
-.dash-stat-bar-wrap{height:4px;background:var(--bar-track);border-radius:99px;margin-top:12px;overflow:hidden}
-.dash-stat-bar-fill{height:100%;background:var(--gold);border-radius:99px;transition:width .3s ease}
-.dash-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.dash-grid .dash-row2-pri{grid-column:span 2}
-.dash-grid .dash-row2-sched{grid-column:span 1}
-@media(max-width:1100px){
-  .dash-grid{grid-template-columns:1fr 1fr}
-  .dash-grid .dash-row2-pri,.dash-grid .dash-row2-sched{grid-column:span 1}
-}
-@media(max-width:720px){.dash-grid{grid-template-columns:1fr}.dash-grid .dash-row2-pri,.dash-grid .dash-row2-sched{grid-column:span 1}}
-.dash-first-fruits{background:linear-gradient(135deg,var(--gold-fill-06),transparent);border:1px solid var(--gold-border-soft);
-  border-radius:12px;padding:0;margin-bottom:12px;overflow:hidden}
-.dash-first-head{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--gold-border-soft);
-  background:color-mix(in srgb,var(--gold) 6%,transparent)}
-.dash-first-badge{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;
-  background:var(--gold-dim);color:var(--gold-text);font-size:14px;flex:none}
-.dash-first-meta{flex:1;min-width:0}
-.dash-first-title{display:block;font-family:"Cormorant Garamond",serif;font-size:15px;font-weight:600;color:var(--gold-text);line-height:1.2}
-.dash-first-hint{display:block;font-size:11px;color:var(--text-secondary);margin-top:1px}
-.dash-first-progress{font-size:11px;font-weight:600;color:var(--gold-text);background:var(--gold-dim);padding:3px 8px;border-radius:99px;flex:none}
-.dash-first-list{padding:4px 0}
-.dash-ff-item{border-bottom:1px solid var(--border)}
-.dash-ff-item:last-child{border-bottom:none}
-.dash-ff-row{display:flex;align-items:center;gap:10px;padding:8px 12px 8px 14px;cursor:pointer;font-size:13px;
-  border-left:3px solid var(--gold-border-soft);margin-left:0}
-.dash-ff-item.done .dash-ff-row{border-left-color:var(--green);opacity:.85}
-.dash-ff-row input{accent-color:var(--gold);width:16px;height:16px;flex:none}
-.dash-ff-text{flex:1;color:var(--text-primary)}
-.dash-ff-item.done .dash-ff-text{text-decoration:line-through;color:var(--text-secondary)}
-.dash-ff-dur{font-size:11px;color:var(--text-secondary);flex:none}
-.dash-pri-divider{height:1px;background:var(--border);margin:12px 0}
-.dash-suggestions{margin-top:12px;display:flex;flex-direction:column;gap:8px}
-.dash-suggest-row{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;padding:8px 10px;background:var(--bg-hover);border-radius:8px;font-size:12px}
-.dash-suggest-text{flex:1;color:var(--text-secondary);line-height:1.4}
-.dash-suggest-actions{display:flex;gap:4px;flex:none}
-.dash-suggest-add,.dash-suggest-dismiss{border:1px solid var(--border);background:transparent;color:var(--gold-text);width:26px;height:26px;border-radius:6px;cursor:pointer;font-size:14px}
-.dash-suggest-dismiss{color:var(--text-secondary)}
-.dash-suggest-edit{margin-top:6px;display:flex;gap:6px}
-.dash-suggest-inp{flex:1;font-size:12px;padding:6px 8px;border-radius:6px;border:1px solid var(--border)}
-.dash-suggest-save{border:1px solid var(--gold-border-strong);background:var(--gold-dim);color:var(--gold-text);padding:6px 10px;border-radius:6px;font-size:11px;cursor:pointer;font-family:inherit}
-.dash-inline-add{margin-top:10px}
-.dash-inline-add input{width:100%;font-size:12px;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg-card-2);color:var(--text-primary)}
-.dash-proj-link{width:100%;text-align:left;border:none;background:transparent;padding:0;cursor:pointer;font-family:inherit;color:inherit}
-.dash-journal-widget{cursor:pointer;transition:border-color .15s}
-.dash-journal-widget:hover{border-color:var(--gold-border-soft)}
-.ff-first-fruits-wrap{list-style:none;padding:10px 12px;margin:0 0 10px;background:var(--gold-fill-06);border:1px solid var(--gold-border-soft);border-radius:10px}
-.ff-first-label-row{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--gold-text);font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.ff-pri-divider{list-style:none;height:1px;background:var(--border);margin:8px 0;padding:0}
-.idea-toast .toast-undo{margin-left:8px;border:none;background:var(--gold-dim);color:var(--gold-text);padding:2px 8px;border-radius:4px;cursor:pointer;font-size:11px;font-family:inherit}
-.dash-widget{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;min-height:220px}
-.dash-widget.span2{grid-column:span 2}
-@media(max-width:1100px){.dash-widget.span2{grid-column:span 1}}
-.dash-widget-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.dash-widget-head h3{margin:0;font-family:"Cormorant Garamond",serif;font-size:18px;font-weight:600;color:var(--text-primary)}
-.dash-widget-link{border:none;background:none;padding:0;font-size:12px;color:var(--text-secondary);cursor:pointer;font-family:inherit;
-  display:flex;align-items:center;gap:4px;transition:color .15s}
-.dash-widget-link:hover{color:var(--gold-text)}
 .dash-task{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer;font-size:13px}
 .dash-task:last-child{border-bottom:none}
 .dash-task input{accent-color:var(--gold);width:16px;height:16px;flex:none}
@@ -1062,66 +1005,7 @@ body.focus-mode .app-topbar .topbar-left .btn-ghost{display:none}
 .dash-tag.skill,.dash-tag.tag-skill{background:var(--green-bg);color:var(--green)}
 .dash-tag.growth{background:var(--green-bg);color:var(--green)}
 .dash-tag.stewardship{background:var(--stewardship-bg);color:var(--stewardship-accent)}
-.dash-add-row{display:flex;gap:8px;margin-top:12px}
-.dash-add-row input{flex:1;font-size:12px;padding:8px 10px;border-radius:8px;border:1px solid var(--border)}
-.dash-add-row button{border:1px solid var(--gold-border-strong);background:transparent;color:var(--gold-text);
-  padding:8px 12px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit}
-.dash-tl-row{display:flex;gap:12px;padding:6px 0;position:relative}
-.dash-sched-section{margin-bottom:12px}
-.dash-sched-section:last-child{margin-bottom:0}
-.dash-sched-section-label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-secondary);
-  font-weight:600;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--border)}
-.dash-sched-item{display:flex;align-items:center;gap:6px;padding:5px 0;font-size:12px;border-bottom:1px solid color-mix(in srgb,var(--border) 60%,transparent)}
-.dash-sched-item:last-child{border-bottom:none}
-.dash-sched-item.done .dash-sched-title{text-decoration:line-through;color:var(--text-secondary)}
-.dash-sched-check{display:flex;align-items:center;gap:8px;flex:1;min-width:0;cursor:pointer}
-.dash-sched-check input{accent-color:var(--gold);width:15px;height:15px;flex:none}
-.dash-sched-title{flex:1;min-width:0;color:var(--text-primary);font-size:13px}
-.dash-sched-time{font-size:11px;font-weight:600;color:var(--gold-text);width:72px;flex:none}
-.dash-sched-body{flex:1;min-width:0}
-.dash-sched-sub{font-size:10px;color:var(--text-secondary)}
-.dash-sched-block .dash-sched-title{font-weight:500}
-.dash-sched-slot-sel,.dash-sched-time-inp{font-size:11px;padding:3px 6px;border-radius:6px;border:1px solid var(--border);
-  background:var(--bg-card-2);color:var(--text-primary);font-family:inherit;max-width:110px}
-.dash-sched-ctrls{display:flex;gap:2px;flex:none}
-.dash-sched-btn{border:1px solid var(--border);background:transparent;color:var(--text-secondary);width:26px;height:26px;
-  border-radius:5px;cursor:pointer;font-size:11px;line-height:1;padding:0;font-family:inherit}
-.dash-sched-btn:hover{color:var(--gold-text);border-color:var(--gold-border-soft)}
-.dash-sched-del:hover{color:var(--red);border-color:color-mix(in srgb,var(--red) 40%,transparent)}
-.dash-sched-empty{font-size:11px;color:var(--text-secondary);margin:0;padding:4px 0 6px;font-style:italic}
-.dash-sched-add{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
-.dash-sched-add input[type=text]{flex:1;min-width:120px;font-size:12px;padding:7px 9px;border-radius:8px;border:1px solid var(--border);
-  background:var(--bg-card-2);color:var(--text-primary)}
-.dash-sched-add select,.dash-sched-add input[type=time]{font-size:11px;padding:7px 8px;border-radius:8px;border:1px solid var(--border);
-  background:var(--bg-card-2);color:var(--text-primary);font-family:inherit}
-.dash-sched-add input[type=time][hidden]{display:none}
-.dash-sched-add button{border:1px solid var(--gold-border-strong);background:transparent;color:var(--gold-text);
-  padding:7px 12px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
-.dash-grid .dash-row2-sched .dash-widget{min-height:280px}
-.dash-tl-row:not(:last-child)::after{content:"";position:absolute;left:5px;top:22px;bottom:-6px;width:1px;background:var(--gold-line)}
-.dash-tl-dot{width:11px;height:11px;border-radius:50%;background:var(--gold);flex:none;margin-top:4px;box-shadow:0 0 0 3px var(--gold-dim)}
-.dash-tl-time{font-size:11px;color:var(--gold-text);font-weight:600}
-.dash-tl-title{font-size:13px;color:var(--text-primary)}
-.dash-tl-sub{font-size:11px;color:var(--text-secondary)}
-.dash-proj-row{margin-bottom:12px}
-.dash-proj-head{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px}
-.dash-proj-bar{height:3px;background:var(--bar-track);border-radius:99px;overflow:hidden}
-.dash-proj-fill{height:100%;background:var(--gold);border-radius:99px;transition:width .3s}
-.dash-journal-text{font-size:13px;line-height:1.55;color:var(--text-secondary);flex:1;margin-bottom:14px;font-style:italic}
-.dash-journal-btn{align-self:flex-start;border:none;background:var(--gold-dim);color:var(--gold-text);padding:8px 14px;
-  border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
-.dash-journal-btn:hover{background:var(--gold-fill-20)}
-.dash-capture textarea{width:100%;min-height:72px;border-radius:10px;border:1px solid var(--border);
-  background:var(--bg-card-2);padding:10px 12px;font-size:13px;resize:vertical;font-family:inherit;color:var(--text-primary)}
-.dash-capture-actions{display:flex;justify-content:flex-end;margin-top:10px}
-.dash-seedbed{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.dash-seed-chip{border:1px solid var(--gold-border-soft);background:var(--gold-dim);color:var(--text-primary);
-  padding:6px 12px;border-radius:99px;font-size:12px;cursor:pointer;font-family:inherit;transition:border-color .15s}
-.dash-seed-chip:hover{border-color:var(--gold);color:var(--gold-text)}
 .dash-empty{font-size:12px;color:var(--text-secondary);font-style:italic}
-.dash-note-row{display:flex;align-items:center;gap:8px;font-size:12px;padding:6px 0;border-top:1px solid var(--border)}
-.dash-note-row span{flex:1;color:var(--text-secondary)}
-.dash-note-promote{border:none;background:none;color:var(--gold-text);font-size:11px;cursor:pointer;font-family:inherit;padding:0}
 #projectsPanel .proj-list{display:flex;flex-direction:column;gap:12px}
 #projectsPanel .proj-card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:14px;padding:16px 18px}
 #projectsPanel .proj-card h4{margin:0 0 8px;font-family:"Cormorant Garamond",serif;font-size:18px}
@@ -1139,7 +1023,7 @@ body.view-dashboard .idea-fab{display:none!important}
 #dailyBoard[hidden],#weeklyBoard[hidden],#monthlyBoard[hidden],#journalPanel[hidden],#ideasPanel[hidden],#prayerPanel[hidden],#calendarPanel[hidden],#tagLensPanel[hidden]{display:none!important}
 body.view-dashboard #dailyBoard,body.view-dashboard #weeklyBoard,body.view-dashboard #monthlyBoard,
 body.view-dashboard #journalPanel,body.view-dashboard #ideasPanel,body.view-dashboard #prayerPanel,
-body.view-dashboard #calendarPanel,body.view-dashboard #tagLensPanel,body.view-dashboard #projectsPanel,
+body.view-dashboard #tagLensPanel,body.view-dashboard #projectsPanel,
 body.view-dashboard #settingsPanel,body.view-dashboard #mentorshipPanel,body.view-dashboard #profilePanel,body.view-dashboard #privacyPanel{display:none!important}
 /* ── Stewardship Calendar ─────────────────────────────────── */
 #calendarPanel{
@@ -1722,9 +1606,6 @@ body.faithfulness-app #dailyBoard .ff-progress{color:var(--gold-text)}
     <button type="button" class="nav-item" data-nav="projects">
       <span class="nav-item-inner"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M3 7a2 2 0 0 1 2-2h5l2 2h9a1 1 0 0 1 1 1v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M3 10h20"/></svg></span><span class="nav-label">Projects</span></span>
     </button>
-    <button type="button" class="nav-item" data-nav="calendar">
-      <span class="nav-item-inner"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg></span><span class="nav-label">Calendar</span></span>
-    </button>
     <button type="button" class="nav-item" data-nav="profile">
       <span class="nav-item-inner"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M5 20c0-4 3-6 7-6s7 2 7 6"/></svg></span><span class="nav-label">Profile</span></span>
     </button>
@@ -1770,83 +1651,13 @@ body.faithfulness-app #dailyBoard .ff-progress{color:var(--gold-text)}
 
 <div class="app-content">
 
-<section id="dashboardPanel" class="dash-panel" aria-label="Dashboard">
-  <div class="dash-greeting">
-    <h2 class="serif" id="dashGreeting">Good morning, Kyle</h2>
-    <p id="dashSummary">Loading your day…</p>
-  </div>
+<section id="calendarPanel" aria-label="Dashboard">
+  <div id="homeBand" class="home-band"></div>
   <div id="dashProfileNudge" hidden></div>
-  <div class="dash-stat-row">
-    <div class="dash-stat-card dash-row1-stat">
-      <div class="dash-stat-label">Tasks Completed</div>
-      <div class="dash-stat-val"><span id="dashStatFraction">0 / 0</span></div>
-      <div class="dash-stat-sub"><span id="dashStatPct">0%</span> of today's priorities</div>
-      <div class="dash-stat-bar-wrap"><div class="dash-stat-bar-fill" id="dashStatBar" style="width:0%"></div></div>
-    </div>
-    <div class="dash-widget dash-row1-capture">
-      <div class="dash-widget-head"><h3>Quick Capture</h3></div>
-      <div class="dash-capture">
-        <textarea id="dashQuickNote" placeholder="Write a thought, idea, or note…" aria-label="Quick note"></textarea>
-        <div class="dash-capture-actions">
-          <button type="button" class="btn-gold" id="dashSaveNote">Save Note</button>
-        </div>
-      </div>
-      <div id="dashNotesInbox"></div>
-    </div>
-  </div>
-  <div class="dash-grid">
-    <div class="dash-widget dash-row2-pri span2">
-      <div class="dash-widget-head">
-        <h3>Today's Priorities</h3>
-        <button type="button" class="dash-widget-link" data-dash-link="daily">Open Daily →</button>
-      </div>
-      <div id="dashPriorities"></div>
-      <div class="dash-add-row">
-        <input type="text" id="dashNewTask" placeholder="Add a priority…" aria-label="New priority">
-        <button type="button" id="dashAddTask">+ Add Task</button>
-      </div>
-    </div>
-    <div class="dash-widget dash-row2-sched">
-      <div class="dash-widget-head">
-        <h3>Schedule</h3>
-        <button type="button" class="dash-widget-link" data-dash-link="calendar">View Calendar →</button>
-      </div>
-      <div id="dashScheduleList"></div>
-      <div class="dash-sched-add">
-        <input type="text" id="dashSchedTitle" placeholder="Add to schedule…" aria-label="Schedule item">
-        <select id="dashSchedSlot" aria-label="Time slot">
-          <option value="beforeWork">Before Work</option>
-          <option value="duringWork">During Work</option>
-          <option value="afterWork">After Work</option>
-          <option value="eveningShutdown">Evening Shutdown</option>
-          <option value="timed">Specific time</option>
-        </select>
-        <input type="time" id="dashSchedTime" aria-label="Specific time" hidden>
-        <button type="button" id="dashSchedAdd">+ Add</button>
-      </div>
-    </div>
-    <div class="dash-widget">
-      <div class="dash-widget-head">
-        <h3>Projects</h3>
-        <button type="button" class="dash-widget-link" data-dash-link="projects">All Projects →</button>
-      </div>
-      <div id="dashProjects"></div>
-    </div>
-    <div class="dash-widget dash-journal-widget" id="dashJournalWidget" role="button" tabindex="0" aria-label="Open journal with today's prompt">
-      <div class="dash-widget-head">
-        <h3>Journal Prompt</h3>
-        <span class="dash-widget-link">Write in Journal →</span>
-      </div>
-      <p class="dash-journal-text" id="dashJournalPrompt"></p>
-    </div>
-    <div class="dash-widget">
-      <div class="dash-widget-head">
-        <h3>Seedbed</h3>
-        <button type="button" class="dash-widget-link" data-dash-link="ideas">Open Ideas →</button>
-      </div>
-      <div class="dash-seedbed" id="dashSeedbed"></div>
-    </div>
-  </div>
+  <div id="stewToolbar"></div>
+  <div id="stewBody" class="stew-body"><p class="stew-boot">Preparing your day…</p></div>
+  <div class="ncal-drawer-backdrop" id="stewDrawerBackdrop" hidden></div>
+  <aside class="stew-drawer" id="stewDrawer" hidden aria-label="Time block details"></aside>
 </section>
 
 <section id="projectsPanel" hidden aria-label="Projects">
@@ -1976,13 +1787,6 @@ body.faithfulness-app #dailyBoard .ff-progress{color:var(--gold-text)}
     <div class="mentor-settings" id="mentorSettings"></div>
     <button type="button" class="btn-ghost" id="mentorAddBtn" style="margin-top:10px">+ Add mentor</button>
   </div>
-</section>
-
-<section id="calendarPanel" hidden aria-label="Calendar">
-  <div id="stewToolbar"></div>
-  <div id="stewBody" class="stew-body"><p class="stew-boot">Preparing your day…</p></div>
-  <div class="ncal-drawer-backdrop" id="stewDrawerBackdrop" hidden></div>
-  <aside class="stew-drawer" id="stewDrawer" hidden aria-label="Time block details"></aside>
 </section>
 
 <section id="tagLensPanel" hidden aria-label="Tagged items">
@@ -2203,9 +2007,8 @@ body.faithfulness-app #dailyBoard .ff-progress{color:var(--gold-text)}
 <script src="journal-ui.js?v=2"></script>
 <script src="ideas-hub.js?v=6" onerror="(function(){var p=document.getElementById('ihPipeline');if(p)p.innerHTML='<p class=&quot;ih-load-error&quot;>Failed to load ideas-hub.js — hard-refresh the page.</p>';})()"></script>
 <script src="stewardship-store.js?v=1"></script>
-<script src="calendar-ui.js?v=2"></script>
+<script src="calendar-ui.js?v=3"></script>
 <script src="daily-ui.js?v=1"></script>
-<script src="dashboard-ui.js?v=2"></script>
 <script src="profile-ui.js?v=1"></script>
 <script>
 
@@ -2883,7 +2686,7 @@ async function moveIdeaSchedule(ideaId,newDate){
 function syncIdeaFromMustDo(mustDoId,done){
   if(faithStore){
     faithStore.syncLegacyMustDoToTask(mustDoId, iso(dayOf(dayOffset)), done, dayData);
-    if(typeof renderDashboard === 'function') renderDashboard();
+    if(typeof renderCalendar === 'function') renderCalendar();
   }
   ensureIdeas();
   for(const raw of globals.ideas){
@@ -2893,7 +2696,7 @@ function syncIdeaFromMustDo(mustDoId,done){
     if(done) checkIdeaHarvest(raw);
     raw.updatedAt=new Date().toISOString();
     markDirty();
-    if(isCalendar()) window.renderCalendar?.();
+    if(isDashboard()) window.renderCalendar?.();
     else if(isIdeas()) loadIdeasHub?.();
   }
 }
@@ -2933,10 +2736,6 @@ function loadIdeas(){
   }
   var pipe = document.getElementById('ihPipeline');
   if(pipe) pipe.innerHTML = '<p class="ih-load-error">Ideas Hub could not start. Hard-refresh (Cmd+Shift+R) or Ctrl+Shift+R.</p>';
-}
-function openCalendarView(){
-  ensureIdeas(); ensureMyWeek();
-  window.loadCalendar?.(); // provided by calendar-ui.js
 }
 
 function bindIdeasPageEvents(){
@@ -3083,18 +2882,12 @@ function isMonthly(){ return viewMode==='monthly'; }
 function isJournal(){ return viewMode==='journal'; }
 function isPrayer(){ return viewMode==='prayer'; }
 function isIdeas(){ return viewMode==='ideas'; }
-function isCalendar(){ return viewMode==='calendar'; }
 function isTag(){ return viewMode==='tag'; }
 function isProjects(){ return viewMode==='projects'; }
 function isSettings(){ return viewMode==='settings'; }
 function isProfile(){ return viewMode==='profile'; }
 function isPrivacy(){ return viewMode==='privacy'; }
 function isMentorship(){ return typeof viewMode==='string' && viewMode.startsWith('mentorship'); }
-function dashPeriodLabel(){
-  const d = dayOf(dayOffset);
-  const prefix = dayOffset===0 ? 'Today' : dayLabelFor(dayOffset);
-  return prefix + ' — ' + d.toLocaleDateString('en-US',{weekday:'short', month:'short', day:'numeric', year:'numeric'});
-}
 function renderAnchorSettings(){
   const el=document.getElementById('anchorSettings');
   if(!el || !faithStore) return;
@@ -3126,7 +2919,7 @@ async function saveAnchorSettingsFromDOM(){
     faithStore.syncMustDosFromDay(today, dayData);
     renderFFLists();
   }
-  if(typeof renderDashboard==='function') renderDashboard();
+  if(typeof renderCalendar==='function') renderCalendar();
   markDirty?.();
 }
 function loadSettings(){ renderAnchorSettings(); renderCategorySettings?.(); renderMentorSettings?.(); }
@@ -4494,7 +4287,7 @@ function bindEvents(){
       if(key==='mustDo' && faithStore){
         faithStore.createTask({ title:text, date:iso(dayOf(dayOffset)), timeSlot:'beforeWork', tag:'stewardship', legacyMustDoId:itemId });
         faithStore.save();
-        if(typeof renderDashboard === 'function') renderDashboard();
+        if(typeof renderCalendar === 'function') renderCalendar();
       }
       inp.value = '';
       renderFFLists(); updateScore(); markDirty(); return;
@@ -4619,7 +4412,7 @@ function nav(dir){
   if(isJournal() && typeof flushJournalEntry === 'function'){
     flushJournalEntry().then(()=>{
       satBlockSessionOverride = null;
-      if(isDashboard()||isJournal()||isDaily()) dayOffset += dir;
+      if(isJournal()||isDaily()) dayOffset += dir;
       else if(isWeekly()) weekOffset += dir;
       else if(isMonthly()) monthOffset += dir;
       loadCurrent();
@@ -4628,12 +4421,13 @@ function nav(dir){
   }
   if(dirty) save();
   satBlockSessionOverride = null;
-  if(isDashboard()||isJournal()||isDaily()) dayOffset += dir;
+  if(isJournal()||isDaily()) dayOffset += dir;
   else if(isWeekly()) weekOffset += dir;
   else if(isMonthly()) monthOffset += dir;
   loadCurrent();
 }
 async function setMode(mode){
+  if(mode === 'calendar') mode = 'dashboard';
   const already = viewMode===mode;
   if(!already && dirty) await save();
   viewMode=mode;
@@ -4650,7 +4444,7 @@ function openTagView(tag){
 function updateSidebarNav(){
   document.querySelectorAll('.sidebar-nav [data-nav]').forEach(btn=>{
     const nav = btn.dataset.nav || '';
-    let on = viewMode===nav || (nav==='calendar' && isCalendar());
+    let on = viewMode===nav;
     if(nav.startsWith('mentorship-')) on = viewMode === nav;
     btn.classList.toggle('on', on);
   });
@@ -4661,16 +4455,15 @@ function updateSidebarNav(){
 function updateViewUI(){
   syncViewModeBridge();
   updateSidebarNav();
-  document.getElementById('dashboardPanel').hidden = viewMode!=='dashboard';
   document.getElementById('projectsPanel').hidden = viewMode!=='projects';
   document.getElementById('settingsPanel').hidden = viewMode!=='settings';
   document.getElementById('profilePanel').hidden = viewMode!=='profile';
   document.getElementById('privacyPanel').hidden = viewMode!=='privacy';
-  document.getElementById('calendarPanel').hidden = viewMode!=='calendar';
+  document.getElementById('calendarPanel').hidden = !isDashboard();
   document.getElementById('tagLensPanel').hidden = viewMode!=='tag';
   document.getElementById('mentorshipPanel').hidden = !isMentorship();
   document.getElementById('dailyBoard').hidden = viewMode!=='daily';
-  document.body.classList.toggle('view-dashboard', viewMode==='dashboard');
+  document.body.classList.toggle('view-dashboard', isDashboard());
   document.body.classList.toggle('view-daily', viewMode==='daily');
   document.getElementById('weeklyBoard').hidden = viewMode!=='weekly';
   document.getElementById('monthlyBoard').hidden = viewMode!=='monthly';
@@ -4680,19 +4473,18 @@ function updateViewUI(){
   document.body.classList.toggle('view-journal', viewMode==='journal');
   document.body.classList.toggle('view-ideas', viewMode==='ideas');
   document.body.classList.toggle('view-prayer', viewMode==='prayer');
-  document.body.classList.toggle('view-calendar', viewMode==='calendar');
   const fab = document.getElementById('ideaFab');
   if(fab) fab.hidden = !(isDaily() || isWeekly() || isMonthly());
   const score = document.getElementById('score');
   score.style.display = viewMode==='daily' ? '' : 'none';
   const nav = document.querySelector('.app-topbar .navrow');
-  const hideNav = isPrayer() || isIdeas() || isProjects() || isSettings() || isProfile() || isPrivacy() || isCalendar() || isTag() || isMentorship();
+  const hideNav = isPrayer() || isIdeas() || isProjects() || isSettings() || isProfile() || isPrivacy() || isDashboard() || isTag() || isMentorship();
   if(nav) nav.style.visibility = hideNav ? 'hidden' : 'visible';
   const calJump = document.getElementById('btnCalJump');
-  if(calJump) calJump.hidden = !(isDashboard() || isDaily() || isJournal());
+  if(calJump) calJump.hidden = !(isDaily() || isJournal());
   const clearBtn = document.getElementById('clearPeriod');
   if(clearBtn) clearBtn.textContent = isMonthly() ? "Clear this month's review" : "Clear this week's review";
-  if(isDashboard()) document.getElementById('periodLabel').textContent = dashPeriodLabel();
+  if(isDashboard()) document.getElementById('periodLabel').textContent = 'Dashboard';
   else if(isJournal()||isDaily()) document.getElementById('periodLabel').textContent = dayLabelFor(dayOffset);
   else if(isWeekly()) document.getElementById('periodLabel').textContent = weekLabelFor(weekOffset);
   else if(isMonthly()) document.getElementById('periodLabel').textContent = monthLabelFor(monthOffset);
@@ -4702,7 +4494,6 @@ function updateViewUI(){
   else if(isSettings()) document.getElementById('periodLabel').textContent = 'Settings';
   else if(isProfile()) document.getElementById('periodLabel').textContent = 'Profile';
   else if(isPrivacy()) document.getElementById('periodLabel').textContent = 'Privacy';
-  else if(isCalendar()) document.getElementById('periodLabel').textContent = 'Calendar';
   else if(isTag()) document.getElementById('periodLabel').textContent = 'Tags';
   else if(isMentorship()) document.getElementById('periodLabel').textContent = 'Mentorship';
   const foot = document.querySelector('.site-foot');
@@ -4722,9 +4513,8 @@ async function loadCurrent(){
     new Promise(r => setTimeout(r, 2500))
   ]) : Promise.resolve();
 
-  if(isDashboard()) loadDashboard();
+  if(isDashboard()){ ensureIdeas(); ensureMyWeek(); await loadCalendar?.(); }
   else if(isTag()) loadTagLens?.();
-  else if(isCalendar()) openCalendarView();
   else if(isProjects()) loadProjects?.();
   else if(isMentorship()) loadMentorship?.();
   else if(isSettings()) loadSettings();
@@ -4739,7 +4529,7 @@ async function loadCurrent(){
   await syncTask;
   if(isIdeas()) loadIdeas();
   else if(isPrayer()) loadPrayer();
-  else if(isDashboard()) loadDashboard();
+  else if(isDashboard()){ ensureIdeas(); ensureMyWeek(); await loadCalendar?.(); }
   else if(isMentorship()) loadMentorship?.();
 }
 async function loadDaily(){
@@ -4809,7 +4599,7 @@ function updateJournalMeta(){
 }
 function clearCurrent(){
   const labels = {daily:'this day',weekly:'this week',monthly:'this month'};
-  if(isJournal() || isPrayer() || isIdeas() || isDashboard() || isProjects() || isSettings() || isProfile() || isPrivacy() || isCalendar() || isTag()) return;
+  if(isJournal() || isPrayer() || isIdeas() || isDashboard() || isProjects() || isSettings() || isProfile() || isPrivacy() || isTag()) return;
   if(!confirm('Clear everything for '+labels[viewMode]+'?')) return;
   if(isDaily()) dayData = blankDaily();
   else if(isWeekly()) weekData = blankWeekly();
@@ -4842,7 +4632,8 @@ async function resetAll(){
 (async function init(){
   renderDaily(); renderWeekly(); renderMonthly(); bindEvents(); bindFFAccordion(); bindDailyEvents?.();
   const vm = await window.storage.get('view-mode');
-  if(vm?.value && (['dashboard','daily','weekly','monthly','journal','ideas','prayer','projects','profile','privacy','settings','calendar','tag'].includes(vm.value) || vm.value.startsWith('mentorship-'))) viewMode = vm.value;
+  if(vm?.value === 'calendar') viewMode = 'dashboard';
+  else if(vm?.value && (['dashboard','daily','weekly','monthly','journal','ideas','prayer','projects','profile','privacy','settings','tag'].includes(vm.value) || vm.value.startsWith('mentorship-'))) viewMode = vm.value;
   syncViewModeBridge();
   const g = await getJSON('fs-globals');
   if(g){ globals = {...globals,...g}; window.globals = globals; }
@@ -4862,7 +4653,6 @@ async function resetAll(){
   }
   document.getElementById('researchNotes').value = globals.researchNotes||'';
   simpleMode = localStorage.getItem('wsr:simpleMode')==='1';
-  bindDashboardEvents?.();
   bindProfileEvents?.();
   bindTagEvents?.();
   bindMentorshipEvents?.();

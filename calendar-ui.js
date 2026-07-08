@@ -840,11 +840,82 @@
     renderCalendar();
   }
 
+  /* ── home band (greeting + quick capture) ─────────────────── */
+  const HOME_VIEWS = ['day','week','month','agenda','planning'];
+  function timeGreeting(){
+    const h = new Date().getHours();
+    if(h < 12) return 'Good morning';
+    if(h < 17) return 'Good afternoon';
+    return 'Good evening';
+  }
+  function homeDisplayName(){
+    const p = typeof root.normalizeProfile === 'function' ? root.normalizeProfile(root.userProfile) : (root.userProfile || {});
+    return p.name || 'friend';
+  }
+  function formatSummaryTime(t){
+    const [h,m] = String(t||'').split(':').map(Number);
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    return (h % 12 || 12) + ':' + String(m).padStart(2,'0') + ' ' + ampm;
+  }
+  function buildSummaryLine(summary){
+    if(summary.practiceLine) return summary.practiceLine;
+    if(summary.firstFruitsTotal > 0 && !summary.firstFruitsComplete)
+      return "Start with what's first — Bible reading & prayer.";
+    if(summary.firstFruitsComplete){
+      const n = summary.prioritiesLeft || 0;
+      return 'First things first — done. ' + n + ' priorit' + (n===1?'y':'ies') + ' remain.';
+    }
+    const parts = [];
+    if(summary.prioritiesLeft != null)
+      parts.push(summary.prioritiesLeft + ' priorit' + (summary.prioritiesLeft===1?'y':'ies') + ' left');
+    if(summary.nextBlockLabel && summary.nextBlockTime)
+      parts.push('next block · ' + summary.nextBlockLabel + ' at ' + formatSummaryTime(summary.nextBlockTime));
+    if(summary.seedsGrowing != null)
+      parts.push(summary.seedsGrowing + ' seed' + (summary.seedsGrowing===1?'':'s') + ' growing');
+    return parts.join(' · ') || 'Open space is not wasted space.';
+  }
+  function renderHomeBand(){
+    const el = document.getElementById('homeBand');
+    if(!el) return;
+    const dateStr = anchor || iso(dayOf(0));
+    let summaryText = 'Open space is not wasted space.';
+    if(root.faithStore){
+      root.faithStore.ensureDailyAnchors(dateStr);
+      summaryText = buildSummaryLine(root.faithStore.getDashboardSummary(dateStr, { now: new Date() }));
+    }
+    el.innerHTML =
+      '<div class="home-greeting"><h2 class="serif">'+esc(timeGreeting()+', '+homeDisplayName())+'</h2>'+
+      '<p id="homeSummary">'+esc(summaryText)+'</p></div>'+
+      '<div class="home-capture">'+
+      '<input type="text" id="homeQuickCapture" placeholder="Quick capture…" aria-label="Quick capture">'+
+      '<button type="button" class="home-capture-btn" data-home-act="task">→ Task</button>'+
+      '<button type="button" class="home-capture-btn" data-home-act="seed">→ Seed</button>'+
+      '</div>';
+    root.renderProfileNudge?.();
+  }
+  async function routeHomeCapture(kind){
+    const inp = document.getElementById('homeQuickCapture');
+    const text = inp?.value.trim();
+    if(!text || !root.faithStore) return;
+    const dateStr = anchor || iso(dayOf(0));
+    if(kind === 'task'){
+      root.faithStore.createTask({ title:text, date:dateStr, tag:'stewardship', timeSlot:'beforeWork' });
+    } else {
+      root.faithStore.createSeed({ title:text, lifeArea:'other', status:'active' });
+    }
+    await root.faithStore.save();
+    if(inp) inp.value = '';
+    root.markDirty?.();
+    toast(kind === 'task' ? 'Task added.' : 'Seed planted.');
+    renderCalendar();
+  }
+
   /* ── render root ───────────────────────────────────────────── */
   async function renderCalendar(){
     const body = document.getElementById('stewBody');
     const bar = document.getElementById('stewToolbar');
     if(!body || !S()) return;
+    if(root.isDashboard?.()) renderHomeBand();
     await S().init();
     const dates = view==='week' ? weekDates()
       : view==='agenda' ? Array.from({length:14},(_,i)=>addDays(anchor,i))
@@ -864,7 +935,7 @@
     const q = document.getElementById('stewSearch');
     if(q && searchQuery) q.value = searchQuery;
     clearTimeout(nowTimer);
-    nowTimer = setTimeout(()=>{ if(document.body.classList.contains('view-calendar')) renderCalendar(); }, 60000);
+    nowTimer = setTimeout(()=>{ if(root.isDashboard?.()) renderCalendar(); }, 60000);
   }
 
   /* ── event wiring ──────────────────────────────────────────── */
@@ -899,6 +970,11 @@
     const panel = document.getElementById('calendarPanel');
 
     panel.addEventListener('click', async e=>{
+      const homeAct = e.target.closest('[data-home-act]');
+      if(homeAct){
+        await routeHomeCapture(homeAct.dataset.homeAct);
+        return;
+      }
       const el = e.target.closest('[data-act]');
       if(!el) return;
       const act = el.dataset.act, id = el.dataset.id, date = el.dataset.date;
@@ -1079,6 +1155,11 @@
     });
 
     panel.addEventListener('keydown', e=>{
+      if(e.target.id === 'homeQuickCapture' && e.key === 'Enter'){
+        e.preventDefault();
+        routeHomeCapture('task');
+        return;
+      }
       if(e.key==='Enter'){
         const el = e.target;
         if(el.id==='stewQuickAdd' && el.value.trim()){ handleQuickAdd(el.value.trim()); el.value=''; e.preventDefault(); return; }
@@ -1140,6 +1221,15 @@
     });
 
     document.getElementById('stewDrawerBackdrop')?.addEventListener('click', closeDrawer);
+
+    const qa = document.getElementById('btnQuickAdd');
+    if(qa && !qa.dataset.homeQuick){
+      qa.dataset.homeQuick = '1';
+      qa.addEventListener('click', ()=>{
+        if(!root.isDashboard?.()) return;
+        document.getElementById('homeQuickCapture')?.focus();
+      });
+    }
   }
   let renderDebounce = null;
   function debounceRender(){ clearTimeout(renderDebounce); renderDebounce = setTimeout(renderCalendar, 200); }
@@ -1164,7 +1254,11 @@
     if(!S()) return;
     await S().init();
     if(!anchor) anchor = iso(dayOf(0));
-    try{ view = localStorage.getItem('stew:view') || view; }catch(x){}
+    try{
+      const saved = localStorage.getItem('stew:view');
+      if(saved && HOME_VIEWS.includes(saved)) view = saved;
+      else view = 'day';
+    }catch(x){ view = 'day'; }
     bindCalendarEvents();
     await renderCalendar();
   }

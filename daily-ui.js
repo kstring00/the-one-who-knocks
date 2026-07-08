@@ -410,7 +410,7 @@
     await window.faithStore.save();
     sessionExpandId = null;
     refreshDailyUI();
-    if(typeof renderDashboard === 'function') renderDashboard();
+    if(typeof renderCalendar === 'function') renderCalendar();
     markDirty?.();
   }
 

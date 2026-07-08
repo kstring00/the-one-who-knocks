@@ -90,7 +90,7 @@
       faithStore.updateProject(selectedProjectId, { title: e.target.value.trim() });
       await faithStore.save();
       renderProjects();
-      if(typeof renderDashboard === 'function') renderDashboard();
+      if(typeof renderCalendar === 'function') renderCalendar();
       markDirty?.();
     });
     document.getElementById('projArchiveBtn')?.addEventListener('click', async ()=>{
@@ -100,7 +100,7 @@
       await faithStore.save();
       selectedProjectId = null;
       renderProjects();
-      if(typeof renderDashboard === 'function') renderDashboard();
+      if(typeof renderCalendar === 'function') renderCalendar();
       showProjToast('Archived “'+title+'”.');
       markDirty?.();
     });
@@ -111,7 +111,7 @@
       if(e.target.checked) await faithStore.completeTask(id);
       else await faithStore.uncompleteTask(id);
       renderProjects();
-      if(typeof renderDashboard === 'function') renderDashboard();
+      if(typeof renderCalendar === 'function') renderCalendar();
     });
   }
 
@@ -131,7 +131,7 @@
     inp.value = '';
     if(dateInp) dateInp.value = '';
     renderProjects();
-    if(typeof renderDashboard === 'function') renderDashboard();
+    if(typeof renderCalendar === 'function') renderCalendar();
     markDirty?.();
   }
 
@@ -148,7 +148,7 @@
     document.getElementById('projNewTitle').value = '';
     selectedProjectId = p.id;
     renderProjects();
-    if(typeof renderDashboard === 'function') renderDashboard();
+    if(typeof renderCalendar === 'function') renderCalendar();
     markDirty?.();
   }
 
@@ -156,7 +156,7 @@
     if(!title?.trim() || !faithStore) return;
     faithStore.createProject({ title: title.trim() });
     await faithStore.save();
-    if(typeof renderDashboard === 'function') renderDashboard();
+    if(typeof renderCalendar === 'function') renderCalendar();
     markDirty?.();
   }
 

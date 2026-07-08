@@ -31,9 +31,8 @@ Data is stored in `localStorage`. Signing in (Settings → Cloud sync) backs dat
 | `index.html` | App shell, design tokens/styles, view routing, sync + daily/weekly/monthly boards |
 | `faithfulness-store.js` | Core data store (tasks, anchors, categories, principles) |
 | `stewardship-store.js` | Calendar data layer: goals → projects → tasks → subtasks, habits, events, templates, day meta (theme/prayer/Big Three/reflection), ring math |
+| `calendar-ui.js` | Stewardship Calendar — home dashboard (Day/Week/Month/Agenda/Planning + event drawer) |
 | `daily-ui.js` | Daily Ledger view |
-| `dashboard-ui.js` | Dashboard view |
-| `calendar-ui.js` | Stewardship Calendar (Day/Week/Month/Agenda/Planning + event drawer) |
 | `ideas-hub.js` | Ideas Hub (embedded `IdeasStore` + UI) |
 | `journal-ui.js`, `projects-ui.js`, `tags-ui.js` | Journal, Projects, and tag-lens views |
 | `mentorship-seed.js`, `mentorship-ui.js` | Mentorship principles seed data + view |

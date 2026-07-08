@@ -349,7 +349,7 @@
       await window.faithStore.save();
       div.remove();
       renderMentorship?.();
-      renderDashboard?.();
+      renderCalendar?.();
       markDirty?.();
     };
     document.getElementById('msHarvestSkip').onclick = ()=> div.remove();
@@ -524,7 +524,7 @@
       await window.faithStore.save();
       delete activeForms[pid];
       renderMentorship();
-      renderDashboard?.();
+      renderCalendar?.();
       markDirty?.();
       return;
     }

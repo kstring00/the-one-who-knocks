@@ -155,7 +155,7 @@
   }
 
   function refreshAfterTags(type){
-    if(typeof renderDashboard === 'function') renderDashboard();
+    if(typeof renderCalendar === 'function') renderCalendar();
     if(typeof renderProjects === 'function') renderProjects();
     if(typeof renderSeedbed === 'function') renderSeedbed();
   }
