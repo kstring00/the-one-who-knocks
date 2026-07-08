@@ -103,7 +103,7 @@
       },
       {
         id: 'prayer',
-        title: 'Prayer',
+        title: 'Dream Prayer Log',
         for: 'A simple log of what you\'re carrying and what God has answered.',
         bullets: [
           'Add requests as they come; mark answered when grace shows up.',
@@ -112,7 +112,7 @@
           'Prayer belongs beside your calendar, not buried in notes.'
         ],
         tryView: 'prayer',
-        tryLabel: 'Open Prayer Log',
+        tryLabel: 'Open Dream Prayer Log',
         hint: 'Carry requests and answered prayers in one quiet list.'
       },
       {
