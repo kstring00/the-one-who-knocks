@@ -1213,11 +1213,13 @@ body.view-dashboard #settingsPanel,body.view-dashboard #mentorshipPanel,body.vie
 .stew-habit-main{flex:1;min-width:0;display:flex;flex-direction:column}
 .stew-habit-title{font-size:13px;font-weight:500;color:var(--text-primary)}
 .stew-habit-meta{font-size:10px;color:var(--text-muted)}
-.stew-h-hist{display:flex;gap:3px;flex:none}
-.stew-h-dot{width:6px;height:6px;border-radius:99px;background:var(--bar-track)}
+.stew-h-hist{display:flex;gap:4px;flex:none;align-items:center;padding:0 2px}
+.stew-h-dot{width:8px;height:8px;border-radius:99px;background:var(--bar-track);flex:none}
 .stew-h-dot.hit{background:var(--green)}
-.stew-h-dot.miss{background:color-mix(in srgb,var(--red) 25%,transparent)}
+.stew-h-dot.miss{background:color-mix(in srgb,var(--red) 35%,transparent)}
+.stew-h-dot.pending{background:var(--bar-track)}
 .stew-h-dot.na{background:transparent;border:1px solid var(--bar-track)}
+.stew-h-dot.today{box-shadow:0 0 0 1.5px var(--gold-border-soft)}
 
 /* overflow inbox */
 .stew-of-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid color-mix(in srgb,var(--border) 45%,transparent)}

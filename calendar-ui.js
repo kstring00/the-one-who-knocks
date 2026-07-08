@@ -62,6 +62,31 @@
   function iso(d){ return d.toISOString().slice(0,10); }
   function dayOf(off){ const d=new Date(); d.setDate(d.getDate()+(off||0)); d.setHours(12,0,0,0); return d; }
   function addDays(dateStr, n){ const d=new Date(dateStr+'T12:00:00'); d.setDate(d.getDate()+n); return iso(d); }
+  function mondayOfDateStr(dateStr){
+    const d = new Date(dateStr+'T12:00:00');
+    const day = d.getDay();
+    d.setDate(d.getDate() - (day === 0 ? 6 : day - 1));
+    return iso(d);
+  }
+  function habitWeekDots(h, dateStr){
+    const today = iso(dayOf(0));
+    const weekStart = mondayOfDateStr(dateStr);
+    return Array.from({length:7}, (_, i) => {
+      const d = addDays(weekStart, i);
+      const applies = S().habitAppliesOn(h, d);
+      const done = S().habitDone(h.id, d);
+      const isToday = d === dateStr;
+      let cls = 'stew-h-dot';
+      if(!applies) cls += ' na';
+      else if(done) cls += ' hit';
+      else if(d < today) cls += ' miss';
+      else cls += ' pending';
+      if(isToday) cls += ' today';
+      const dt = new Date(d+'T12:00:00');
+      const label = dt.toLocaleDateString('en-US',{weekday:'short'});
+      return '<span class="'+cls+'" title="'+label+(done?' — kept':applies?'':' — off')+'" aria-hidden="true"></span>';
+    }).join('');
+  }
   function mins(h,m){ return h*60+(m||0); }
   function parseTime(t){
     const p = String(t||'').match(/^(\d{1,2}):(\d{2})/);
@@ -379,11 +404,7 @@
     const rows = habits.map(h=>{
       const isDone = S().habitDone(h.id,dateStr);
       const streak = S().habitStreak(h.id);
-      const hist = [-4,-3,-2,-1].map(off=>{
-        const d = addDays(dateStr,off);
-        const applies = S().habitAppliesOn(h,d);
-        return '<span class="stew-h-dot'+(applies ? (S().getHabit(h.id).log[d]?' hit':' miss') : ' na')+'"></span>';
-      }).join('');
+      const hist = habitWeekDots(h, dateStr);
       const freq = h.frequency==='daily'?'Daily':h.frequency==='weekdays'?'Weekdays':'Weekly';
       return '<div class="stew-habit-row'+(isDone?' done':'')+'">'+
         '<span class="stew-habit-icon" aria-hidden="true">'+esc(h.icon)+'</span>'+
@@ -1002,7 +1023,7 @@
           openEvent(id, date); break;
         }
         case 'toggle-done': e.stopPropagation(); toggleAnyDone(id, date); break;
-        case 'toggle-habit': S().toggleHabit(id, date); renderCalendar(); break;
+        case 'toggle-habit': e.stopPropagation(); S().toggleHabit(id, date); renderCalendar(); break;
         case 'task-done': break; // handled on change
         case 'b3-remove': S().toggleBigThree(date, id); renderCalendar(); break;
         case 'b3-toggle': {
