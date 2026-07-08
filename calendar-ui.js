@@ -906,13 +906,15 @@
     }
     el.innerHTML =
       '<div class="home-greeting"><h2 class="serif">'+esc(timeGreeting()+', '+homeDisplayName())+'</h2>'+
-      '<p id="homeSummary">'+esc(summaryText)+'</p></div>'+
+      '<p id="homeSummary">'+esc(summaryText)+'</p>'+
+      '<div id="dashFocus"></div></div>'+
       '<div class="home-capture">'+
       '<input type="text" id="homeQuickCapture" placeholder="Quick capture…" aria-label="Quick capture">'+
       '<button type="button" class="home-capture-btn" data-home-act="task">→ Task</button>'+
       '<button type="button" class="home-capture-btn" data-home-act="seed">→ Seed</button>'+
       '</div>';
     root.renderProfileNudge?.();
+    root.updateDashIntakeUI?.();
   }
   async function routeHomeCapture(kind){
     const inp = document.getElementById('homeQuickCapture');
