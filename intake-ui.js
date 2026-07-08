@@ -60,6 +60,7 @@
       suggested: 'Waiting for you:',
       typePlaceholder: 'Or type a new task — Enter to add',
       full: 'Three is enough. Release one to add another.',
+      showIdeas: 'Show ideas',
       cont: 'Place them on the day'
     },
     shelf: {
@@ -107,20 +108,39 @@
   const DURATIONS = [[15,'15m'],[30,'30m'],[60,'1h'],[90,'1h 30m'],[120,'2h']];
 
   const COMMON_BLOCKS = [
-    { id:'cb-prayer',    title:'Morning prayer',     min:20, category:'spiritual',     slot:'beforeWork' },
-    { id:'cb-bible',     title:'Bible reading',      min:20, category:'spiritual',     slot:'beforeWork' },
-    { id:'cb-workout',   title:'Workout',            min:60, category:'health',        slot:'afterWork' },
-    { id:'cb-mealprep',  title:'Meal prep',          min:45, category:'personal',      slot:'eveningShutdown' },
-    { id:'cb-commute',   title:'Commute',            min:30, category:'admin',         slot:'beforeWork' },
-    { id:'cb-deepwork',  title:'Deep work',          min:90, category:'deepwork',      slot:'duringWork' },
-    { id:'cb-admin',     title:'Admin / email hour', min:60, category:'admin',         slot:'duringWork' },
-    { id:'cb-family',    title:'Family time',        min:60, category:'relationships', slot:'eveningShutdown' },
-    { id:'cb-rest',      title:'Rest',               min:45, category:'rest',          slot:'afterWork' },
-    { id:'cb-budget',    title:'Budget check',       min:30, category:'admin',         slot:'eveningShutdown' },
-    { id:'cb-journal',   title:'Journal',            min:15, category:'spiritual',     slot:'eveningShutdown' },
-    { id:'cb-reflect',   title:'Evening reflection', min:15, category:'spiritual',     slot:'eveningShutdown' },
-    { id:'cb-mentor',    title:'Call a mentor',      min:30, category:'leadership',    slot:'afterWork' },
-    { id:'cb-study',     title:'Study session',      min:60, category:'learning',      slot:'eveningShutdown' }
+    { id:'cb-prayer',    title:'Morning prayer',     min:20, category:'spiritual',     slot:'beforeWork',      why:'Beginning with God orders all that follows.', refs:'Ps 5:3' },
+    { id:'cb-bible',     title:'Bible reading',      min:20, category:'spiritual',     slot:'beforeWork',      why:'A little daily input shapes a whole life.', refs:'Ps 119:105' },
+    { id:'cb-workout',   title:'Workout',            min:60, category:'health',        slot:'afterWork',       why:'Movement lifts mood, focus, and sleep.', refs:'1 Cor 6:19' },
+    { id:'cb-mealprep',  title:'Meal prep',          min:45, category:'personal',      slot:'eveningShutdown', why:'Deciding ahead protects tomorrow’s willpower.', refs:'Prov 21:5' },
+    { id:'cb-commute',   title:'Commute',            min:30, category:'admin',         slot:'beforeWork',      why:'Guard the edges of the day with intention.', refs:'Eph 5:15-16' },
+    { id:'cb-deepwork',  title:'Deep work',          min:90, category:'deepwork',      slot:'duringWork',      why:'Focused effort compounds; distraction scatters.', refs:'Col 3:23' },
+    { id:'cb-admin',     title:'Admin / email hour', min:60, category:'admin',         slot:'duringWork',      why:'Batching small tasks frees the mind.', refs:'1 Cor 14:40' },
+    { id:'cb-family',    title:'Family time',        min:60, category:'relationships', slot:'eveningShutdown', why:'Presence with people is never wasted.', refs:'Ps 127:3-5' },
+    { id:'cb-rest',      title:'Rest',               min:45, category:'rest',          slot:'afterWork',       why:'Recovery makes work sustainable, not lazy.', refs:'Mark 6:31' },
+    { id:'cb-budget',    title:'Budget check',       min:30, category:'admin',         slot:'eveningShutdown', why:'What gets watched gets stewarded.', refs:'Prov 27:23' },
+    { id:'cb-journal',   title:'Journal',            min:15, category:'spiritual',     slot:'eveningShutdown', why:'Naming thoughts on paper lightens the load.', refs:'Phil 4:6' },
+    { id:'cb-reflect',   title:'Evening reflection', min:15, category:'spiritual',     slot:'eveningShutdown', why:'Reviewing the day turns experience into wisdom.', refs:'Ps 90:12' },
+    { id:'cb-mentor',    title:'Call a mentor',      min:30, category:'leadership',    slot:'afterWork',       why:'Wise counsel multiplies good decisions.', refs:'Prov 15:22' },
+    { id:'cb-study',     title:'Study session',      min:60, category:'learning',      slot:'eveningShutdown', why:'Consistent learning compounds into mastery.', refs:'Prov 9:9' }
+  ];
+
+  /* ── starter Big-Three ideas for brand-new users (edit freely) ──
+     Shown only when the user's own tasks/projects yield fewer than 4
+     suggestions. The "why" is intake-only — it never follows the task
+     into the day view. Slots are defaults; every pick stays editable. */
+  const STARTERS = [
+    { id:'st-quiet',   title:'Spend 10 quiet minutes with God',        min:15, slot:'beforeWork',      why:'Starting with stillness lowers stress and sets the day’s tone.', refs:'Ps 46:10; Mark 1:35' },
+    { id:'st-move',    title:'Move your body — a walk counts',          min:30, slot:'afterWork',       why:'Exercise reliably lifts mood, focus, and sleep.',               refs:'1 Cor 6:19' },
+    { id:'st-avoid',   title:'Do the one task you keep avoiding',       min:30, slot:'duringWork',      why:'Finishing what we dread frees more energy than it takes.',      refs:'Col 3:23' },
+    { id:'st-braindump',title:'Write down what’s on your mind',         min:15, slot:'duringWork',      why:'Externalizing thoughts reduces mental load and worry.',         refs:'Phil 4:6; 1 Pet 5:7' },
+    { id:'st-reach',   title:'Reach out to someone who matters',        min:15, slot:'afterWork',       why:'Strong relationships are the best predictor of wellbeing.',     refs:'Ecc 4:9-10; Heb 10:24-25' },
+    { id:'st-prep',    title:'Prepare tomorrow’s food or clothes tonight',min:30, slot:'eveningShutdown',why:'Deciding in advance protects willpower for what matters.',      refs:'Prov 21:5; 6:6-8' },
+    { id:'st-tidy',    title:'Tidy one small space',                    min:15, slot:'duringWork',      why:'Order in one corner quiets the whole mind.',                    refs:'1 Cor 14:40' },
+    { id:'st-money',   title:'Look at your money honestly',             min:15, slot:'eveningShutdown', why:'What gets watched gets stewarded.',                             refs:'Prov 27:23-24; Luke 14:28' },
+    { id:'st-read',    title:'Read something that grows you',           min:30, slot:'afterWork',       why:'Small consistent input compounds into wisdom.',                 refs:'Prov 9:9' },
+    { id:'st-rest',    title:'Rest — actually rest',                    min:60, slot:'eveningShutdown', why:'Rest is commanded, not earned; recovery makes work last.',      refs:'Ex 20:8-10; Mark 6:31' },
+    { id:'st-thank',   title:'Thank someone specifically',             min:15, slot:'afterWork',       why:'Practiced gratitude lifts mood and deepens relationships.',     refs:'1 Thess 5:18' },
+    { id:'st-plan',    title:'Plan your top task for tomorrow',         min:15, slot:'eveningShutdown', why:'Ending with a plan reduces night worry and speeds tomorrow.',   refs:'Prov 16:3, 9' }
   ];
 
   /* ── state ───────────────────────────────────────────────────── */
@@ -449,8 +469,10 @@
       '</div>';
   }
 
-  async function bigThreeSuggestions(){
-    if(st.b3sugg) return st.b3sugg;
+  // The user's OWN Big-Three candidates: yesterday's unfinished, the task
+  // inbox, and project tasks. Cached on st.b3own for the session.
+  async function bigThreeOwn(){
+    if(st.b3own) return st.b3own;
     const out = [];
     try{
       const yday = await root.getDayDataByDate(todayStr(-1));
@@ -461,13 +483,42 @@
       out.push({ title: t.title, source:'Still Entrusted', stewTaskId: t.id, min: t.durationMin||undefined }));
     (S()?.getTasks({status:'todo'})||[]).filter(t=>t.projectId && !out.some(o=>o.stewTaskId===t.id))
       .slice(0,3).forEach(t=> out.push({ title: t.title, source: S().getProject(t.projectId)?.title || 'Project', stewTaskId: t.id, min: t.durationMin||undefined }));
-    st.b3sugg = out.slice(0,8);
-    return st.b3sugg;
+    st.b3own = out.slice(0,8);
+    return st.b3own;
+  }
+  // Rotate the starter library day-to-day so the list stays fresh.
+  function rotatedStarters(){
+    const seed = todayStr().split('-').reduce((a,b)=>a+parseInt(b,10),0);
+    const off = seed % STARTERS.length;
+    return STARTERS.slice(off).concat(STARTERS.slice(0, off));
+  }
+  // Blend own suggestions with starters. Starters fill the gap up to 5 when
+  // the user has fewer than 4 of their own; once they have enough, starters
+  // step aside until asked for via "show ideas".
+  function b3SuggestionList(){
+    const own = st.b3own || [];
+    const enoughOwn = own.length >= 4;
+    const showStarters = !enoughOwn || st.showStarters;
+    let starters = [];
+    if(showStarters){
+      const count = enoughOwn ? 5 : Math.max(0, 5 - own.length);
+      const ownTitles = new Set(own.map(o=>String(o.title).toLowerCase()));
+      starters = rotatedStarters()
+        .filter(s=>!ownTitles.has(s.title.toLowerCase()))
+        .slice(0, count)
+        .map(s=>({ title:s.title, min:s.min, slot:s.slot, why:s.why, refs:s.refs, starter:true }));
+    }
+    return { own, starters, enoughOwn };
+  }
+  function b3Remaining(){
+    const { own, starters } = b3SuggestionList();
+    return own.concat(starters).filter(sg=>!st.picks.some(p=>p.title===sg.title));
   }
   function renderBigThree(){
-    const sugg = st.b3sugg || [];
-    if(!st.b3sugg) bigThreeSuggestions().then(()=>{ if(st && st.steps[st.i]==='bigthree') renderStep(); });
-    const remaining = sugg.filter(sg=>!st.picks.some(p=>p.title===sg.title));
+    if(!st.b3own) bigThreeOwn().then(()=>{ if(st && st.steps[st.i]==='bigthree') renderStep(); });
+    const { enoughOwn } = b3SuggestionList();
+    const remaining = b3Remaining();
+    const full = st.picks.length >= 3;
     const pickRows = st.picks.map((p,idx)=>
       '<div class="intake-pick" data-idx="'+idx+'">'+
       '<span class="intake-pick-num">'+(idx+1)+'</span>'+
@@ -476,18 +527,27 @@
       '<button type="button" class="intake-mini" data-in="pick-slot" data-idx="'+idx+'">'+SLOT_LABEL[p.slot]+'</button>'+
       '<button type="button" class="intake-x" data-in="pick-rm" data-idx="'+idx+'" aria-label="Remove">×</button>'+
       '</div>').join('');
+    const suggHtml = remaining.length
+      ? '<p class="intake-hint">'+COPY.bigThree.suggested+'</p>'+
+        remaining.map((sg,i)=>{
+          const sub = sg.starter ? (sg.why + (sg.refs ? ' ('+sg.refs+')' : '')) : sg.source;
+          return '<button type="button" class="intake-sugg" data-in="b3-add" data-i="'+i+'"'+(full?' disabled':'')+'>'+
+            '<span class="intake-sugg-title">'+esc(sg.title)+'</span>'+
+            '<span class="intake-sugg-src">'+esc(sub)+'</span></button>';
+        }).join('')
+      : '';
+    const showIdeasLink = (enoughOwn && !st.showStarters)
+      ? '<button type="button" class="intake-quiet intake-show-ideas" data-in="b3-show-ideas">'+COPY.bigThree.showIdeas+'</button>'
+      : '';
     return '<div class="intake-wide">'+
       '<h2 class="intake-h serif">'+COPY.bigThree.title+'</h2>'+
       '<p class="intake-sub">'+COPY.bigThree.sub+'</p>'+
       '<div class="intake-b3-grid">'+
       '<div class="intake-b3-left">'+
-      (remaining.length ? '<p class="intake-hint">'+COPY.bigThree.suggested+'</p>'+
-        remaining.map((sg,i)=>
-          '<button type="button" class="intake-sugg" data-in="b3-add" data-i="'+i+'"'+(st.picks.length>=3?' disabled':'')+'>'+
-          '<span class="intake-sugg-title">'+esc(sg.title)+'</span>'+
-          '<span class="intake-sugg-src">'+esc(sg.source)+'</span></button>').join('') : '')+
-      '<input type="text" class="intake-type-input" id="intakeB3Input" placeholder="'+COPY.bigThree.typePlaceholder+'"'+(st.picks.length>=3?' disabled':'')+'>'+
-      (st.picks.length>=3 ? '<p class="intake-hint">'+COPY.bigThree.full+'</p>' : '')+
+      suggHtml+
+      '<input type="text" class="intake-type-input" id="intakeB3Input" placeholder="'+COPY.bigThree.typePlaceholder+'"'+(full?' disabled':'')+'>'+
+      (full ? '<p class="intake-hint">'+COPY.bigThree.full+'</p>' : '')+
+      showIdeasLink+
       '</div>'+
       '<div class="intake-agenda" id="intakeAgenda"><p class="intake-hint" style="margin-top:0">Today</p>'+
       (pickRows || '<p class="intake-empty">Your three will land here.</p>')+
@@ -511,7 +571,7 @@
       key:'tpl-'+t.id, templateId:t.id, title:t.title, min:t.endMin-t.startMin,
       category:t.category, slot: slotForMin(t.startMin) }));
     const commons = COMMON_BLOCKS.filter(b=>!it.hiddenBlocks.includes(b.id))
-      .map(b=>({ key:b.id, commonId:b.id, title:b.title, min:b.min, category:b.category, slot:b.slot }));
+      .map(b=>({ key:b.id, commonId:b.id, title:b.title, min:b.min, category:b.category, slot:b.slot, why:b.why, refs:b.refs }));
     return { tpls, commons };
   }
   function slotForMin(m){
@@ -525,12 +585,25 @@
     return c ? c.color : 'var(--gold)';
   }
   function shelfChip(e, group){
+    const why = e.why ? esc(e.why + (e.refs ? ' ('+e.refs+')' : '')) : '';
     return '<button type="button" class="intake-shelf-chip" draggable="true" data-in="shelf-add" '+
-      'data-key="'+esc(e.key)+'" data-group="'+group+'" style="--cat:'+catColor(e.category)+'">'+
+      'data-key="'+esc(e.key)+'" data-group="'+group+'"'+(why?' title="'+why+'" data-why="'+why+'"':'')+' style="--cat:'+catColor(e.category)+'">'+
       '<span class="intake-shelf-dot"></span>'+esc(e.title)+
       '<span class="intake-shelf-dur">'+fmtDur(e.min)+'</span>'+
       (e.commonId ? '<span class="intake-hide-block" data-in="shelf-hide" data-key="'+e.key+'" title="Hide this block" aria-label="Hide '+esc(e.title)+'">×</span>' : '')+
       '</button>';
+  }
+  // Small tooltip for the block "why" on long-press (touch) — hover uses title.
+  function showChipWhy(chip, text){
+    let pop = document.getElementById('intakeWhyPop');
+    if(!pop){ pop = document.createElement('div'); pop.id = 'intakeWhyPop'; pop.className = 'intake-why-pop'; document.body.appendChild(pop); }
+    pop.textContent = text;
+    const r = chip.getBoundingClientRect();
+    pop.style.left = Math.max(8, Math.min(r.left, window.innerWidth - 248)) + 'px';
+    pop.style.top = (r.bottom + 6) + 'px';
+    requestAnimationFrame(()=> pop.classList.add('show'));
+    clearTimeout(pop._hideT);
+    pop._hideT = setTimeout(()=> pop.classList.remove('show'), 2600);
   }
   function renderShelf(){
     const { tpls, commons } = shelfEntries();
@@ -674,11 +747,12 @@
           advance(); break;
         }
         case 'b3-add': {
-          const remaining = (st.b3sugg||[]).filter(sg=>!st.picks.some(p=>p.title===sg.title));
+          const remaining = b3Remaining();
           const sg = remaining[+el.dataset.i];
-          if(sg) addPick(sg.title, { stewTaskId: sg.stewTaskId, min: sg.min || 30 });
+          if(sg) addPick(sg.title, { stewTaskId: sg.stewTaskId, min: sg.min || 30, slot: sg.slot });
           break;
         }
+        case 'b3-show-ideas': st.showStarters = true; renderStep(); break;
         case 'pick-rm': st.picks.splice(+el.dataset.idx,1); renderStep(); break;
         case 'pick-dur': {
           const p = st.picks[+el.dataset.idx];
@@ -737,6 +811,18 @@
         e.preventDefault();
       }
     });
+
+    /* long-press a shelf block to reveal its "why" on touch devices */
+    let lpTimer = null;
+    const clearLp = ()=>{ clearTimeout(lpTimer); lpTimer = null; };
+    ov.addEventListener('touchstart', e=>{
+      const chip = e.target.closest?.('.intake-shelf-chip');
+      if(!chip || !chip.dataset.why) return;
+      lpTimer = setTimeout(()=> showChipWhy(chip, chip.dataset.why), 450);
+    }, { passive:true });
+    ov.addEventListener('touchend', clearLp);
+    ov.addEventListener('touchmove', clearLp);
+    ov.addEventListener('touchcancel', clearLp);
 
     /* drag from shelf tray onto a slot */
     ov.addEventListener('dragstart', e=>{
