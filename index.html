@@ -1262,6 +1262,14 @@ body.view-daily .site-foot,body.view-weekly .site-foot,body.view-monthly .site-f
 #dailyBoard.guided-daily #dailyGuideChrome{padding:0 24px;max-width:1400px;margin:0 auto 8px}
 #dailyBoard.guided-daily .gr-btn-danger{background:transparent;border:1px solid color-mix(in srgb,var(--danger) 50%,var(--border));color:var(--danger);font-weight:600}
 #dailyBoard.guided-daily .gr-btn-danger:hover{background:color-mix(in srgb,var(--danger) 8%,transparent)}
+.dl-phase-suggest-host{max-width:1400px;margin:0 auto 8px;padding:0 24px}
+.dl-phase-suggest-host:empty{display:none}
+.dl-phase-suggest{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:10px 14px;border-radius:12px;border:1px solid var(--gold-border-soft);background:color-mix(in srgb,var(--gold) 7%,var(--bg-card));font-size:12px;color:var(--text-secondary)}
+.dl-phase-suggest-text{flex:1;min-width:200px;line-height:1.45}
+.dl-phase-suggest-act{border:1px solid var(--green);background:var(--green);color:var(--text-on-green);border-radius:999px;padding:6px 12px;font-size:11px;font-weight:600;font-family:inherit;cursor:pointer}
+.dl-phase-suggest-act:hover{filter:brightness(1.03)}
+.dl-phase-suggest-dismiss{border:none;background:transparent;color:var(--text-muted);font-size:11px;font-weight:600;font-family:inherit;cursor:pointer;padding:6px 8px}
+.dl-phase-suggest-dismiss:hover{color:var(--text-secondary)}
 .dl-intro{margin:0 0 12px;font-size:13px;color:var(--text-secondary);line-height:1.5;font-style:italic}
 .dl-habit-list{display:flex;flex-direction:column;gap:0;margin-bottom:8px}
 .dl-habit-card{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--border-subtle);border-radius:12px;background:var(--bg-card-2);margin-bottom:6px}
@@ -2449,6 +2457,7 @@ body.intake-open{overflow:hidden}
       <button type="button" class="why-btn" id="whyWorksBtn">Why This Works</button>
     </div>
   </div>
+  <div id="dailyPhaseSuggestHost" class="dl-phase-suggest-host" aria-live="polite"></div>
   <div class="daily-toolbar">
     <div class="phase-tabs sat-block-tabs" id="satBlockTabs" role="tablist" aria-label="Time blocks"></div>
   </div>
@@ -4842,6 +4851,41 @@ function applyDailyPhase(){
   if(!board) return;
   board.dataset.phase = dailyPhase;
   document.querySelectorAll('.weekday-phase-tabs .phase-tab').forEach(t=> t.classList.toggle('on', t.dataset.phase===dailyPhase));
+  refreshPhaseSuggestion();
+}
+function phaseSuggestStorageKey(phase){
+  return 'wsr:phase-suggest:'+iso(dayOf(dayOffset))+':'+phase;
+}
+function isPhaseSuggestDismissed(phase){
+  try{ return sessionStorage.getItem(phaseSuggestStorageKey(phase))==='1'; }catch(e){ return false; }
+}
+function dismissPhaseSuggest(phase){
+  try{ sessionStorage.setItem(phaseSuggestStorageKey(phase),'1'); }catch(e){}
+}
+function inferSuggestedDailyPhase(){
+  if(!isDaily() || isSaturdayRecovery() || dayOffset !== 0) return null;
+  const h = new Date().getHours();
+  if(h >= 17 && dailyPhase !== 'evening') return 'evening';
+  if(h >= 11 && dailyPhase === 'morning') return 'day';
+  return null;
+}
+function renderPhaseSuggestion(){
+  const suggest = inferSuggestedDailyPhase();
+  if(!suggest || isPhaseSuggestDismissed(suggest)) return '';
+  const labels = { day:'During the Day', evening:'Evening Review' };
+  const messages = {
+    day:'Later in the day — ready to check habits and must-dos?',
+    evening:'Winding down? Evening Review is here when you\u2019re ready.'
+  };
+  return '<div class="dl-phase-suggest" id="dailyPhaseSuggest" role="status">'+
+    '<span class="dl-phase-suggest-text">'+messages[suggest]+'</span>'+
+    '<button type="button" class="dl-phase-suggest-act" data-phase-suggest-go="'+suggest+'">Switch to '+labels[suggest]+'</button>'+
+    '<button type="button" class="dl-phase-suggest-dismiss" data-phase-suggest-dismiss="'+suggest+'">Not now</button></div>';
+}
+function refreshPhaseSuggestion(){
+  const host = document.getElementById('dailyPhaseSuggestHost');
+  if(!host) return;
+  host.innerHTML = (!isDaily() || document.getElementById('dailyBoard')?.hidden) ? '' : renderPhaseSuggestion();
 }
 function scrollDailyPhaseIntoView(){
   const board = document.getElementById('dailyBoard');
@@ -4852,17 +4896,33 @@ function scrollDailyPhaseIntoView(){
 function setDailyPhase(phase){
   dailyPhase = phase;
   applyDailyPhase();
+  if(phase === 'day' || phase === 'evening') dismissPhaseSuggest(phase);
   if(typeof refreshDailySummary === 'function') refreshDailySummary();
   setTimeout(scrollDailyPhaseIntoView, 40);
 }
 function bindDailyPhaseTabs(){
   if(document.body.dataset.dailyPhaseBound) return;
   document.body.dataset.dailyPhaseBound = '1';
-  document.getElementById('dailyBoard')?.addEventListener('click', e=>{
+  const board = document.getElementById('dailyBoard');
+  board?.addEventListener('click', e=>{
     const tab = e.target.closest('.weekday-phase-tabs .phase-tab[data-phase]');
-    if(!tab || !isDaily()) return;
-    e.preventDefault();
-    setDailyPhase(tab.dataset.phase);
+    if(tab && isDaily()){
+      e.preventDefault();
+      setDailyPhase(tab.dataset.phase);
+      return;
+    }
+    const go = e.target.closest('[data-phase-suggest-go]');
+    if(go && isDaily()){
+      setDailyPhase(go.dataset.phaseSuggestGo);
+      dismissPhaseSuggest(go.dataset.phaseSuggestGo);
+      refreshPhaseSuggestion();
+      return;
+    }
+    const dis = e.target.closest('[data-phase-suggest-dismiss]');
+    if(dis && isDaily()){
+      dismissPhaseSuggest(dis.dataset.phaseSuggestDismiss);
+      refreshPhaseSuggestion();
+    }
   });
 }
 
