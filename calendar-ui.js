@@ -890,7 +890,7 @@
   }
   function homeDisplayName(){
     const p = typeof root.normalizeProfile === 'function' ? root.normalizeProfile(root.userProfile) : (root.userProfile || {});
-    return p.name || 'friend';
+    return (p.name || '').trim();
   }
   function formatSummaryTime(t){
     const [h,m] = String(t||'').split(':').map(Number);
@@ -924,7 +924,7 @@
       summaryText = buildSummaryLine(root.faithStore.getDashboardSummary(dateStr, { now: new Date() }));
     }
     el.innerHTML =
-      '<div class="home-greeting"><h2 class="serif">'+esc(timeGreeting()+', '+homeDisplayName())+'</h2>'+
+      '<div class="home-greeting"><h2 class="serif">'+esc(homeDisplayName() ? timeGreeting()+', '+homeDisplayName() : timeGreeting())+'</h2>'+
       '<p id="homeSummary">'+esc(summaryText)+'</p>'+
       '<div id="dashFocus"></div></div>';
     root.renderProfileNudge?.();
