@@ -1308,6 +1308,62 @@ body.view-daily .site-foot,body.view-weekly .site-foot,body.view-monthly .site-f
 .dl-reguide-aim{font-size:14px;font-weight:600;color:var(--text-primary);margin:0 0 6px}
 .dl-reguide-plan{font-size:12px;color:var(--text-secondary);margin:0 0 8px;line-height:1.45}
 .dl-reguide-hint{font-size:11px;color:var(--text-muted);margin:0;font-style:italic}
+/* During the Day — midday check-in dashboard */
+.dd-dashboard{display:flex;flex-direction:column;gap:12px;padding-bottom:12px}
+.dd-hero{background:color-mix(in srgb,var(--gold) 8%,var(--bg-card));border:1px solid var(--gold-border-soft);border-radius:16px;padding:18px 20px;margin-bottom:4px;box-shadow:0 1px 5px var(--shadow-elevated)}
+.dd-hero-kicker{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-text);margin-bottom:6px}
+.dd-hero-title{font-family:"Cormorant Garamond",serif;font-size:22px;font-weight:600;margin:0 0 6px;color:var(--text-primary);line-height:1.25}
+.dd-hero-sub{margin:0;font-size:13px;color:var(--text-secondary);line-height:1.5}
+.dd-card{padding:14px 16px!important;margin-bottom:0!important}
+.dd-card-kicker{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin:0 0 4px}
+.dd-card-title{font-family:"Cormorant Garamond",serif;font-size:17px;font-weight:600;margin:0 0 6px;color:var(--text-primary)}
+.dd-question,.dd-helper{margin:0 0 10px;font-size:12px;color:var(--text-secondary);line-height:1.45}
+.dd-question{font-style:italic}
+.dd-summary{font-size:12px;font-weight:600;color:var(--gold-text);margin:0 0 8px}
+.dd-empty{margin:0;font-size:12px;color:var(--text-muted);font-style:italic}
+.dd-aim-show{display:flex;flex-direction:column;gap:2px;margin-bottom:12px;padding:10px 12px;border-radius:10px;background:var(--bg-card-2);border:1px solid var(--border-subtle)}
+.dd-aim-label{font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em}
+.dd-aim-value{font-size:15px;font-weight:600;color:var(--text-primary)}
+.dd-pill-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.dd-pill{flex:1;min-width:100px;border:1px solid var(--border);background:var(--bg-card-2);color:var(--text-secondary);border-radius:12px;padding:12px 14px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;text-align:center;transition:background .15s,border-color .15s,color .15s}
+.dd-pill:hover{border-color:var(--gold-border-soft);color:var(--text-primary)}
+.dd-pill.on{background:var(--gold-dim);border-color:var(--gold-border-soft);color:var(--gold-text)}
+.dd-microcopy{margin:0 0 4px;font-size:12px;color:var(--text-primary);line-height:1.45}
+.dd-grace{margin:0;font-size:11px;color:var(--text-muted);font-style:italic}
+.dd-compact-list{display:flex;flex-direction:column;gap:0}
+.dd-compact-row{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid color-mix(in srgb,var(--border) 50%,transparent)}
+.dd-compact-row:last-child{border-bottom:none}
+.dd-compact-row.done .dd-row-title{text-decoration:line-through;color:var(--text-muted)}
+.dd-row-main{flex:1;min-width:0}
+.dd-row-title{display:block;font-size:13px;font-weight:600;color:var(--text-primary)}
+.dd-row-meta{display:block;font-size:10px;color:var(--text-muted);margin-top:2px}
+.dd-status{font-size:10px;font-weight:600;color:var(--gold-text);flex:none;padding-top:2px;white-space:nowrap}
+.dd-status.complete{color:var(--green)}
+.dd-mini-actions{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.dd-mini-btn{border:1px solid var(--border-subtle);background:var(--bg-card);color:var(--text-muted);border-radius:999px;padding:3px 8px;font-size:10px;font-weight:600;font-family:inherit;cursor:pointer}
+.dd-mini-btn.on{background:var(--gold-dim);border-color:var(--gold-border-soft);color:var(--gold-text)}
+.dd-release-msg{margin:6px 0 0;font-size:11px;color:var(--green);font-style:italic}
+.dd-chip-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.dd-chip{border:1px solid var(--border);background:var(--bg-card-2);color:var(--text-secondary);border-radius:999px;padding:5px 10px;font-size:11px;font-family:inherit;cursor:pointer;transition:background .15s,border-color .15s}
+.dd-chip.on{background:var(--gold-dim);border-color:var(--gold-border-soft);color:var(--gold-text)}
+.dd-option-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+@media(max-width:520px){.dd-option-grid{grid-template-columns:1fr}}
+.dd-option-card{display:flex;flex-direction:column;align-items:flex-start;text-align:left;border:1px solid var(--border-subtle);background:var(--bg-card-2);border-radius:12px;padding:10px 12px;cursor:pointer;font-family:inherit;transition:background .15s,border-color .15s}
+.dd-option-card:hover{border-color:var(--gold-border-soft)}
+.dd-option-card.on{background:color-mix(in srgb,var(--green) 10%,var(--bg-card));border-color:color-mix(in srgb,var(--green) 35%,var(--border))}
+.dd-option-title{font-size:12px;font-weight:700;color:var(--text-primary);margin-bottom:2px}
+.dd-option-sub{font-size:11px;color:var(--text-muted);line-height:1.35}
+.dd-guidance{margin:0;font-size:12px;font-style:italic;color:var(--text-secondary);line-height:1.45}
+.dd-prominent,.dd-highlight{border-color:var(--gold-border-soft);box-shadow:0 2px 8px color-mix(in srgb,var(--gold) 12%,transparent)}
+.dd-next-step{border-color:color-mix(in srgb,var(--green) 30%,var(--border-subtle));background:color-mix(in srgb,var(--green) 5%,var(--bg-card))}
+.dd-commit-msg{margin:10px 0 0;font-size:13px;font-weight:600;color:var(--green)}
+.dd-reduce-field{margin-top:8px}
+.dd-orig-line{margin:4px 0 0;font-size:10px;color:var(--text-muted);font-style:italic}
+.dd-friction-details summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.dd-friction-details summary::-webkit-details-marker{display:none}
+.dd-optional{font-size:10px;color:var(--text-muted);font-weight:600}
+.dd-scripture-compact .dl-scripture{font-size:12px;line-height:1.45}
+.dd-scripture-sm{font-size:12px!important}
 .dl-nn-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
 .dl-how-card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:14px;padding:14px 16px;box-shadow:0 1px 4px var(--shadow-elevated)}
 .dl-how-card h4{margin:0 0 8px;font-family:"Cormorant Garamond",serif;font-size:16px;font-weight:600}
@@ -2467,6 +2523,7 @@ body.intake-open{overflow:hidden}
   </div>
   <div class="gr-sticky-bar" id="dailyStickyBar" hidden>
     <button type="button" class="gr-btn-primary" data-gr-act="save-day">Save Day</button>
+    <button type="button" class="gr-btn-secondary" data-gr-act="commit-next-step" hidden>Commit Next Step</button>
     <button type="button" class="gr-btn-secondary" data-gr-act="mark-phase">Mark Morning Complete</button>
     <button type="button" class="gr-btn-danger" data-gr-act="clear-day">Clear Day</button>
   </div>
@@ -2749,7 +2806,8 @@ body.intake-open{overflow:hidden}
 <script src="ideas-hub.js?v=6" onerror="(function(){var p=document.getElementById('ihPipeline');if(p)p.innerHTML='<p class=&quot;ih-load-error&quot;>Failed to load ideas-hub.js — hard-refresh the page.</p>';})()"></script>
 <script src="stewardship-store.js?v=1"></script>
 <script src="calendar-ui.js?v=4"></script>
-<script src="daily-ui.js?v=5"></script>
+<script src="daily-ui.js?v=6"></script>
+<script src="midday-ui.js?v=1"></script>
 <script src="review-ui.js?v=2"></script>
 <script src="profile-ui.js?v=1"></script>
 <script src="guide-ui.js?v=2"></script>
@@ -3851,7 +3909,16 @@ function blankDaily(){
     satRecovery: blankSatRecovery(),
     phaseComplete:{morning:false,day:false,evening:false},
     morningComplete:false,
-    dayComplete:false
+    dayComplete:false,
+    dayCheckIn:{
+      alignment:'',
+      habits:{},
+      audible:{whatChanged:[],adjustment:'',note:''},
+      nextStep:'',
+      nextStepCommitted:false,
+      friction:{pull:[],support:''},
+      middayComplete:false
+    }
   };
 }
 function blankSatRecovery(){
@@ -4018,6 +4085,10 @@ function normalizeDaily(s){
   d.commit = {...b.commit,...(s.commit||{})};
   d.growthTree = {...b.growthTree,...(s.growthTree||{})};
   d.growthRep = {...b.growthRep,...(s.growthRep||{})};
+  d.dayCheckIn = {...b.dayCheckIn,...(s.dayCheckIn||{})};
+  if(s.dayCheckIn?.audible) d.dayCheckIn.audible = {...b.dayCheckIn.audible,...s.dayCheckIn.audible};
+  if(s.dayCheckIn?.friction) d.dayCheckIn.friction = {...b.dayCheckIn.friction,...s.dayCheckIn.friction};
+  if(s.dayCheckIn?.habits) d.dayCheckIn.habits = {...(s.dayCheckIn.habits||{})};
   d.satRecovery = normalizeSatRecovery(s.satRecovery);
   if(s.focus != null) d.focus = String(s.focus);
   if(s.soulCheck != null) d.soulCheck = s.soulCheck;
@@ -4898,6 +4969,7 @@ function setDailyPhase(phase){
   applyDailyPhase();
   if(phase === 'day' || phase === 'evening') dismissPhaseSuggest(phase);
   if(typeof refreshDailySummary === 'function') refreshDailySummary();
+  if(typeof hookDailyPhaseRefresh === 'function') hookDailyPhaseRefresh();
   setTimeout(scrollDailyPhaseIntoView, 40);
 }
 function bindDailyPhaseTabs(){
@@ -5106,6 +5178,7 @@ function bindPanelEvents(){
   try{ bindMentorshipEvents?.(); }catch(e){ console.warn('[bindPanelEvents] mentorship', e); }
   try{ bindDailyEvents?.(); }catch(e){ console.warn('[bindPanelEvents] daily', e); }
   try{ bindDailyPhaseTabs(); }catch(e){ console.warn('[bindPanelEvents] daily phases', e); }
+  try{ bindMiddayEvents?.(); }catch(e){ console.warn('[bindPanelEvents] midday', e); }
   try{ bindReviewEvents?.(); }catch(e){ console.warn('[bindPanelEvents] review', e); }
   try{ bindJournalEvents?.(); }catch(e){ console.warn('[bindPanelEvents] journal', e); }
   try{ bindIdeasPageEvents(); }catch(e){ console.warn('[bindPanelEvents] ideas page', e); }

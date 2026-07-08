@@ -25,8 +25,8 @@
   ];
   const DAILY_STEPS = [
     { id:'aim', label:'Aim', sec:'sec-daily-aim', phases:['morning'] },
-    { id:'habits', label:'Habits', sec:'sec-first-fruits', phases:['morning','day','evening'] },
-    { id:'mustdos', label:'Must-Dos', sec:'sec-non-neg', phases:['morning','day','evening'] },
+    { id:'habits', label:'Habits', sec:'sec-first-fruits', phases:['morning','evening'] },
+    { id:'mustdos', label:'Must-Dos', sec:'sec-non-neg', phases:['morning','evening'] },
     { id:'growth', label:'Growth', sec:'sec-growth', phases:['morning'] },
     { id:'plan', label:'Plan', sec:'sec-friction', phases:['morning'] },
     { id:'reflect', label:'Reflect', sec:'sec-evening-review', phases:['evening'] }
@@ -270,29 +270,6 @@
       '</div>';
   }
 
-  function renderDayReguide(){
-    ensureGrowthRep();
-    const aim = dayData?.posture?.aim?.trim();
-    const d = dayData?.danger || {};
-    const top = getTopMustDos();
-    const aimLine = aim ? 'Today\u2019s aim: '+esc(aim) : 'Set your aim in Morning Setup when you can.';
-    let planLine = '';
-    if(d.danger && d.thenWill){
-      planLine = 'If '+esc(d.danger)+', then '+esc(d.thenWill);
-    } else if(d.danger || d.thenWill){
-      planLine = 'Finish your friction plan in Morning Setup.';
-    }
-    const todoHint = top.length
-      ? 'Check off habits and your top '+Math.min(top.length, 3)+' as you go.'
-      : 'Add up to three must-dos in Morning Setup, then check them off here.';
-    return '<section class="gr-card daily-section dl-reguide" data-phases="day" id="sec-day-reguide" data-dl-sec="reguide">'+
-      '<div class="gr-card-head"><div><div class="gr-card-kicker">Midday check-in</div>'+
-      '<h3 class="gr-card-title serif">Reguide toward this morning\u2019s plan</h3></div></div>'+
-      '<p class="dl-reguide-aim">'+aimLine+'</p>'+
-      (planLine ? '<p class="dl-reguide-plan">'+planLine+'</p>' : '')+
-      '<p class="dl-reguide-hint">'+todoHint+'</p></section>';
-  }
-
   function renderTodayAim(){
     const st = sectionStatus('aim');
     return '<section class="gr-card daily-section" data-phases="morning" id="sec-daily-aim" data-dl-sec="aim">'+
@@ -340,7 +317,7 @@
     const st = sectionStatus('habits');
     const cards = rows.length ? rows.map(renderHabitRow).join('')
       : '<p class="dl-empty">These are the rhythms that protect your day. Add your own non-negotiables below.</p>';
-    return '<section class="gr-card daily-section" data-phases="morning day evening" id="sec-first-fruits" data-dl-sec="habits">'+
+    return '<section class="gr-card daily-section" data-phases="morning evening" id="sec-first-fruits" data-dl-sec="habits">'+
       '<div class="gr-card-head">'+
       '<div><div class="gr-card-kicker">Step 2</div>'+
       '<h3 class="gr-card-title serif">Non-Negotiables / Habits'+(window.helpTip?.(2,'Daily rhythms you return to. Check off when kept — they can sync to your dashboard.')||'')+'</h3>'+
@@ -377,7 +354,7 @@
       ? '<details class="dl-more-tasks"><summary>More tasks ('+more.length+')</summary>'+
         '<div class="dl-list">'+more.map(it=> renderMustDoRow(it)).join('')+'</div></details>'
       : '';
-    return '<section class="gr-card daily-section" data-phases="morning day evening" id="sec-non-neg" data-dl-sec="mustdos">'+
+    return '<section class="gr-card daily-section" data-phases="morning evening" id="sec-non-neg" data-dl-sec="mustdos">'+
       '<div class="gr-card-head">'+
       '<div><div class="gr-card-kicker">Step 3</div>'+
       '<h3 class="gr-card-title serif">Top 3 Must-Dos'+(window.helpTip?.(3,'Only three priorities visible — not a giant task manager. More tasks stay tucked away.')||'')+'</h3>'+
@@ -556,6 +533,8 @@
   }
 
   function renderDailySidebar(){
+    const phase = typeof dailyPhase === 'string' ? dailyPhase : 'morning';
+    if(phase === 'day' && typeof root.renderDaySidebar === 'function') return root.renderDaySidebar();
     const tip = typeof helpTip === 'function' ? helpTip(8,'A calm margin for passing thoughts. Kept safe across days.') : '';
     return '<div class="dl-rail-journal" id="thoughtJournal" aria-label="Thought journal">'+
       '<h4 class="serif">Thought Journal'+tip+'</h4>'+
@@ -568,14 +547,26 @@
   }
 
   function syncActionBar(){
-    const bar = document.getElementById('dailyStickyBar');
-    if(!bar) return;
-    bar.hidden = false;
-    const phase = typeof dailyPhase === 'string' ? dailyPhase : 'morning';
-    const markBtn = bar.querySelector('[data-gr-act="mark-phase"]');
-    if(markBtn){
-      markBtn.textContent = phase === 'morning' ? 'Mark Morning Complete' : 'Mark Day Complete';
+    if(typeof root.syncDayActionBar === 'function') root.syncDayActionBar();
+    else {
+      const bar = document.getElementById('dailyStickyBar');
+      if(!bar) return;
+      bar.hidden = false;
+      const phase = typeof dailyPhase === 'string' ? dailyPhase : 'morning';
+      const markBtn = bar.querySelector('[data-gr-act="mark-phase"]');
+      if(markBtn){
+        markBtn.textContent = phase === 'morning' ? 'Mark Morning Complete' : 'Mark Day Complete';
+      }
     }
+  }
+
+  function refreshProgressChrome(){
+    const host = document.getElementById('dailyGuideChrome');
+    if(host){
+      const phase = typeof dailyPhase === 'string' ? dailyPhase : 'morning';
+      host.innerHTML = phase === 'day' ? '' : renderProgressPills();
+    }
+    syncActionBar();
   }
 
   function scrollToStep(stepId){
@@ -600,12 +591,6 @@
     }, 60);
   }
 
-  function refreshProgressChrome(){
-    const host = document.getElementById('dailyGuideChrome');
-    if(host) host.innerHTML = renderProgressPills();
-    syncActionBar();
-  }
-
   function renderDailyLedger(){
     if(typeof isSaturdayRecovery === 'function' && isSaturdayRecovery()) return false;
     const main = document.getElementById('dailyMain');
@@ -620,11 +605,11 @@
       const layout = document.querySelector('#dailyBoard .daily-layout');
       layout?.parentNode?.insertBefore(chrome, layout);
     }
-    chrome.innerHTML = renderProgressPills();
+    chrome.innerHTML = (typeof dailyPhase === 'string' && dailyPhase === 'day') ? '' : renderProgressPills();
 
     main.innerHTML =
       renderTodayAim()+
-      renderDayReguide()+
+      (typeof root.renderDuringDayDashboard === 'function' ? root.renderDuringDayDashboard() : '')+
       renderFirstFruits()+
       renderNonNegotiables()+
       renderGrowthRep()+
@@ -669,8 +654,9 @@
     const aim = document.getElementById('sec-daily-aim');
     if(aim) aim.outerHTML = renderTodayAim();
 
-    const reguide = document.getElementById('sec-day-reguide');
-    if(reguide) reguide.outerHTML = renderDayReguide();
+    const reguide = document.getElementById('sec-day-dashboard');
+    if(reguide && typeof root.refreshDuringDayUI === 'function') root.refreshDuringDayUI();
+    else if(reguide) reguide.outerHTML = root.renderDuringDayDashboard?.() || '';
 
     const ff = document.getElementById('sec-first-fruits');
     if(ff) ff.outerHTML = renderFirstFruits();
@@ -699,7 +685,11 @@
     }
 
     refreshProgressChrome();
-    populateFields?.(document.getElementById('dailyMain'), dayData);
+    if(typeof dailyPhase === 'string' && dailyPhase === 'day'){
+      root.refreshDuringDayUI?.();
+    } else {
+      populateFields?.(document.getElementById('dailyMain'), dayData);
+    }
     updateDailyScore();
   }
 
@@ -911,6 +901,8 @@
     } else if(phase === 'day'){
       dayData.phaseComplete.day = true;
       dayData.dayComplete = true;
+      root.ensureDayCheckIn?.();
+      if(dayData.dayCheckIn) dayData.dayCheckIn.middayComplete = true;
       if(typeof setDailyPhase === 'function') setDailyPhase('evening');
     } else {
       dayData.phaseComplete.evening = true;
@@ -1258,10 +1250,30 @@
         saveCategorySettingsFromDOM();
       }
     });
+    root.bindMiddayEvents?.();
   }
+
+  root.__dailyHelpers = {
+    getHabitRows, habitRowDone, habitRowStatus, getTopMustDos, getMoreMustDos, getNonNegItems,
+    getAnchors, anchorDone, anchorCue, stewHabitCue, markAnchorKept, toggleStewHabit,
+    addNonNeg, addAnchor, filled, dateStr
+  };
 
   root.hookDailyPhaseRefresh = function(){
     refreshProgressChrome();
+    if(typeof dailyPhase === 'string' && dailyPhase === 'day'){
+      const side = document.getElementById('dailySidebar');
+      if(side && typeof root.renderDaySidebar === 'function'){
+        side.innerHTML = root.renderDaySidebar();
+        if(typeof loadThoughtJournal === 'function') loadThoughtJournal();
+      }
+    } else {
+      const side = document.getElementById('dailySidebar');
+      if(side && document.getElementById('sec-daily-aim')){
+        side.innerHTML = renderDailySidebar();
+        if(typeof loadThoughtJournal === 'function') loadThoughtJournal();
+      }
+    }
   };
 
   root.renderDailyLedger = renderDailyLedger;
