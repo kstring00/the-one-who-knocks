@@ -954,6 +954,177 @@ body.view-ideas .daily-layout,body.view-ideas .weekly-board,body.view-ideas .mon
   .pipe-slots{grid-template-columns:1fr}
 }
 
+
+/* ── Guided Review system (Daily / Weekly / Monthly) ── */
+.gr-progress{display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:2px 0 10px;margin:0 0 14px;scrollbar-width:thin}
+.gr-pill{flex:none;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);border-radius:999px;padding:6px 12px;font-size:11px;font-weight:600;font-family:inherit;cursor:pointer;transition:background .15s,border-color .15s,color .15s;white-space:nowrap}
+.gr-pill:hover{border-color:var(--gold-border-soft);color:var(--text-primary)}
+.gr-pill.on{background:var(--gold-dim);border-color:var(--gold-border-soft);color:var(--gold-text)}
+.gr-pill.done{color:var(--green)}
+.gr-pill-num{width:16px;height:16px;border-radius:50%;background:color-mix(in srgb,var(--gold) 18%,transparent);color:var(--gold-text);display:grid;place-items:center;font-size:10px;font-weight:700}
+.gr-pill.done .gr-pill-num{background:var(--green);color:var(--text-on-green)}
+.gr-pill.done .gr-pill-num::after{content:"✓";font-size:9px}
+.gr-pill.done .gr-pill-num{font-size:0}
+.gr-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}
+@media(max-width:900px){.gr-summary{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.gr-summary{grid-template-columns:1fr}}
+.gr-sum-card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:14px;padding:12px 14px;box-shadow:0 1px 4px var(--shadow-elevated);min-height:72px;display:flex;flex-direction:column;gap:4px}
+.gr-sum-card.accent{border-color:var(--gold-border-soft)}
+.gr-sum-kicker{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-text)}
+.gr-sum-value{font-family:"Cormorant Garamond",serif;font-size:20px;font-weight:600;color:var(--text-primary);line-height:1.2}
+.gr-sum-meta{font-size:11px;color:var(--text-secondary);line-height:1.4}
+.gr-sum-status{font-size:10px;font-weight:600;margin-top:auto;color:var(--text-muted)}
+.gr-sum-status.done{color:var(--green)}
+.gr-sum-status.progress{color:var(--gold-text)}
+.gr-layout{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:24px;align-items:start}
+@media(max-width:1100px){.gr-layout{grid-template-columns:1fr}.gr-rail{order:2}}
+.gr-main{display:flex;flex-direction:column;gap:12px;min-width:0}
+.gr-rail{display:flex;flex-direction:column;gap:12px;position:sticky;top:12px}
+@media(max-width:1100px){.gr-rail{position:static}}
+.gr-card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:14px;box-shadow:0 1px 4px var(--shadow-elevated);overflow:hidden}
+.gr-card + .gr-card{margin-top:0}
+.gr-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:12px 14px;cursor:pointer;list-style:none;user-select:none}
+.gr-card-head::-webkit-details-marker{display:none}
+.gr-card-head h3{margin:0;font-family:"Cormorant Garamond",serif;font-size:18px;font-weight:600;color:var(--text-primary);line-height:1.25}
+.gr-card-q{margin:2px 0 0;font-size:12px;color:var(--text-secondary);font-style:italic;line-height:1.4}
+.gr-card-meta{display:flex;align-items:center;gap:8px;flex:none}
+.gr-status{font-size:10px;font-weight:600;padding:3px 8px;border-radius:999px;background:var(--bg-card-2);color:var(--text-muted)}
+.gr-status.done{background:color-mix(in srgb,var(--green) 16%,var(--bg-card));color:var(--green)}
+.gr-status.progress{background:var(--gold-dim);color:var(--gold-text)}
+.gr-chevron{font-size:10px;color:var(--text-muted);transition:transform .15s}
+details.gr-card:not([open]) .gr-chevron{transform:rotate(-90deg)}
+.gr-card-body{padding:0 14px 14px;display:flex;flex-direction:column;gap:10px}
+.gr-helper{margin:0;font-size:11.5px;color:var(--text-muted);line-height:1.5}
+.gr-field{display:flex;flex-direction:column;gap:4px}
+.gr-field label{font-size:11px;font-weight:600;color:var(--text-secondary)}
+.gr-field textarea,.gr-field input[type="text"]{width:100%;box-sizing:border-box;border:1px solid transparent;border-radius:10px;background:var(--bg-card-2);padding:8px 10px;font:13px/1.5 inherit;color:var(--text-primary);resize:none;min-height:38px;max-height:180px;transition:border-color .15s,background .15s,min-height .15s}
+.gr-field textarea:focus,.gr-field input[type="text"]:focus{outline:none;border-color:var(--gold-border-soft);background:var(--bg-card);min-height:72px}
+.gr-field textarea.gr-ta-open{min-height:88px}
+.gr-chips{display:flex;flex-wrap:wrap;gap:6px}
+.gr-chip{border:none;background:var(--bg-card-2);color:var(--text-secondary);font-size:11px;padding:5px 10px;border-radius:999px;cursor:pointer;font-family:inherit;transition:background .15s,color .15s}
+.gr-chip:hover,.gr-chip.on{background:var(--gold-dim);color:var(--gold-text)}
+.gr-chip.done{background:color-mix(in srgb,var(--green) 14%,var(--bg-card));color:var(--green)}
+.gr-score-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+@media(max-width:720px){.gr-score-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.gr-score-grid{grid-template-columns:1fr}}
+.gr-score-item{background:var(--bg-card-2);border-radius:10px;padding:10px 12px}
+.gr-score-item .name{font-size:12px;font-weight:600;color:var(--text-primary);margin:0 0 6px}
+.gr-score-bar{height:5px;background:var(--bar-track,var(--border));border-radius:99px;overflow:hidden}
+.gr-score-bar > i{display:block;height:100%;background:var(--green);border-radius:99px}
+.gr-score-item.low .gr-score-bar > i{background:var(--gold)}
+.gr-score-pct{font-size:10px;color:var(--text-muted);margin-top:4px}
+.gr-acc-one{display:flex;flex-direction:column;gap:6px}
+.gr-prompt{border:1px solid var(--border-subtle);border-radius:10px;background:var(--bg-card-2);overflow:hidden}
+.gr-prompt[open]{background:var(--bg-card);border-color:var(--gold-border-soft)}
+.gr-prompt summary{padding:10px 12px;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--text-primary);list-style:none}
+.gr-prompt summary::-webkit-details-marker{display:none}
+.gr-prompt .gr-field{padding:0 12px 12px}
+.gr-compact-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:640px){.gr-compact-grid{grid-template-columns:1fr}}
+.gr-fruit-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+@media(max-width:720px){.gr-fruit-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.gr-fruit-grid{grid-template-columns:1fr}}
+.gr-fruit-card{background:var(--bg-card-2);border-radius:12px;padding:10px;text-align:center}
+.gr-fruit-card h4{margin:0 0 8px;font-family:"Cormorant Garamond",serif;font-size:15px;font-weight:600;color:var(--text-primary)}
+.gr-fruit-card .rating-pills{justify-content:center;margin-bottom:6px}
+.gr-fruit-note-toggle{border:none;background:none;color:var(--gold-text);font-size:10px;cursor:pointer;font-family:inherit;padding:0}
+.gr-fruit-note{display:none;margin-top:6px}
+.gr-fruit-card.note-open .gr-fruit-note{display:block}
+.gr-how{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:14px;padding:14px;box-shadow:0 1px 4px var(--shadow-elevated)}
+.gr-how h4{margin:0 0 8px;font-family:"Cormorant Garamond",serif;font-size:16px;font-weight:600;color:var(--text-primary)}
+.gr-how ol{margin:0;padding-left:18px;font-size:12px;color:var(--text-secondary);line-height:1.55}
+.gr-how li{margin-bottom:4px}
+.gr-rail-card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:14px;padding:14px;box-shadow:0 1px 4px var(--shadow-elevated)}
+.gr-rail-card h4{margin:0 0 8px;font-family:"Cormorant Garamond",serif;font-size:15px;font-weight:600;color:var(--text-primary)}
+.gr-rail-card p,.gr-rail-line{margin:0 0 6px;font-size:12px;color:var(--text-secondary);line-height:1.45}
+.gr-sticky,.gr-sticky-bar{position:sticky;bottom:0;z-index:40;display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 14px;margin:18px -4px 0;background:color-mix(in srgb,var(--bg-page) 88%,transparent);backdrop-filter:blur(8px);border-top:1px solid var(--border);border-radius:12px 12px 0 0}
+.gr-sticky-bar[hidden]{display:none!important}
+.gr-btn-primary{border:none;background:var(--green);color:var(--text-on-green);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+.gr-btn-primary:hover{filter:brightness(1.06)}
+.gr-btn-secondary{border:1px solid var(--border);background:var(--bg-card);color:var(--text-primary);border-radius:8px;padding:8px 12px;font-size:12px;cursor:pointer;font-family:inherit}
+.gr-btn-secondary:hover{border-color:var(--gold-border-soft);color:var(--gold-text)}
+.gr-btn-danger{border:1px solid var(--danger);background:transparent;color:var(--danger);border-radius:8px;padding:8px 12px;font-size:12px;cursor:pointer;font-family:inherit;margin-left:auto}
+.gr-btn-danger:hover{background:var(--danger-bg)}
+@media(max-width:560px){
+  .gr-sticky-bar{margin-left:-8px;margin-right:-8px;border-radius:0}
+  .gr-btn-danger{margin-left:0;width:100%}
+}
+#dailyBoard .gr-progress,#dailyBoard .gr-summary{padding-left:24px;padding-right:24px;max-width:1400px;margin-left:auto;margin-right:auto}
+#dailyBoard .gr-sticky-bar{max-width:1400px;margin-left:auto;margin-right:auto}
+#dailyBoard:not(.saturday-recovery) .daily-toolbar{display:none}
+body.view-daily .site-foot,body.view-weekly .site-foot,body.view-monthly .site-foot{display:none!important}
+.weekly-board .page-head,.monthly-board .page-head{margin-bottom:8px}
+.dl-nn-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.dl-nn-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border-subtle);background:var(--bg-card-2);border-radius:999px;padding:5px 10px 5px 8px;font-size:12px;color:var(--text-primary)}
+.dl-nn-chip.done{background:color-mix(in srgb,var(--green) 12%,var(--bg-card));border-color:transparent;color:var(--green)}
+.dl-nn-chip input{accent-color:var(--green);width:14px;height:14px;margin:0}
+.dl-nn-chip button{border:none;background:none;color:var(--text-muted);cursor:pointer;font-size:14px;padding:0 0 0 2px;line-height:1}
+.dl-must-row{display:flex;align-items:center;gap:8px;padding:6px 4px;border-radius:8px}
+.dl-must-row:hover{background:var(--bg-card-2)}
+.dl-must-row.done .dl-item-main{text-decoration:line-through;opacity:.75}
+.dl-must-menu{border:none;background:none;color:var(--text-muted);cursor:pointer;font-size:14px;padding:2px 6px}
+.dl-growth-row{display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid color-mix(in srgb,var(--border) 50%,transparent);cursor:pointer}
+.dl-growth-row:last-child{border-bottom:none}
+.dl-growth-icon{width:28px;height:28px;border-radius:8px;background:var(--gold-dim);display:grid;place-items:center;color:var(--gold-text);flex:none}
+.dl-growth-main{flex:1;min-width:0}
+.dl-growth-main strong{display:block;font-size:13px;color:var(--text-primary)}
+.dl-growth-main span{font-size:11px;color:var(--text-secondary)}
+.dl-plan-icon{width:22px;text-align:center;color:var(--gold-text);flex:none}
+body.view-daily #dailyBoard,body.view-weekly #weeklyBoard,body.view-monthly #monthlyBoard{padding-bottom:72px}
+
+/* Guided accordion sections (Daily / Weekly / Monthly) */
+.gr-acc{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:14px;box-shadow:0 1px 4px var(--shadow-elevated);overflow:hidden;margin-bottom:10px;scroll-margin-top:100px}
+.gr-acc.open{border-color:var(--gold-border-soft)}
+.gr-acc.is-complete{border-color:color-mix(in srgb,var(--green) 35%,var(--border-subtle))}
+.gr-acc-head{width:100%;display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:none;background:transparent;cursor:pointer;font-family:inherit;text-align:left}
+.gr-acc-num{width:22px;height:22px;border-radius:50%;background:var(--gold-dim);color:var(--gold-text);display:grid;place-items:center;font-size:11px;font-weight:700;flex:none;margin-top:2px}
+.gr-acc.is-complete .gr-acc-num{background:var(--green);color:var(--text-on-green)}
+.gr-acc-titles{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.gr-acc-title{font-family:"Cormorant Garamond",serif;font-size:18px;font-weight:600;color:var(--text-primary);line-height:1.25}
+.gr-acc-q{font-size:12px;color:var(--text-secondary);font-style:italic;line-height:1.4}
+.gr-acc-help{font-size:11px;color:var(--text-muted);line-height:1.45}
+.gr-acc-chevron{font-size:10px;color:var(--text-muted);flex:none;margin-top:6px;transition:transform .15s}
+.gr-acc:not(.open) .gr-acc-chevron{transform:rotate(-90deg)}
+.gr-acc-body{padding:0 14px 14px;display:flex;flex-direction:column;gap:10px}
+.gr-acc-body[hidden]{display:none!important}
+.gr-status{font-size:10px;font-weight:600;padding:3px 8px;border-radius:999px;background:var(--bg-card-2);color:var(--text-muted);flex:none;margin-top:2px}
+.gr-status.complete,.gr-status.done{background:color-mix(in srgb,var(--green) 16%,var(--bg-card));color:var(--green)}
+.gr-status.progress{background:var(--gold-dim);color:var(--gold-text)}
+.gr-status.empty{color:var(--text-muted)}
+.gr-field{display:flex;flex-direction:column;gap:4px}
+.gr-field-label{font-size:11px;font-weight:600;color:var(--text-secondary)}
+.gr-ta,.gr-input{width:100%;box-sizing:border-box;border:1px solid transparent;border-radius:10px;background:var(--bg-card-2);padding:8px 10px;font:13px/1.5 inherit;color:var(--text-primary);resize:none;min-height:38px;max-height:180px;transition:border-color .15s,background .15s,min-height .15s}
+.gr-ta:focus,.gr-input:focus{outline:none;border-color:var(--gold-border-soft);background:var(--bg-card);min-height:72px}
+.gr-sum-sub{font-size:11px;color:var(--text-secondary);line-height:1.4}
+.review-layout{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:24px;align-items:start}
+@media(max-width:1100px){.review-layout{grid-template-columns:1fr}}
+.review-main{min-width:0}
+.review-rail{display:flex;flex-direction:column;gap:12px;position:sticky;top:12px}
+@media(max-width:1100px){.review-rail{position:static}}
+.gr-btn{border:1px solid var(--border);background:var(--bg-card);color:var(--text-primary);border-radius:8px;padding:8px 12px;font-size:12px;cursor:pointer;font-family:inherit}
+.gr-btn:hover{border-color:var(--gold-border-soft);color:var(--gold-text)}
+.gr-btn-primary.gr-btn,.gr-btn.gr-btn-primary{border:none;background:var(--green);color:var(--text-on-green);font-weight:600}
+.gr-btn-danger.gr-btn,.gr-btn.gr-btn-danger{border:1px solid var(--danger);background:transparent;color:var(--danger);margin-left:auto}
+.gr-fruit-note[hidden]{display:none!important}
+.gr-prompt-list{display:flex;flex-direction:column;gap:6px}
+.gr-prompt-item{border:1px solid var(--border-subtle);border-radius:10px;background:var(--bg-card-2);overflow:hidden}
+.gr-prompt-item.open{background:var(--bg-card);border-color:var(--gold-border-soft)}
+.gr-prompt-item > button{width:100%;border:none;background:transparent;padding:10px 12px;text-align:left;font:12.5px/1.4 inherit;font-weight:600;color:var(--text-primary);cursor:pointer}
+.gr-prompt-item .gr-field{padding:0 12px 12px}
+.weekly-board .gr-progress,.monthly-board .gr-progress{margin-top:4px}
+
+
+.gr-card-kicker{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-text);margin-bottom:2px}
+.gr-card-title{margin:0;font-size:18px;font-weight:600;color:var(--text-primary);line-height:1.25}
+.gr-card-help{margin:0 14px 10px;font-size:11.5px;color:var(--text-muted);line-height:1.5}
+.gr-status.partial,.gr-status.progress{background:var(--gold-dim);color:var(--gold-text)}
+.gr-status.empty{background:var(--bg-card-2);color:var(--text-muted)}
+.gr-action-bar{display:none} /* prefer HTML sticky bars */
+#dailyStickyBar:not([hidden]),#weeklyStickyBar:not([hidden]),#monthlyStickyBar:not([hidden]){display:flex}
+.review-layout{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:24px;align-items:start}
+@media(max-width:1100px){.review-layout{grid-template-columns:1fr}}
+.review-rail{display:flex;flex-direction:column;gap:12px}
+
 /* Thought journal — calm reflection card in the daily sidebar */
 .thought-journal{background:linear-gradient(180deg,var(--bg-card),color-mix(in srgb,var(--bg-card-2) 35%,var(--bg-card)));
   border:1px solid var(--gold-border-soft);border-radius:16px;
@@ -976,6 +1147,123 @@ body.view-ideas .daily-layout,body.view-ideas .weekly-board,body.view-ideas .mon
 #thoughtJournalText::placeholder{color:var(--text-muted);font-style:italic;opacity:.85}
 #thoughtJournalText:focus{outline:none;border-color:var(--gold-border-soft);background:var(--bg-card)}
 .thought-journal-meta{font-size:10px;color:var(--mist);text-align:right;min-height:12px;font-style:italic}
+
+/* ── Guided stewardship reviews (Daily / Weekly / Monthly) ── */
+.rv-progress{display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:2px 0 10px;margin:0 0 14px;scrollbar-width:thin}
+.rv-pill{flex:none;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);
+  border-radius:999px;padding:6px 12px;font-size:11px;font-weight:600;font-family:inherit;cursor:pointer;transition:border-color .15s,color .15s,background .15s}
+.rv-pill .rv-n{width:16px;height:16px;border-radius:50%;background:var(--gold-dim);color:var(--gold-text);display:grid;place-items:center;font-size:10px;font-weight:700}
+.rv-pill:hover{border-color:var(--gold-border-soft);color:var(--text-primary)}
+.rv-pill.on{border-color:var(--gold-border);background:var(--gold-dim);color:var(--text-primary)}
+.rv-pill.done{border-color:color-mix(in srgb,var(--green) 45%,var(--border));color:var(--text-primary)}
+.rv-pill.done .rv-n{background:var(--green);color:var(--text-on-green)}
+.rv-pill.done .rv-n::after{content:"✓";font-size:9px}
+.rv-pill.done .rv-n{font-size:0}
+.rv-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:18px}
+@media(max-width:1100px){.rv-summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.rv-summary{grid-template-columns:1fr}}
+.rv-sum-card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:14px;padding:12px 14px;box-shadow:0 1px 4px var(--shadow-elevated);min-height:72px}
+.rv-sum-card.accent{border-color:var(--gold-border-soft)}
+.rv-sum-kicker{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-text);margin:0 0 4px}
+.rv-sum-value{font-family:"Cormorant Garamond",serif;font-size:20px;font-weight:600;color:var(--text-primary);margin:0;line-height:1.2}
+.rv-sum-meta{font-size:11px;color:var(--text-secondary);margin:4px 0 0;line-height:1.4}
+.rv-status{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;letter-spacing:.02em;margin-top:6px}
+.rv-status.empty{color:var(--text-muted)}
+.rv-status.progress{color:var(--gold-text)}
+.rv-status.done{color:var(--green)}
+.rv-layout{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:24px;align-items:start}
+@media(max-width:1100px){.rv-layout{grid-template-columns:1fr}.rv-rail{display:grid;grid-template-columns:1fr 1fr;gap:12px}.rv-rail .rv-rail-card:last-child{grid-column:1/-1}}
+@media(max-width:720px){.rv-rail{grid-template-columns:1fr}}
+.rv-main{display:flex;flex-direction:column;gap:12px;min-width:0}
+.rv-rail{display:flex;flex-direction:column;gap:12px;position:sticky;top:72px}
+.rv-rail-card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:14px;padding:14px 16px;box-shadow:0 1px 4px var(--shadow-elevated)}
+.rv-rail-card h4{margin:0 0 8px;font-family:"Cormorant Garamond",serif;font-size:16px;font-weight:600;color:var(--text-primary)}
+.rv-rail-card p,.rv-how li{margin:0;font-size:12px;color:var(--text-secondary);line-height:1.5}
+.rv-how{margin:0;padding:0 0 0 18px}
+.rv-how li{margin-bottom:6px}
+.rv-how li::marker{color:var(--gold-text);font-weight:700}
+.rv-sec{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:16px;overflow:hidden;box-shadow:0 1px 5px var(--shadow-elevated);scroll-margin-top:100px}
+.rv-sec-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:14px 16px;cursor:pointer;list-style:none;user-select:none}
+.rv-sec-head::-webkit-details-marker{display:none}
+.rv-sec-head:hover{background:color-mix(in srgb,var(--bg-card-2) 55%,transparent)}
+.rv-sec-title{margin:0;font-family:"Cormorant Garamond",serif;font-size:18px;font-weight:600;color:var(--text-primary);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.rv-sec-q{margin:4px 0 0;font-size:12px;color:var(--text-secondary);font-style:italic;line-height:1.45}
+.rv-sec-help{margin:2px 0 0;font-size:11px;color:var(--text-muted);line-height:1.4}
+.rv-sec-body{padding:0 16px 16px;display:flex;flex-direction:column;gap:10px}
+.rv-sec:not([open]) .rv-sec-body{display:none}
+.rv-sec[open] .rv-chevron{transform:rotate(180deg)}
+.rv-chevron{font-size:10px;color:var(--text-muted);transition:transform .15s;flex:none;margin-top:4px}
+.rv-chip-row{display:flex;flex-wrap:wrap;gap:6px}
+.rv-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--bg-card-2);border-radius:999px;padding:5px 10px;font-size:12px;color:var(--text-primary)}
+.rv-chip.done{border-color:color-mix(in srgb,var(--green) 40%,var(--border));background:color-mix(in srgb,var(--green) 10%,var(--bg-card))}
+.rv-chip input{accent-color:var(--green);width:14px;height:14px;margin:0}
+.rv-chip button{border:none;background:none;color:var(--text-muted);cursor:pointer;font-size:14px;padding:0 0 0 2px;line-height:1}
+.rv-chip button:hover{color:var(--danger)}
+.rv-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rv-grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media(max-width:900px){.rv-grid-3{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.rv-grid-2,.rv-grid-3{grid-template-columns:1fr}}
+.rv-mini{background:var(--bg-card-2);border:1px solid transparent;border-radius:12px;padding:10px 12px;transition:border-color .15s,background .15s}
+.rv-mini:focus-within{border-color:var(--gold-border-soft);background:var(--bg-card)}
+.rv-mini label{display:block;font-size:11px;font-weight:600;color:var(--text-secondary);margin-bottom:4px}
+.rv-mini .rv-prompt{font-size:11px;color:var(--text-muted);font-style:italic;margin:0 0 6px;line-height:1.4}
+.rv-expand-ta{width:100%;border:none;background:transparent;resize:none;min-height:28px;max-height:160px;font:13px/1.5 inherit;color:var(--text-primary);padding:0;overflow:hidden}
+.rv-expand-ta:focus{outline:none;min-height:72px;overflow:auto}
+.rv-expand-ta.filled{min-height:44px}
+.rv-acc{border:1px solid var(--border-subtle);border-radius:12px;background:var(--bg-card-2);overflow:hidden}
+.rv-acc+.rv-acc{margin-top:6px}
+.rv-acc>summary{display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;list-style:none;font-size:13px;font-weight:600;color:var(--text-primary)}
+.rv-acc>summary::-webkit-details-marker{display:none}
+.rv-acc>summary .rv-acc-preview{margin-left:auto;font-size:11px;font-weight:400;color:var(--text-secondary);max-width:40%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rv-acc[open]>summary{border-bottom:1px solid var(--border-subtle);background:var(--bg-card)}
+.rv-acc-body{padding:10px 12px 12px}
+.rv-score-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+@media(max-width:720px){.rv-score-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.rv-score-grid{grid-template-columns:1fr}}
+.rv-score-card{background:var(--bg-card-2);border-radius:12px;padding:10px 12px;border:1px solid transparent}
+.rv-score-card .name{font-size:12px;font-weight:600;color:var(--text-primary);margin:0 0 6px}
+.rv-score-card .bar{height:5px;border-radius:99px;background:var(--bar-track,var(--border));overflow:hidden}
+.rv-score-card .bar>i{display:block;height:100%;border-radius:99px;background:var(--green);transition:width .3s ease}
+.rv-score-card .pct{font-size:11px;color:var(--text-secondary);margin-top:4px;font-variant-numeric:tabular-nums}
+.rv-fruit-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+@media(max-width:720px){.rv-fruit-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.rv-fruit-grid{grid-template-columns:1fr}}
+.rv-fruit{background:var(--bg-card-2);border-radius:12px;padding:10px 12px;border:1px solid transparent}
+.rv-fruit h3{margin:0 0 8px;font-family:"Cormorant Garamond",serif;font-size:15px;font-weight:600;color:var(--text-primary)}
+.rv-fruit .rating-pills{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:4px}
+.rv-fruit .rate-pill{width:26px;height:26px;padding:0;border-radius:8px;font-size:11px}
+.rv-fruit-note-toggle{border:none;background:none;color:var(--gold-text);font-size:11px;cursor:pointer;padding:4px 0;font-family:inherit;text-align:left}
+.rv-fruit-note-toggle:hover{text-decoration:underline}
+.rv-fruit-note[hidden]{display:none!important}
+.rv-fruit-note{margin-top:6px;width:100%;min-height:48px;border:1px solid var(--border-subtle);border-radius:8px;padding:8px;font:12px/1.45 inherit;background:var(--bg-card);color:var(--text-primary);resize:vertical}
+.rv-theme-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.rv-theme-chip{border:1px solid var(--border);background:var(--bg-card-2);border-radius:999px;padding:5px 11px;font-size:11px;cursor:pointer;font-family:inherit;color:var(--text-secondary)}
+.rv-theme-chip:hover,.rv-theme-chip.on{border-color:var(--gold-border-soft);color:var(--gold-text);background:var(--gold-dim)}
+.rv-sticky{position:sticky;bottom:0;z-index:40;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;
+  margin:20px -4px 0;padding:12px 14px;background:color-mix(in srgb,var(--bg-card) 92%,transparent);backdrop-filter:blur(8px);
+  border:1px solid var(--border-subtle);border-radius:14px 14px 0 0;box-shadow:0 -4px 20px var(--shadow-elevated)}
+.rv-sticky-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.rv-btn{border:1px solid var(--border);background:var(--bg-card);color:var(--text-primary);border-radius:9px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:filter .15s,border-color .15s}
+.rv-btn:hover{border-color:var(--gold-border-soft)}
+.rv-btn-primary{background:var(--green);border-color:var(--green);color:var(--text-on-green)}
+.rv-btn-primary:hover{filter:brightness(1.06);border-color:var(--green)}
+.rv-btn-ghost{background:transparent;border-color:transparent;color:var(--text-secondary)}
+.rv-btn-danger{background:transparent;border-color:var(--danger);color:var(--danger)}
+.rv-btn-danger:hover{background:color-mix(in srgb,var(--danger) 8%,transparent)}
+body.view-daily .site-foot,body.view-weekly .site-foot,body.view-monthly .site-foot{display:none!important}
+#dailyBoard.guided-daily .daily-layout{grid-template-columns:minmax(0,1fr) 280px;gap:24px;padding-bottom:88px}
+@media(max-width:1100px){#dailyBoard.guided-daily .daily-layout{grid-template-columns:1fr}.dl-rail-col{display:flex!important;flex-direction:column;gap:12px;margin-top:8px}}
+#dailyBoard.guided-daily .dl-section{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:16px;padding:14px 16px;margin-bottom:12px;box-shadow:0 1px 5px var(--shadow-elevated)}
+#dailyBoard.guided-daily .dl-section-head{font-size:18px;margin:0 0 4px}
+#dailyBoard.guided-daily .dl-section-sub{margin:0 0 10px}
+#dailyBoard.guided-daily .dl-q{margin:0 0 8px;font-size:12px;font-style:italic;color:var(--text-secondary)}
+#dailyBoard.guided-daily #dailyTopSummary{display:block;margin-bottom:4px}
+.dl-nn-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.dl-how-card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:14px;padding:14px 16px;box-shadow:0 1px 4px var(--shadow-elevated)}
+.dl-how-card h4{margin:0 0 8px;font-family:"Cormorant Garamond",serif;font-size:16px;font-weight:600}
+.weekly-board,.monthly-board{padding-bottom:96px}
+.weekly-board .page-head,.monthly-board .page-head{margin-bottom:8px}
+.weekly-board .page-head p,.monthly-board .page-head p{font-size:13px;color:var(--text-secondary)}
 
 /* ── Phase 2: App shell + dashboard ── */
 body.faithfulness-app{background:var(--bg-page);color:var(--text-primary);min-height:100vh}
@@ -2123,23 +2411,50 @@ body.intake-open{overflow:hidden}
     <div class="main-col" id="dailyMain"></div>
     <aside class="sidebar dl-rail-col" id="dailySidebar"></aside>
   </div>
+  <div class="gr-sticky-bar" id="dailyStickyBar" hidden>
+    <button type="button" class="gr-btn-primary" data-gr-act="save-day">Save Day</button>
+    <button type="button" class="gr-btn-secondary" data-gr-act="mark-phase">Mark Morning Complete</button>
+    <button type="button" class="gr-btn-danger" data-gr-act="clear-day">Clear Day</button>
+  </div>
 </div>
 
 <div class="board weekly-board" id="weeklyBoard" hidden>
   <div class="page-head">
-    <h2>Weekly Stewardship Review</h2>
-    <p>Review. Adjust. Experiment.</p>
+    <div>
+      <h2>Weekly Stewardship Review</h2>
+      <p>Review. Adjust. Strengthen.</p>
+    </div>
   </div>
   <div id="ideaTriageZone"></div>
-  <div id="weeklyMain"></div>
+  <div class="review-layout">
+    <div class="review-main" id="weeklyMain"></div>
+    <aside class="review-rail" id="weeklySidebar"></aside>
+  </div>
+  <div class="gr-sticky-bar" id="weeklyStickyBar" hidden>
+    <button type="button" class="gr-btn-primary" data-gr-act="save-week">Save Weekly Review</button>
+    <button type="button" class="gr-btn-secondary" data-gr-act="mark-week">Mark Week Complete</button>
+    <button type="button" class="gr-btn-secondary" data-gr-act="carry-week">Carry Focus Into Next Week</button>
+    <button type="button" class="gr-btn-danger" data-gr-act="clear-week">Clear Review</button>
+  </div>
 </div>
 
 <div class="board monthly-board" id="monthlyBoard" hidden>
   <div class="page-head">
-    <h2>Monthly Fruit &amp; Multiplication Review</h2>
-    <p>Zoom out. Celebrate. Realign.</p>
+    <div>
+      <h2>Monthly Fruit &amp; Multiplication Review</h2>
+      <p>Zoom out. Celebrate. Realign.</p>
+    </div>
   </div>
-  <div id="monthlyMain"></div>
+  <div class="review-layout">
+    <div class="review-main" id="monthlyMain"></div>
+    <aside class="review-rail" id="monthlySidebar"></aside>
+  </div>
+  <div class="gr-sticky-bar" id="monthlyStickyBar" hidden>
+    <button type="button" class="gr-btn-primary" data-gr-act="save-month">Save Monthly Review</button>
+    <button type="button" class="gr-btn-secondary" data-gr-act="mark-month">Mark Month Complete</button>
+    <button type="button" class="gr-btn-secondary" data-gr-act="carry-month">Carry Theme Into Next Month</button>
+    <button type="button" class="gr-btn-danger" data-gr-act="clear-month">Clear Review</button>
+  </div>
 </div>
 
 <div class="board journal-panel" id="journalPanel" hidden>
@@ -2380,7 +2695,8 @@ body.intake-open{overflow:hidden}
 <script src="ideas-hub.js?v=6" onerror="(function(){var p=document.getElementById('ihPipeline');if(p)p.innerHTML='<p class=&quot;ih-load-error&quot;>Failed to load ideas-hub.js — hard-refresh the page.</p>';})()"></script>
 <script src="stewardship-store.js?v=1"></script>
 <script src="calendar-ui.js?v=3"></script>
-<script src="daily-ui.js?v=1"></script>
+<script src="daily-ui.js?v=2"></script>
+<script src="review-ui.js?v=1"></script>
 <script src="profile-ui.js?v=1"></script>
 <script src="guide-ui.js?v=1"></script>
 <script src="intake-ui.js?v=1"></script>
@@ -3462,7 +3778,10 @@ function blankDaily(){
     talent:{used:'',needsRep:'',served:''},
     commit:{improvement:'',whenWhere:'',obstacle:'',ifThen:'',because:''},
     growthTree:{root:'',why:'',requires:'',hinder:'',systems:'',nextAction:''},
-    satRecovery: blankSatRecovery()
+    satRecovery: blankSatRecovery(),
+    phaseComplete:{morning:false,day:false,evening:false},
+    morningComplete:false,
+    dayComplete:false
   };
 }
 function blankSatRecovery(){
@@ -3560,7 +3879,9 @@ function blankWeekly(){
     talentReview:{usedWell:'',discovered:'',buried:'',practiceNext:''},
     neighborLove:{whoInFront:'',howServed:'',followUp:''},
     experiment:{test:'',why:'',success:'',block:'',ifThen:''},
-    planWeek:{top3:'',deadlines:'',studyBlocks:'',workResp:'',bodyHealth:'',sabbath:''}
+    planWeek:{top3:'',deadlines:'',studyBlocks:'',workResp:'',bodyHealth:'',sabbath:''},
+    reviewComplete:false,
+    nextWeekFocus:''
   };
 }
 function blankMonth(){
@@ -3570,7 +3891,8 @@ function blankMonth(){
     buried:{avoided:'',whyAvoided:'',support:''},
     compounded:{smallAct:'',smallNeglect:''},
     fruitOfSpirit:FRUITS.map(n=>({name:n,rating:0,note:''})),
-    theme:'', keystone:''
+    theme:'', keystone:'',
+    reviewComplete:false
   };
 }
 function normalizeFFCategory(raw){
@@ -3628,6 +3950,12 @@ function normalizeDaily(s){
   d.satRecovery = normalizeSatRecovery(s.satRecovery);
   if(s.focus != null) d.focus = String(s.focus);
   if(s.soulCheck != null) d.soulCheck = s.soulCheck;
+  const pc = s.phaseComplete;
+  if(pc && typeof pc === 'object') d.phaseComplete = { morning:!!pc.morning, day:!!pc.day, evening:!!pc.evening };
+  else if(typeof pc === 'string' && pc) d.phaseComplete = { morning: pc==='morning'||pc==='day'||pc==='evening', day: pc==='day'||pc==='evening', evening: pc==='evening' };
+  else d.phaseComplete = { morning:!!d.morningComplete, day:!!d.dayComplete, evening:false };
+  d.morningComplete = !!(d.phaseComplete.morning || s.morningComplete);
+  d.dayComplete = !!(d.phaseComplete.day || s.dayComplete);
   return d;
 }
 window.normalizeDaily = normalizeDaily;
@@ -3638,6 +3966,8 @@ function normalizeWeekly(s){
   if(!s) return b;
   const w = {...b,...s};
   Object.keys(b).forEach(k=>{ if(typeof b[k]==='object' && !Array.isArray(b[k])) w[k]={...b[k],...(s[k]||{})}; });
+  w.reviewComplete = !!(s.reviewComplete ?? w.reviewComplete);
+  w.nextWeekFocus = String(s.nextWeekFocus ?? w.nextWeekFocus ?? '');
   return w;
 }
 function normalizeMonth(s){
@@ -3650,6 +3980,9 @@ function normalizeMonth(s){
   m.compounded = {...b.compounded,...(s.compounded||{})};
   if(!s.fruitOfSpirit?.length) m.fruitOfSpirit = b.fruitOfSpirit;
   else m.fruitOfSpirit = FRUITS.map((n,i)=>({name:n,rating:s.fruitOfSpirit[i]?.rating||0,note:s.fruitOfSpirit[i]?.note||''}));
+  m.reviewComplete = !!(s.reviewComplete ?? m.reviewComplete);
+  m.theme = String(s.theme ?? m.theme ?? '');
+  m.keystone = String(s.keystone ?? m.keystone ?? '');
   return m;
 }
 
@@ -3807,10 +4140,10 @@ function field(path, label, opts={}){
   const ph = opts.placeholder||'';
   let el;
   if(opts.input){
-    el = '<input type="text" class="inp-sm" data-field="'+path+'" placeholder="'+esc(ph)+'">';
+    el = '<input type="text" class="inp-sm'+(opts.expand?' gr-expand-input':'')+'" data-field="'+path+'" placeholder="'+esc(ph)+'">';
   } else {
     const rows = opts.rows||(opts.short?2:3);
-    const cls = opts.short?' ta-sm':' ta-md';
+    const cls = (opts.short?' ta-sm':' ta-md')+(opts.expand?' gr-expand-ta':'');
     el = '<textarea class="'+cls.trim()+'" rows="'+rows+'" data-field="'+path+'" placeholder="'+esc(ph)+'"></textarea>';
   }
   const lbl = label ? '<label class="q'+(opts.compact?' q-compact':'')+'">'+esc(label)+'</label>' : '';
@@ -4447,78 +4780,19 @@ function applyDailyPhase(){
 function setDailyPhase(phase){
   dailyPhase = phase;
   applyDailyPhase();
+  if(typeof refreshDailySummary === 'function') refreshDailySummary();
 }
 
 function renderWeekly(){
+  if(typeof renderGuidedWeekly === 'function'){ renderGuidedWeekly(); return; }
   const el = document.getElementById('weeklyMain');
-  let h = '';
-  h += '<section class="zone">'+sectionHead('1 · Scorecard','Faithfulness Scorecard','Completion across the week from daily ledgers.')+'<div class="zonebody">';
-  h += '<div class="progress-list" id="weekScorecard"></div><div style="margin-top:16px">';
-  ['mustDo','body','order','leadership','skill','journal','study','guardrail','overall'].forEach(k=>{
-    const labels = {mustDo:'Must-do notes',body:'Body notes',order:'Order notes',leadership:'Leadership notes',skill:'Skill notes',
-      journal:'Journal notes',study:'Study block notes',guardrail:'Guardrail notes',overall:'Overall reflection'};
-    h += field('scorecardNotes.'+k, labels[k]||k);
-  });
-  h += '</div></div></section>';
-
-  h += '<section class="zone">'+sectionHead('2 · Patterns','Pattern Recognition','What kept repeating this week?')+'<div class="zonebody">';
-  h += field('patternRecognition.repeating','What kept repeating?')+field('patternRecognition.momentum','What created momentum?');
-  h += field('patternRecognition.drained','What drained me?')+field('patternRecognition.neglected','What details did I keep neglecting?');
-  h += field('patternRecognition.positiveCompound','What small thing compounded positively?');
-  h += field('patternRecognition.negativeCompound','What small thing compounded negatively?')+'</div></section>';
-
-  h += '<section class="zone">'+sectionHead('3 · Talent','Talent Review','Steward the gifts entrusted to you.')+'<div class="zonebody">';
-  h += field('talentReview.usedWell','What did I use well this week?')+field('talentReview.discovered','What did I discover?');
-  h += field('talentReview.buried','What did I bury or neglect?')+field('talentReview.practiceNext','What needs deliberate practice next week?')+'</div></section>';
-
-  h += '<section class="zone">'+sectionHead('4 · Neighbor','Neighbor Love','Who was in front of you this week?')+'<div class="zonebody">';
-  h += field('neighborLove.whoInFront','Who was in front of me this week?')+field('neighborLove.howServed','How did I serve them practically?');
-  h += field('neighborLove.followUp','Who needs follow-up?')+'</div></section>';
-
-  h += '<section class="zone">'+sectionHead('5 · Experiment','One Weekly Experiment','Test one change with intention.')+'<div class="zonebody">';
-  h += field('experiment.test','This week I will test…')+field('experiment.why','Why this matters');
-  h += field('experiment.success','What would count as success?')+field('experiment.block','What could block it?');
-  h += field('experiment.ifThen','If-then plan')+'</div></section>';
-
-  h += '<section class="zone">'+sectionHead('6 · Plan','Plan the Week','Set priorities and protections.')+'<div class="zonebody">';
-  h += field('planWeek.top3','Top 3 priorities')+field('planWeek.deadlines','Important deadlines');
-  h += field('planWeek.studyBlocks','Study blocks')+field('planWeek.workResp','Work responsibilities');
-  h += field('planWeek.bodyHealth','Body/health commitments')+field('planWeek.sabbath','Sabbath/rest/protection')+'</div></section>';
-  el.innerHTML = h;
+  if(el) el.innerHTML = '<p class="hint">Weekly review unavailable.</p>';
 }
 
 function renderMonthly(){
+  if(typeof renderGuidedMonthly === 'function'){ renderGuidedMonthly(); return; }
   const el = document.getElementById('monthlyMain');
-  let h = '';
-  h += '<section class="zone">'+sectionHead('1 · Entrusted','What was entrusted to me this month?','Categories of stewardship.')+'<div class="zonebody entrusted-grid">';
-  ['work','school','body','money','relationships','faith','opportunities'].forEach(k=>{
-    h += '<div>'+field('entrusted.'+k, k.charAt(0).toUpperCase()+k.slice(1))+'</div>';
-  });
-  h += '</div></section>';
-
-  h += '<section class="zone">'+sectionHead('2 · Multiplied','What did I multiply?','Fruit from faithful stewardship.')+'<div class="zonebody entrusted-grid">';
-  ['skills','habits','relationships','knowledge','leadership','service'].forEach(k=>{
-    h += '<div>'+field('multiplied.'+k, k.charAt(0).toUpperCase()+k.slice(1))+'</div>';
-  });
-  h += '</div></section>';
-
-  h += '<section class="zone">'+sectionHead('3 · Buried','What did I bury or neglect?','Not shame — honest inventory.')+'<div class="zonebody">';
-  h += field('buried.avoided','What ability, responsibility, or opportunity did I avoid?');
-  h += field('buried.whyAvoided','Why did I avoid it?');
-  h += field('buried.support','What support or system would help next month?')+'</div></section>';
-
-  h += '<section class="zone">'+sectionHead('4 · Compounded','What small details compounded?','The power of small acts.')+'<div class="zonebody">';
-  h += field('compounded.smallAct','Small act that helped more than expected');
-  h += field('compounded.smallNeglect','Small neglect that cost more than expected')+'</div></section>';
-
-  h += '<section class="zone">'+sectionHead('5 · Fruit','Fruit of the Spirit Check','Galatians 5:22–23 — rate and note each.')+'<div class="zonebody fruit-grid" id="fruitGrid"></div></section>';
-
-  h += '<section class="zone">'+sectionHead('6 · Theme',"Next Month's Theme",'One word or phrase to orient the month.')+'<div class="zonebody">';
-  h += field('theme','Theme',{placeholder:'Order before overflow · Diligence in hidden places · Faithful with little…'})+'</div></section>';
-
-  h += '<section class="zone">'+sectionHead('7 · Keystone','Keystone System','What one system will make the biggest difference?')+'<div class="zonebody">';
-  h += field('keystone','Keystone system',{placeholder:'The one system that unlocks faithfulness…'})+'</div></section>';
-  el.innerHTML = h;
+  if(el) el.innerHTML = '<p class="hint">Monthly review unavailable.</p>';
 }
 
 function populateFields(root, data){
@@ -4893,7 +5167,9 @@ function bindEvents(){
     const fr = e.target.closest('[data-fruit]');
     if(fr && isMonthly()){
       monthData.fruitOfSpirit[+fr.dataset.fruit].rating = +fr.dataset.v;
-      renderFruitGrid(); markDirty(); return;
+      if(typeof refreshGuidedMonthly === 'function') refreshGuidedMonthly();
+      else renderFruitGrid();
+      markDirty(); return;
     }
     const ffAdd = e.target.closest('[data-ff-add-btn]');
     if(ffAdd && isDaily()){
@@ -5082,6 +5358,12 @@ function updateViewUI(){
   document.getElementById('dailyBoard').hidden = viewMode!=='daily';
   document.body.classList.toggle('view-dashboard', isDashboard());
   document.body.classList.toggle('view-daily', viewMode==='daily');
+  const dBar = document.getElementById('dailyStickyBar');
+  const wBar = document.getElementById('weeklyStickyBar');
+  const mBar = document.getElementById('monthlyStickyBar');
+  if(dBar && !isDaily()) dBar.hidden = true;
+  if(wBar && !isWeekly()) wBar.hidden = true;
+  if(mBar && !isMonthly()) mBar.hidden = true;
   document.getElementById('weeklyBoard').hidden = viewMode!=='weekly';
   document.getElementById('monthlyBoard').hidden = viewMode!=='monthly';
   document.getElementById('journalPanel').hidden = viewMode!=='journal';
@@ -5109,7 +5391,7 @@ function updateViewUI(){
   else if(isTag()) document.getElementById('periodLabel').textContent = 'Tags';
   else if(isMentorship()) document.getElementById('periodLabel').textContent = 'Mentorship';
   const foot = document.querySelector('.site-foot');
-  if(foot) foot.style.display = (isWeekly()||isMonthly()) ? '' : 'none';
+  if(foot) foot.style.display = 'none';
   if(isIdeas() && typeof loadIdeasHub === 'function'){
     requestAnimationFrame(function(){ loadIdeasHub(); });
   }
@@ -5177,12 +5459,20 @@ async function loadDaily(){
 }
 async function loadWeekly(){
   weekData = normalizeWeekly(await getJSON(weekKeyFor(weekOffset)));
+  if(typeof loadGuidedWeekly === 'function'){
+    await loadGuidedWeekly();
+    return;
+  }
   populateFields(document.getElementById('weeklyMain'), weekData);
   renderIdeaTriage();
   await computeWeekScorecard();
 }
 async function loadMonthly(){
   monthData = normalizeMonth(await getJSON(monthKeyFor(monthOffset)));
+  if(typeof loadGuidedMonthly === 'function'){
+    await loadGuidedMonthly();
+    return;
+  }
   renderFruitGrid();
   populateFields(document.getElementById('monthlyMain'), monthData);
 }
@@ -5246,7 +5536,7 @@ async function resetAll(){
 
 
 (async function init(){
-  renderDaily(); renderWeekly(); renderMonthly(); bindEvents(); bindFFAccordion(); bindDailyEvents?.();
+  renderDaily(); renderWeekly(); renderMonthly(); bindEvents(); bindFFAccordion(); bindDailyEvents?.(); bindReviewEvents?.();
   const vm = await window.storage.get('view-mode');
   if(vm?.value === 'calendar') viewMode = 'dashboard';
   else if(vm?.value && (['dashboard','daily','weekly','monthly','journal','ideas','prayer','projects','profile','privacy','guide','settings','tag'].includes(vm.value) || vm.value.startsWith('mentorship-'))) viewMode = vm.value;
