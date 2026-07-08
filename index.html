@@ -1258,6 +1258,45 @@ body.view-daily .site-foot,body.view-weekly .site-foot,body.view-monthly .site-f
 #dailyBoard.guided-daily .dl-section-sub{margin:0 0 10px}
 #dailyBoard.guided-daily .dl-q{margin:0 0 8px;font-size:12px;font-style:italic;color:var(--text-secondary)}
 #dailyBoard.guided-daily #dailyTopSummary{display:block;margin-bottom:4px}
+#dailyBoard.guided-daily .daily-tagline{font-size:13px;color:var(--text-secondary);max-width:36em;margin:4px 0 0}
+#dailyBoard.guided-daily #dailyGuideChrome{padding:0 24px;max-width:1400px;margin:0 auto 8px}
+#dailyBoard.guided-daily .gr-btn-danger{background:transparent;border:1px solid color-mix(in srgb,var(--danger) 50%,var(--border));color:var(--danger);font-weight:600}
+#dailyBoard.guided-daily .gr-btn-danger:hover{background:color-mix(in srgb,var(--danger) 8%,transparent)}
+.dl-intro{margin:0 0 12px;font-size:13px;color:var(--text-secondary);line-height:1.5;font-style:italic}
+.dl-habit-list{display:flex;flex-direction:column;gap:0;margin-bottom:8px}
+.dl-habit-card{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--border-subtle);border-radius:12px;background:var(--bg-card-2);margin-bottom:6px}
+.dl-habit-card.done{border-color:color-mix(in srgb,var(--green) 35%,var(--border-subtle));background:color-mix(in srgb,var(--green) 8%,var(--bg-card))}
+.dl-habit-card input[type=checkbox]{width:16px;height:16px;accent-color:var(--gold);flex:none}
+.dl-habit-main{flex:1;min-width:0}
+.dl-habit-name{font-size:13px;font-weight:600;color:var(--text-primary);display:block}
+.dl-habit-meta{font-size:10px;color:var(--text-muted);margin-top:2px}
+.dl-habit-status{font-size:10px;font-weight:600;color:var(--gold-text);flex:none}
+.dl-habit-card.done .dl-habit-status{color:var(--green)}
+.dl-priority{width:20px;height:20px;border-radius:50%;background:var(--gold-dim);color:var(--gold-text);font-size:10px;font-weight:700;display:grid;place-items:center;flex:none}
+.dl-must-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid color-mix(in srgb,var(--border) 55%,transparent)}
+.dl-must-row:last-child{border-bottom:none}
+.dl-must-row.done .dl-must-text{text-decoration:line-through;color:var(--text-muted)}
+.dl-grip{color:var(--text-muted);font-size:12px;cursor:grab;flex:none;user-select:none;opacity:.5}
+.dl-growth-cats{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.dl-growth-cat{border:1px solid var(--border);background:var(--bg-card-2);color:var(--text-secondary);font-size:11px;padding:6px 10px;border-radius:999px;cursor:pointer;font-family:inherit;transition:background .15s,border-color .15s,color .15s}
+.dl-growth-cat.on{background:var(--gold-dim);border-color:var(--gold-border-soft);color:var(--gold-text)}
+.dl-friction-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:640px){.dl-friction-grid{grid-template-columns:1fr}}
+.dl-window-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid color-mix(in srgb,var(--border) 45%,transparent)}
+.dl-window-row:last-child{border-bottom:none}
+.dl-window-label{font-size:11px;font-weight:600;color:var(--text-secondary);width:108px;flex:none}
+.dl-window-row input{flex:1}
+.dl-evening-prompt{margin-bottom:10px}
+.dl-evening-prompt label{display:block;font-size:11px;font-weight:600;color:var(--text-secondary);margin-bottom:4px}
+.dl-evening-prompt input{width:100%}
+.dl-more-tasks summary{font-size:12px;font-weight:600;color:var(--text-secondary);cursor:pointer;padding:8px 0;list-style:none}
+.dl-more-tasks summary::-webkit-details-marker{display:none}
+.dl-rail-journal{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:14px;padding:14px;box-shadow:0 1px 4px var(--shadow-elevated)}
+.dl-rail-journal h4{margin:0 0 4px;font-family:"Cormorant Garamond",serif;font-size:16px;font-weight:600}
+.dl-rail-journal .dl-rail-q{margin:0 0 8px;font-size:12px;font-style:italic;color:var(--text-secondary)}
+.dl-rail-journal textarea{width:100%;min-height:72px;border:1px solid transparent;border-radius:10px;background:var(--bg-card-2);padding:8px 10px;font:13px/1.5 inherit;color:var(--text-primary);resize:vertical}
+.dl-rail-journal textarea:focus{outline:none;border-color:var(--gold-border-soft);background:var(--bg-card);min-height:96px}
+.dl-note{font-size:11px;color:var(--text-muted);line-height:1.45;margin:8px 0 0}
 .dl-nn-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
 .dl-how-card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:14px;padding:14px 16px;box-shadow:0 1px 4px var(--shadow-elevated)}
 .dl-how-card h4{margin:0 0 8px;font-family:"Cormorant Garamond",serif;font-size:16px;font-weight:600}
@@ -2392,11 +2431,11 @@ body.intake-open{overflow:hidden}
   <div id="tagLensBody"></div>
 </section>
 
-<div class="board" id="dailyBoard" data-phase="morning" hidden>
+<div class="board guided-daily" id="dailyBoard" data-phase="morning" hidden>
   <div class="page-head daily-head">
     <div class="daily-head-title">
       <h2>Daily Ledger</h2>
-      <p>Start the day on purpose. End the day in peace.</p>
+      <p class="daily-tagline">Here is the faithful next version of today. Let’s build it quickly.</p>
     </div>
     <div class="phase-tabs weekday-phase-tabs" role="tablist" aria-label="Daily rhythm">
       <button type="button" class="phase-tab on" data-phase="morning" role="tab">Morning Setup</button>
@@ -2698,7 +2737,7 @@ body.intake-open{overflow:hidden}
 <script src="ideas-hub.js?v=6" onerror="(function(){var p=document.getElementById('ihPipeline');if(p)p.innerHTML='<p class=&quot;ih-load-error&quot;>Failed to load ideas-hub.js — hard-refresh the page.</p>';})()"></script>
 <script src="stewardship-store.js?v=1"></script>
 <script src="calendar-ui.js?v=4"></script>
-<script src="daily-ui.js?v=2"></script>
+<script src="daily-ui.js?v=3"></script>
 <script src="review-ui.js?v=2"></script>
 <script src="profile-ui.js?v=1"></script>
 <script src="guide-ui.js?v=2"></script>
@@ -3783,7 +3822,8 @@ function blankDaily(){
   const ff = {};
   FF_KEYS.forEach(f=>{ ff[f.key] = {items:[]}; });
   return {
-    posture:{virtues:[],motives:[],prayer:''},
+    posture:{virtues:[],motives:[],prayer:'',aim:''},
+    growthRep:{category:'',text:'',done:false},
     faithfulFew:ff,
     danger:{danger:'',ifHappens:'',thenWill:'',why:'',guardrailKept:false,borrowedPrincipleId:null},
     execute:{beforeWork:'',duringWork:'',afterWork:'',eveningShutdown:'',
@@ -3963,6 +4003,7 @@ function normalizeDaily(s){
   d.talent = {...b.talent,...(s.talent||{})};
   d.commit = {...b.commit,...(s.commit||{})};
   d.growthTree = {...b.growthTree,...(s.growthTree||{})};
+  d.growthRep = {...b.growthRep,...(s.growthRep||{})};
   d.satRecovery = normalizeSatRecovery(s.satRecovery);
   if(s.focus != null) d.focus = String(s.focus);
   if(s.soulCheck != null) d.soulCheck = s.soulCheck;
@@ -4617,9 +4658,9 @@ function loadThoughtJournal(){
 }
 function restoreWeekdayPageHead(){
   const h2 = document.querySelector('#dailyBoard .page-head h2');
-  const p = document.querySelector('#dailyBoard .page-head p');
+  const tag = document.querySelector('#dailyBoard .daily-tagline');
   if(h2) h2.textContent = 'Daily Ledger';
-  if(p) p.textContent = 'Start the day on purpose. End the day in peace.';
+  if(tag) tag.textContent = 'Here is the faithful next version of today. Let\u2019s build it quickly.';
 }
 function satGetCheck(path){
   return !!getNested(dayData, 'satRecovery.blocks.'+path);
@@ -5493,7 +5534,7 @@ async function loadDaily(){
     await faithStore.save();
   }
   if(!isSat && typeof loadDailyLedger === 'function'){
-    if(!document.getElementById('sec-first-fruits')) renderDailyLedger?.();
+    if(!document.getElementById('sec-daily-aim')) renderDailyLedger?.();
     await loadDailyLedger();
     applyDailyPhase();
     if(typeof updateDailyScore === 'function') updateDailyScore();
