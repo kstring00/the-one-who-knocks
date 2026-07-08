@@ -2694,9 +2694,9 @@ body.intake-open{overflow:hidden}
 <script src="journal-ui.js?v=2"></script>
 <script src="ideas-hub.js?v=6" onerror="(function(){var p=document.getElementById('ihPipeline');if(p)p.innerHTML='<p class=&quot;ih-load-error&quot;>Failed to load ideas-hub.js — hard-refresh the page.</p>';})()"></script>
 <script src="stewardship-store.js?v=1"></script>
-<script src="calendar-ui.js?v=3"></script>
+<script src="calendar-ui.js?v=4"></script>
 <script src="daily-ui.js?v=2"></script>
-<script src="review-ui.js?v=1"></script>
+<script src="review-ui.js?v=2"></script>
 <script src="profile-ui.js?v=1"></script>
 <script src="guide-ui.js?v=1"></script>
 <script src="intake-ui.js?v=1"></script>
@@ -3080,6 +3080,14 @@ async function migrateLocalToCloud(){
   }
   try{ localStorage.setItem(flag, authUser.id); }catch(e){}
 }
+async function withTimeout(promise, ms, label){
+  let timer;
+  const timeout = new Promise((_, reject)=>{
+    timer = setTimeout(()=> reject(new Error(label || 'Timed out')), ms);
+  });
+  try{ return await Promise.race([promise, timeout]); }
+  finally{ clearTimeout(timer); }
+}
 async function initAuth(){
   initSupabaseClient();
   if(!sb) return;
@@ -3107,12 +3115,17 @@ async function initAuth(){
       updateSaveState(dirty ? 'dirty' : 'saved');
     }
   });
-  const { data: { session } } = await sb.auth.getSession();
-  authUser = session?.user || null;
+  try{
+    const { data: { session } } = await withTimeout(sb.auth.getSession(), 8000, 'Auth session check');
+    authUser = session?.user || null;
+  }catch(e){
+    console.warn('[auth] session check failed — continuing offline', e);
+    authUser = null;
+  }
   updateAuthUI();
   if(authUser){
-    await migrateLocalToCloud();
-    await syncPullForView();
+    await withTimeout(migrateLocalToCloud(), 15000, 'Cloud migrate').catch(e=> console.warn('[auth] migrate failed', e));
+    await withTimeout(syncPullForView(), 12000, 'Cloud sync pull').catch(e=> console.warn('[auth] sync pull failed', e));
     loadPendingPush();
     if(cloudPushKeys.size) scheduleCloudPush([]);
     dailyCloudBackup();
@@ -4767,7 +4780,8 @@ function renderDaily(){
     CommitCard(false) +
     CommitCard(true);
   document.getElementById('dailySidebar').innerHTML = DailySidebar();
-  document.getElementById('drawerGrowthTree').innerHTML = GrowthTreeFields();
+  const dgt = document.getElementById('drawerGrowthTree');
+  if(dgt) dgt.innerHTML = GrowthTreeFields();
   restoreWeekdayPageHead();
   loadThoughtJournal();
   applyDailyPhase();
@@ -5398,8 +5412,8 @@ function updateViewUI(){
   if(isMentorship() && typeof loadMentorship === 'function'){
     requestAnimationFrame(function(){ loadMentorship(); });
   }
-  renderViewHint?.();
-  updateGuideHelpButton?.();
+  if(typeof renderViewHint === 'function') renderViewHint();
+  if(typeof updateGuideHelpButton === 'function') updateGuideHelpButton();
 }
 async function loadCurrent(){
   updateViewUI();
@@ -5536,45 +5550,50 @@ async function resetAll(){
 
 
 (async function init(){
-  renderDaily(); renderWeekly(); renderMonthly(); bindEvents(); bindFFAccordion(); bindDailyEvents?.(); bindReviewEvents?.();
-  const vm = await window.storage.get('view-mode');
-  if(vm?.value === 'calendar') viewMode = 'dashboard';
-  else if(vm?.value && (['dashboard','daily','weekly','monthly','journal','ideas','prayer','projects','profile','privacy','guide','settings','tag'].includes(vm.value) || vm.value.startsWith('mentorship-'))) viewMode = vm.value;
-  syncViewModeBridge();
-  const g = await getJSON('fs-globals');
-  if(g){ globals = {...globals,...g}; window.globals = globals; }
-  ensureMotives();
-  ensurePrayers();
-  ensureIdeas();
-  ensureMyWeek();
-  if(typeof IdeasStore !== 'undefined') IdeasStore.init(globals.ideasHub || globals.ideas);
-  faithStoreInitPromise = initFaithStore();
-  await faithStoreInitPromise;
-  await window.StewStore?.init().catch(e=>console.warn('[StewStore] init failed', e));
-  await initAuth();
-  if(new URLSearchParams(location.search).get('test')==='store' && typeof runFaithfulnessStoreTests === 'function'){
-    const out = await runFaithfulnessStoreTests(()=> new FaithfulnessStore(createMemoryStorage()));
-    console.log('[FaithfulnessStore tests]', out);
-    alert(out.pass ? 'FaithfulnessStore tests passed ('+out.results.length+' checks)' : 'Store tests FAILED: '+out.error);
+  try{
+    renderDaily(); renderWeekly(); renderMonthly(); bindEvents(); bindFFAccordion(); bindDailyEvents?.(); bindReviewEvents?.();
+    const vm = await window.storage.get('view-mode');
+    if(vm?.value === 'calendar') viewMode = 'dashboard';
+    else if(vm?.value && (['dashboard','daily','weekly','monthly','journal','ideas','prayer','projects','profile','privacy','guide','settings','tag'].includes(vm.value) || vm.value.startsWith('mentorship-'))) viewMode = vm.value;
+    syncViewModeBridge();
+    const g = await getJSON('fs-globals');
+    if(g){ globals = {...globals,...g}; window.globals = globals; }
+    ensureMotives();
+    ensurePrayers();
+    ensureIdeas();
+    ensureMyWeek();
+    if(typeof IdeasStore !== 'undefined') IdeasStore.init(globals.ideasHub || globals.ideas);
+    faithStoreInitPromise = initFaithStore();
+    await faithStoreInitPromise;
+    await window.StewStore?.init().catch(e=>console.warn('[StewStore] init failed', e));
+    await initAuth();
+    if(new URLSearchParams(location.search).get('test')==='store' && typeof runFaithfulnessStoreTests === 'function'){
+      const out = await runFaithfulnessStoreTests(()=> new FaithfulnessStore(createMemoryStorage()));
+      console.log('[FaithfulnessStore tests]', out);
+      alert(out.pass ? 'FaithfulnessStore tests passed ('+out.results.length+' checks)' : 'Store tests FAILED: '+out.error);
+    }
+    document.getElementById('researchNotes').value = globals.researchNotes||'';
+    bindProfileEvents?.();
+    bindGuideEvents?.();
+    bindTagEvents?.();
+    bindMentorshipEvents?.();
+    renderMentorshipNav?.();
+    if(isMentorship()) loadMentorship?.();
+    document.querySelectorAll('[data-nav]').forEach(btn=>{
+      if(btn.closest('.sidebar-nav')) return;
+      btn.addEventListener('click', ()=> setMode(btn.dataset.nav));
+    });
+    await loadGuide?.();
+    await loadProfile?.();
+    if(authUser) maybeGuideOnboarding?.();
+  }catch(e){
+    console.error('[init] startup error — loading local view anyway', e);
+  }finally{
+    await loadCurrent().catch(e=> console.warn('[init] loadCurrent failed', e));
+    loadThoughtJournal();
+    if(authUser && !dirty) updateSaveState('synced');
+    window.maybeLaunchIntake?.();
   }
-  document.getElementById('researchNotes').value = globals.researchNotes||'';
-  bindProfileEvents?.();
-  bindGuideEvents?.();
-  bindTagEvents?.();
-  bindMentorshipEvents?.();
-  renderMentorshipNav?.();
-  if(isMentorship()) loadMentorship?.();
-  document.querySelectorAll('[data-nav]').forEach(btn=>{
-    if(btn.closest('.sidebar-nav')) return;
-    btn.addEventListener('click', ()=> setMode(btn.dataset.nav));
-  });
-  await loadGuide?.();
-  await loadProfile?.();
-  if(authUser) maybeGuideOnboarding?.();
-  await loadCurrent();
-  loadThoughtJournal();
-  if(authUser && !dirty) updateSaveState('synced');
-  window.maybeLaunchIntake?.();
 })();
 </script>
 </body>

@@ -5,6 +5,11 @@
 (function(root){
   'use strict';
 
+  function esc(s){
+    if(typeof root.esc === 'function') return root.esc(s);
+    return String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  }
+
   let weekOpen = 'scorecard';
   let monthOpen = 'entrusted';
   let weekScoreStats = null;

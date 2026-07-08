@@ -1257,16 +1257,25 @@
   }
 
   async function loadCalendar(){
-    if(!S()) return;
-    await S().init();
-    if(!anchor) anchor = iso(dayOf(0));
+    const body = document.getElementById('stewBody');
+    if(!S()){
+      if(body) body.innerHTML = '<p class="stew-boot">Dashboard could not load — stewardship-store.js may be missing. Hard-refresh the page.</p>';
+      return;
+    }
     try{
-      const saved = localStorage.getItem('stew:view');
-      if(saved && HOME_VIEWS.includes(saved)) view = saved;
-      else view = 'day';
-    }catch(x){ view = 'day'; }
-    bindCalendarEvents();
-    await renderCalendar();
+      await S().init();
+      if(!anchor) anchor = iso(dayOf(0));
+      try{
+        const saved = localStorage.getItem('stew:view');
+        if(saved && HOME_VIEWS.includes(saved)) view = saved;
+        else view = 'day';
+      }catch(x){ view = 'day'; }
+      bindCalendarEvents();
+      await renderCalendar();
+    }catch(e){
+      console.error('[calendar] load failed', e);
+      if(body) body.innerHTML = '<p class="stew-boot">Could not load the dashboard. Try a hard refresh — your saved data is still on this device.</p>';
+    }
   }
 
   root.renderCalendar = renderCalendar;
