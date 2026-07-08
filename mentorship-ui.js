@@ -47,7 +47,6 @@
   function renderMentorshipNav(){
     const sub = document.getElementById('navMentorshipSub');
     if(!sub || !window.faithStore) return;
-    window.faithStore.ensureDefaultMentors();
     const mentors = window.faithStore.getMentors();
     let html = '<button type="button" data-nav="mentorship-threads"><span class="nav-icon" aria-hidden="true">◎</span><span>Threads</span></button>';
     mentors.forEach(m=>{
@@ -60,7 +59,6 @@
   function renderMentorSettings(){
     const el = document.getElementById('mentorSettings');
     if(!el || !window.faithStore) return;
-    window.faithStore.ensureDefaultMentors();
     el.innerHTML = window.faithStore.getMentors().map((m,i)=>
       '<div class="mentor-row" data-mentor-row data-mentor-idx="'+i+'">'+
       '<input type="text" data-mentor-label value="'+esc(m.label)+'" placeholder="Label" aria-label="Label">'+
@@ -299,8 +297,11 @@
       return;
     }
     try {
-      MentorshipSeed?.ensureMentorshipReady(window.faithStore);
       renderMentorshipNav();
+      if(!window.faithStore.getMentors().length){
+        panel.innerHTML = renderMentorshipEmptyState();
+        return;
+      }
       const view = parseMentorshipView(getViewMode());
       if(!view){
         panel.innerHTML = '<p class="dash-empty">Select a mentor.</p>';
@@ -325,6 +326,35 @@
   function todayIso(){
     const d = new Date();
     return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  }
+
+  /* ── first-run setup: no mentors yet ─────────────────────────── */
+  function renderMentorshipEmptyState(){
+    return '<div class="page-head"><div><h2 class="serif">Mentorship</h2>'+
+      '<p>Wisdom from the people who speak into your life.</p></div></div>'+
+      '<div class="settings-card ms-empty-setup">'+
+      '<h3 class="serif">Who speaks life into you?</h3>'+
+      '<p class="ms-muted" style="margin:6px 0 14px">A mentor, a pastor, a wise friend, a boss worth learning from. '+
+      'Name them here — then capture their principles as they come, queue questions for your next conversation, '+
+      'and borrow their wisdom on hard days.</p>'+
+      '<div class="proj-new-row">'+
+      '<input type="text" id="msFirstMentorName" placeholder="Their name or role — e.g. Pastor Mike" aria-label="Mentor name">'+
+      '<button type="button" class="btn-gold" id="msFirstMentorAdd">Add mentor</button>'+
+      '</div>'+
+      '<p class="ms-muted" style="margin:12px 0 0;font-size:12px">Still searching for one? That’s a faithful step too — '+
+      'add them whenever they arrive. You can manage mentors anytime in Settings.</p>'+
+      '</div>';
+  }
+  async function addFirstMentor(){
+    const inp = document.getElementById('msFirstMentorName');
+    const name = inp?.value.trim();
+    if(!name || !window.faithStore) return;
+    const label = name.split(/\s+/).map(w=>w[0]).join('').toUpperCase().slice(0,3) || 'M1';
+    window.faithStore.createMentor({ label, role:'', name });
+    await window.faithStore.save();
+    renderMentorshipNav();
+    renderMentorship();
+    markDirty?.();
   }
 
   function showPrincipleHarvestPrompt(taskId){
@@ -415,6 +445,13 @@
     if(document.body.dataset.msBound) return;
     document.body.dataset.msBound = '1';
     wrapCompleteTask();
+
+    document.getElementById('mentorshipPanel')?.addEventListener('click', e=>{
+      if(e.target.closest('#msFirstMentorAdd')) addFirstMentor();
+    });
+    document.getElementById('mentorshipPanel')?.addEventListener('keydown', e=>{
+      if(e.key==='Enter' && e.target.id==='msFirstMentorName'){ e.preventDefault(); addFirstMentor(); }
+    });
 
     document.getElementById('mentorAddBtn')?.addEventListener('click', async ()=>{
       if(!window.faithStore) return;

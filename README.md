@@ -1,4 +1,6 @@
-# The Faithfulness System
+# With Little
+
+*faithful with very little — Luke 16:10*
 
 A local-first personal stewardship app built around one question: **"How do I faithfully steward today?"**
 
@@ -35,7 +37,7 @@ Data is stored in `localStorage`. Signing in (Settings → Cloud sync) backs dat
 | `daily-ui.js` | Daily Ledger view |
 | `ideas-hub.js` | Ideas Hub (embedded `IdeasStore` + UI) |
 | `journal-ui.js`, `projects-ui.js`, `tags-ui.js` | Journal, Projects, and tag-lens views |
-| `mentorship-seed.js`, `mentorship-ui.js` | Mentorship principles seed data + view |
+| `mentorship-ui.js` | Mentorship principles view |
 
 ## Design tokens
 

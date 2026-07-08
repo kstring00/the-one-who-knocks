@@ -1,5 +1,5 @@
 /**
- * Stewardship Calendar — the signature surface of The Faithfulness System.
+ * Stewardship Calendar — the signature surface of With Little.
  *
  * Five views (Day · Week · Month · Agenda · Planning) built on StewStore,
  * with the existing data sources (Daily Ledger must-dos, Dashboard tasks,

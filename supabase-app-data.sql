@@ -1,5 +1,5 @@
 -- ============================================================
--- The Faithfulness System — app_data sync upgrade
+-- With Little — app_data sync upgrade
 -- Run in the Supabase SQL editor. Both scripts are idempotent.
 -- The old `entries` table is NOT touched — it remains as a backup.
 -- ============================================================

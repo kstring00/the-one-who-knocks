@@ -126,7 +126,9 @@
       console.warn('[StewStore] load failed, starting fresh', e);
       data = blankData();
     }
-    if(!data.meta.seeded){ seedSampleData(); data.meta.seeded = true; persistNow(); }
+    // New accounts start empty — no sample data. meta.seeded is kept so
+    // existing stores keep their flag, but nothing is planted anymore.
+    if(!data.meta.seeded) data.meta.seeded = true;
     return data;
   }
   function init(){
@@ -403,90 +405,6 @@
       habitPct: habits.length ? habitsDone/habits.length : 0,
       bigPct: bigTotal ? bigDone/bigTotal : 0
     };
-  }
-
-  /* ── sample data (first run only) ──────────────────────────── */
-  function seedSampleData(){
-    const t0 = todayStr(), t1 = todayStr(1);
-    const gBody = createGoal({ title:'Build a healthy body', lifeArea:'Health',
-      why:'My body is entrusted to me — strength for family, work, and service.',
-      milestones:[{title:'Train 3× per week for a month'},{title:'Sleep by 10:30 for two weeks'}] });
-    const gLead = createGoal({ title:'Become a stronger leader', lifeArea:'Leadership',
-      why:'Lead people the way the Lord leads me — with clarity and care.',
-      milestones:[{title:'Complete one mentorship cycle'},{title:'Apply one lesson each week'}] });
-    const gWalk = createGoal({ title:'Walk closely with God', lifeArea:'Faith',
-      why:'Everything else flows from this.', milestones:[{title:'Psalms in July'}] });
-
-    const pStrength = createProject({ goalId:gBody.id, title:'July strength cycle' });
-    const pED  = createProject({ goalId:gLead.id, title:'Executive Director mentorship' });
-    createProject({ goalId:gLead.id, title:'Clinical Director mentorship' });
-    createProject({ goalId:gLead.id, title:'Director of Operations mentorship' });
-    const pPsalms = createProject({ goalId:gWalk.id, title:'Psalms in July' });
-
-    const tTrain = createTask({ title:'Train chest and biceps', goalId:gBody.id, projectId:pStrength.id,
-      priority:'high', urgency:'today', energy:'high', durationMin:60, dueDate:t0,
-      subtasks:[{text:'Warm up cardio'},{text:'Chest press'},{text:'Incline press'},{text:'Biceps curls'},{text:'Cooldown cardio'}] });
-    const tQuestions = createTask({ title:'Write questions for ED session', goalId:gLead.id, projectId:pED.id,
-      priority:'high', urgency:'today', energy:'medium', durationMin:30, dueDate:t0 });
-    const tPsalm = createTask({ title:'Read Psalm 119 slowly', goalId:gWalk.id, projectId:pPsalms.id,
-      priority:'medium', urgency:'today', energy:'low', durationMin:20 });
-    createTask({ title:'Apply one leadership lesson at work', goalId:gLead.id, projectId:pED.id,
-      priority:'medium', urgency:'week', energy:'medium', durationMin:15 });
-    createTask({ title:'Meal prep for the week', goalId:gBody.id, projectId:pStrength.id,
-      priority:'medium', urgency:'week', energy:'medium', durationMin:90 });
-    createTask({ title:'Review monthly budget', priority:'low', urgency:'later', energy:'low', durationMin:30 });
-    createTask({ title:'Memorize Colossians 3:23', goalId:gWalk.id, priority:'low', urgency:'someday', energy:'low' });
-
-    const hPray = createHabit({ title:'Morning prayer', icon:'🙏', frequency:'daily', targetTime:'morning', goalId:gWalk.id });
-    const hBible = createHabit({ title:'Bible reading', icon:'📖', frequency:'daily', targetTime:'morning', goalId:gWalk.id });
-    const hGym = createHabit({ title:'Gym', icon:'💪', frequency:'weekdays', targetTime:'evening', goalId:gBody.id });
-    createHabit({ title:'Journaling', icon:'✒', frequency:'daily', targetTime:'evening' });
-    const hReflect = createHabit({ title:'Evening reflection', icon:'🌙', frequency:'daily', targetTime:'evening' });
-    createHabit({ title:'Clean room', icon:'🧺', frequency:'weekly', days:[6], targetTime:'any' });
-    createHabit({ title:'Budget check', icon:'📊', frequency:'weekly', days:[5], targetTime:'any' });
-    createHabit({ title:'Leadership reading', icon:'📚', frequency:'weekdays', targetTime:'midday', goalId:gLead.id });
-    // a little history so streaks feel alive
-    [hPray,hBible,hReflect].forEach(h=>{ for(let off=-1; off>=-4; off--) h.log[todayStr(off)] = true; });
-    hGym.log[todayStr(-1)] = true; hGym.log[todayStr(-2)] = true;
-
-    const evPrayer = createEvent({ title:'Morning prayer & Scripture', date:t0, startMin:6*60, endMin:6*60+30,
-      category:'spiritual', energy:'low', goalId:gWalk.id, projectId:pPsalms.id,
-      habitIds:[hPray.id,hBible.id], taskIds:[tPsalm.id],
-      notes:'Begin before the noise begins.' });
-    createEvent({ title:'Deep work — priority project', date:t0, startMin:9*60, endMin:11*60,
-      category:'deepwork', priority:'high', energy:'high', goalId:gLead.id,
-      notes:'Phone in the other room.' });
-    createEvent({ title:'Lunch + reset', date:t0, startMin:12*60, endMin:13*60, category:'rest', energy:'low',
-      notes:'Rest. Recharge. Reflect.' });
-    createEvent({ title:'Admin + email sweep', date:t0, startMin:15*60+30, endMin:16*60+30, category:'admin', energy:'low' });
-    createEvent({ title:'Workout — chest & biceps', date:t0, startMin:17*60, endMin:18*60,
-      category:'health', priority:'high', energy:'high', goalId:gBody.id, projectId:pStrength.id,
-      taskIds:[tTrain.id], habitIds:[hGym.id],
-      notes:'Discipline in the body. Freedom in the mind.' });
-    createEvent({ title:'Evening reflection + journal', date:t0, startMin:21*60, endMin:21*60+20,
-      category:'spiritual', energy:'low', habitIds:[hReflect.id],
-      notes:'What did I steward well today?' });
-    createEvent({ title:'Mentorship session — Executive Director', date:t1, startMin:13*60, endMin:14*60,
-      category:'leadership', priority:'high', energy:'medium', goalId:gLead.id, projectId:pED.id,
-      taskIds:[tQuestions.id], notes:'Bring prepared questions. Listen first.' });
-
-    // completing the first block makes the ring meaningful on first open
-    completeEvent(evPrayer.id, { checkHabits:true });
-    updateTask(tPsalm.id, { status:'done' });
-
-    const dm = getDayMeta(t0);
-    dm.bigThree = [tTrain.id, tQuestions.id, tPsalm.id];
-    dm.theme = 'Faithful in the small things';
-    dm.prayer = 'Lord, help me steward the time, talents, and relationships You entrusted to me today.';
-
-    data.templates.push(
-      Object.assign(normEvent({ title:'Workout — strength', category:'health', startMin:17*60, endMin:18*60,
-        energy:'high', goalId:gBody.id, projectId:pStrength.id, notes:'Warm up · main lifts · cooldown' }), { date:'' }),
-      Object.assign(normEvent({ title:'Deep work block', category:'deepwork', startMin:9*60, endMin:10*60+30,
-        energy:'high', notes:'One task. No inputs.' }), { date:'' }),
-      Object.assign(normEvent({ title:'Mentorship session', category:'leadership', startMin:13*60, endMin:14*60,
-        energy:'medium', goalId:gLead.id, notes:'Prepared questions · notes · one application' }), { date:'' })
-    );
   }
 
   root.StewStore = {

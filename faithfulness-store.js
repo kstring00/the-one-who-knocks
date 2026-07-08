@@ -1,5 +1,5 @@
 /**
- * Faithfulness System — unified data layer (Phase 1)
+ * With Little — unified data layer (Phase 1)
  * Single source of truth for Tasks, Seeds, Schedule, Projects, Journal, QuickNotes.
  */
 (function(root){
@@ -288,14 +288,10 @@
     };
   }
 
-  const DEFAULT_MENTORS = [
-    { id: 'mentor-ed', label: 'ED', role: 'Executive Director', name: '', sortOrder: 0 },
-    { id: 'mentor-cd', label: 'CD', role: 'Clinical Director', name: '', sortOrder: 1 },
-    { id: 'mentor-doo', label: 'DOO', role: 'Director of Operations', name: '', sortOrder: 2 }
-  ];
-
+  // New accounts start with zero mentors — the Mentorship view shows a
+  // "Who speaks life into you?" setup until the user names their own.
   function getDefaultMentors(){
-    return DEFAULT_MENTORS.map(m=> normalizeMentor({ ...m }));
+    return [];
   }
 
   function normalizeCore(raw){
@@ -811,17 +807,13 @@
     }
 
     // ——— Mentorship ———
+    // Kept for API compatibility; new accounts intentionally start with no mentors.
     ensureDefaultMentors(){
-      if(!this.data.mentors?.length){
-        this.data.mentors = getDefaultMentors();
-        return true;
-      }
       return false;
     }
 
     getMentors(){
-      this.ensureDefaultMentors();
-      return this.data.mentors.slice().sort((a,b)=> (a.sortOrder||0) - (b.sortOrder||0));
+      return (this.data.mentors || []).slice().sort((a,b)=> (a.sortOrder||0) - (b.sortOrder||0));
     }
 
     getMentor(id){

@@ -3,7 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The Faithfulness System</title>
+<title>With Little</title>
+<meta name="application-name" content="With Little">
+<meta name="apple-mobile-web-app-title" content="With Little">
+<meta name="description" content="With Little — a quiet place to be faithful with very little (Luke 16:10). Days, goals, prayer, and mentorship, local-first and synced.">
+<meta property="og:title" content="With Little">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23f6f1e9'/><text x='16' y='23' font-size='19' text-anchor='middle' fill='%23b8892a'>✦</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -889,6 +893,7 @@ body.faithfulness-app{background:var(--bg-page);color:var(--text-primary);min-he
 .brand-icon{width:36px;height:36px;border-radius:10px;background:var(--gold-dim);border:1px solid var(--gold-border);
   display:grid;place-items:center;color:var(--gold-text);font-size:16px}
 .brand-text{font-size:17px;font-weight:600;color:var(--text-primary);line-height:1.2}
+.brand-tagline{display:block;font-family:'Inter',sans-serif;font-size:10px;font-weight:400;color:var(--text-muted);letter-spacing:.02em;margin-top:2px}
 .sidebar-nav{flex:1;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
 .nav-item{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;border:none;background:transparent;
   color:var(--text-secondary);padding:10px 12px 10px 14px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;
@@ -1735,7 +1740,7 @@ body.intake-open{overflow:hidden}
 <aside class="app-sidebar" aria-label="Main navigation">
   <div class="sidebar-brand">
     <div class="brand-icon" aria-hidden="true">✦</div>
-    <div class="brand-text serif">The Faithfulness System</div>
+    <div class="brand-text serif">With Little<span class="brand-tagline">faithful with very little · Luke 16:10</span></div>
   </div>
   <nav class="sidebar-nav">
     <button type="button" class="nav-item on" data-nav="dashboard">
@@ -1876,7 +1881,7 @@ body.intake-open{overflow:hidden}
     </div>
   </div>
   <article class="privacy-doc">
-    <p class="privacy-lead">The Faithfulness System is built local-first: your journal, calendar, prayers, profile, and daily notes live on your device first. Signing in is optional — it backs everything up and syncs across your phone, tablet, and computer. We do not sell your data, run ads, or track you across the web.</p>
+    <p class="privacy-lead">With Little is built local-first: your journal, calendar, prayers, profile, and daily notes live on your device first. Signing in is optional — it backs everything up and syncs across your phone, tablet, and computer. We do not sell your data, run ads, or track you across the web.</p>
 
     <section>
       <h3 class="serif">The short version</h3>
@@ -1921,7 +1926,7 @@ body.intake-open{overflow:hidden}
 
     <section>
       <h3 class="serif">How the app is made</h3>
-      <p>The Faithfulness System is a single-page web app: HTML, CSS, and JavaScript files you can open in any modern browser. There is no npm install, no framework bundle, and no native app wrapper. Modules (<code>faithfulness-store.js</code>, <code>calendar-ui.js</code>, <code>profile-ui.js</code>, and others) each own a slice of the UI and talk to one shared storage layer.</p>
+      <p>With Little is a single-page web app: HTML, CSS, and JavaScript files you can open in any modern browser. There is no npm install, no framework bundle, and no native app wrapper. Modules (<code>faithfulness-store.js</code>, <code>calendar-ui.js</code>, <code>profile-ui.js</code>, and others) each own a slice of the UI and talk to one shared storage layer.</p>
       <p>That storage layer writes to <code>localStorage</code> on your machine. The optional sync layer watches the same keys and mirrors them to Supabase when you’re signed in. Fonts load from Google Fonts; Supabase’s client library loads from their CDN when you open the page. We do not embed analytics, ad pixels, or third-party tracking scripts.</p>
     </section>
 
@@ -1942,7 +1947,7 @@ body.intake-open{overflow:hidden}
 <section id="settingsPanel" hidden aria-label="Settings">
   <div class="page-head"><div><h2 class="serif">Settings</h2><p>Cloud sync, daily anchors, categories, and mentors.</p></div></div>
   <div id="authCard" class="auth-card settings-card">
-    <h3 class="serif">Cloud sync</h3>
+    <h3 class="serif">Sign in to With Little</h3>
     <p>Optional — sign in to back up and sync across devices. Everything works offline without an account.</p>
     <div class="auth-row">
       <input type="email" id="authEmail" placeholder="you@email.com" autocomplete="email" aria-label="Email for sign-in link">
@@ -2188,7 +2193,6 @@ body.intake-open{overflow:hidden}
 </div><!-- /.app-shell -->
 
 <script src="faithfulness-store.js"></script>
-<script src="mentorship-seed.js?v=7"></script>
 <script src="mentorship-ui.js?v=7"></script>
 <script src="tags-ui.js"></script>
 <script src="projects-ui.js"></script>
@@ -2241,6 +2245,33 @@ let authUser = null;
 let cloudPushTimer = null;
 let cloudPushKeys = new Set();
 let cloudPushDeadline = 0;
+/* Cloud-safety: no pushes leave this device until we've successfully pulled
+   from the cloud at least once this session. Prevents a fresh/empty browser
+   from ever overwriting real cloud data with blanks. */
+let cloudHydrated = false;
+const PENDING_PUSH_LS = 'wsr:pending-push';
+function persistPendingPush(){
+  try{ localStorage.setItem(PENDING_PUSH_LS, JSON.stringify([...cloudPushKeys])); }catch(e){}
+}
+function loadPendingPush(){
+  try{
+    (JSON.parse(localStorage.getItem(PENDING_PUSH_LS) || '[]') || [])
+      .forEach(k=>{ if(isSyncableKey(k)) cloudPushKeys.add(k); });
+  }catch(e){}
+}
+/* True when a payload contains no user content — only empty arrays/objects/
+   strings and structural fields. Used to refuse pushing fresh blanks over a
+   cloud row this device has never pulled. */
+const STRUCTURAL_KEYS = new Set(['version','updatedAt','createdAt','meta','_legacyMigrated','seeded','onboardingDone','nudgeDismissed']);
+function isEmptyPayload(v){
+  if(v == null || typeof v === 'number' || typeof v === 'boolean') return true;
+  if(typeof v === 'string') return v.trim() === '';
+  if(Array.isArray(v)) return v.every(isEmptyPayload);
+  if(typeof v === 'object'){
+    return Object.entries(v).every(([k,val])=> STRUCTURAL_KEYS.has(k) || isEmptyPayload(val));
+  }
+  return false;
+}
 
 function initSupabaseClient(){
   if(!window.supabase?.createClient) return null;
@@ -2366,7 +2397,7 @@ async function applyPulledRow(key, dataObj, updatedAt){
   return true;
 }
 async function syncPullForView(){
-  if(!authUser || !sb) return;
+  if(!authUser || !sb) return false;
   const keys = syncKeysForView();
   let rows;
   try{
@@ -2378,7 +2409,7 @@ async function syncPullForView(){
     rows = data || [];
   }catch(e){
     console.warn('Sync pull failed:', e);
-    return;
+    return false;
   }
   let globalsPulled = false;
   for(const row of rows){
@@ -2398,11 +2429,14 @@ async function syncPullForView(){
       if(isPrayer()) renderPrayerList();
     }
   }
+  cloudHydrated = true;
+  return true;
 }
 function scheduleCloudPush(keys){
   if(!authUser) return;
   keys.forEach(k=>{ if(isSyncableKey(k)) cloudPushKeys.add(k); });
   if(!cloudPushKeys.size) return;
+  persistPendingPush();   // survive a tab close mid-offline
   // Debounced 2s, but with a max-wait: continuous edits can delay the
   // flush, never postpone it past 10s.
   const now = Date.now();
@@ -2410,9 +2444,23 @@ function scheduleCloudPush(keys){
   clearTimeout(cloudPushTimer);
   cloudPushTimer = setTimeout(flushCloudPush, Math.min(2000, Math.max(100, cloudPushDeadline - now)));
 }
+async function ensureCloudHydrated(){
+  if(cloudHydrated || !authUser || !sb) return cloudHydrated;
+  if(await syncPullForView()) cloudHydrated = true;
+  return cloudHydrated;
+}
 async function flushCloudPush(){
   cloudPushDeadline = 0;
   if(!authUser || !cloudPushKeys.size) return;
+  // Never push before this session has pulled once — cloud wins over a
+  // fresh device, not the other way round. Keys stay queued (persisted).
+  if(!(await ensureCloudHydrated())){
+    persistPendingPush();
+    if(!dirty) updateSaveState('offline');
+    clearTimeout(cloudPushTimer);
+    cloudPushTimer = setTimeout(flushCloudPush, 30000);
+    return;
+  }
   const keys = [...cloudPushKeys];
   cloudPushKeys.clear();
   if(!dirty) updateSaveState('syncing');
@@ -2422,14 +2470,36 @@ async function flushCloudPush(){
     if(raw == null || raw === '') continue;
     let data;
     try{ data = JSON.parse(raw); }catch{ continue; }
+    // Empty-state protection: before pushing a payload with no user content,
+    // check the cloud row. If the cloud copy is non-empty, refuse the push —
+    // an empty/fresh local state must never overwrite real data.
+    if(isEmptyPayload(data)){
+      try{
+        const { data: row, error } = await sb.from('app_data')
+          .select('data')
+          .eq('user_id', authUser.id)
+          .eq('key', key)
+          .maybeSingle();
+        if(error) throw error;
+        if(row && !isEmptyPayload(row.data)){
+          console.warn('Sync: refused to overwrite non-empty cloud data with empty local state:', key);
+          continue;
+        }
+      }catch(e){ allOk = false; continue; }
+    }
     if(!(await syncPushKey(key, data))) allOk = false;
   }
+  if(allOk) persistPendingPush();
   if(!dirty){
     if(allOk) updateSaveState('synced');
     else{
       updateSaveState('offline');
       keys.forEach(k=> cloudPushKeys.add(k));
+      persistPendingPush();
     }
+  } else if(!allOk){
+    keys.forEach(k=> cloudPushKeys.add(k));
+    persistPendingPush();
   }
 }
 /**
@@ -2438,6 +2508,46 @@ async function flushCloudPush(){
  * wsr:-wrapped keys and the raw fs:* module keys — is reconciled against
  * app_data. Local-only data is uploaded; a newer cloud copy wins locally.
  */
+/**
+ * Safety net: once per day (per signed-in user), snapshot every syncable key
+ * into a single app_data row "backup:<date>". Keeps the last 7, prunes older.
+ */
+async function dailyCloudBackup(){
+  if(!authUser || !sb || !cloudHydrated) return;
+  const today = new Date().toISOString().slice(0,10);
+  const flag = 'wsr:last-backup';
+  try{ if(localStorage.getItem(flag) === today + ':' + authUser.id) return; }catch(e){}
+  const snapshot = {};
+  const seen = new Set();
+  for(let i = 0; i < localStorage.length; i++){
+    const full = localStorage.key(i);
+    if(!full) continue;
+    const key = full.startsWith('wsr:') ? full.slice(4) : full;
+    if(!isSyncableKey(key) || seen.has(key)) continue;
+    seen.add(key);
+    const raw = await getLocalValue(key);
+    if(raw == null || raw === '') continue;
+    try{ snapshot[key] = JSON.parse(raw); }catch(e){}
+  }
+  if(!Object.keys(snapshot).length) return;
+  try{
+    const { error } = await sb.from('app_data').upsert({
+      user_id: authUser.id,
+      key: 'backup:'+today,
+      data: { takenAt: new Date().toISOString(), keys: snapshot }
+    }, { onConflict: 'user_id,key' });
+    if(error) throw error;
+    try{ localStorage.setItem(flag, today + ':' + authUser.id); }catch(e){}
+    const { data: rows } = await sb.from('app_data')
+      .select('key')
+      .eq('user_id', authUser.id)
+      .like('key', 'backup:%');
+    const names = (rows || []).map(r=> r.key).sort().reverse();
+    for(const k of names.slice(7)){
+      await sb.from('app_data').delete().eq('user_id', authUser.id).eq('key', k);
+    }
+  }catch(e){ console.warn('Daily backup failed:', e); }
+}
 async function migrateLocalToCloud(){
   if(!authUser || !sb) return;
   const flag = 'wsr:migration-done-v2';
@@ -2491,7 +2601,13 @@ async function initAuth(){
       await loadCurrent();
       if(!dirty) updateSaveState('synced');
       window.maybeLaunchIntake?.();
+      loadPendingPush();
+      if(cloudPushKeys.size) scheduleCloudPush([]);
+      dailyCloudBackup();
     } else if(event === 'SIGNED_OUT'){
+      // Signing out never touches local or cloud data — it only ends the
+      // session. Signing back in re-hydrates everything.
+      cloudHydrated = false;
       updateSaveState(dirty ? 'dirty' : 'saved');
     }
   });
@@ -2501,7 +2617,13 @@ async function initAuth(){
   if(authUser){
     await migrateLocalToCloud();
     await syncPullForView();
+    loadPendingPush();
+    if(cloudPushKeys.size) scheduleCloudPush([]);
+    dailyCloudBackup();
   }
+  window.addEventListener('online', ()=>{
+    if(authUser && cloudPushKeys.size) scheduleCloudPush([]);
+  });
 }
 async function sendMagicLink(){
   const msg = document.getElementById('authMsg');
@@ -2528,6 +2650,7 @@ async function signOut(){
   if(!sb) return;
   await sb.auth.signOut();
   authUser = null;
+  cloudHydrated = false;
   updateAuthUI();
   updateSaveState(dirty ? 'dirty' : 'saved');
 }
@@ -3380,11 +3503,6 @@ async function initFaithStore(){
   window.faithStore = faithStore;
   await faithStore.load();
   await faithStore.migrateFromLegacy({ globals, getDayJSON: key => getJSON(key) });
-  if(faithStore.ensureDefaultMentors()) await faithStore.save();
-  if(typeof MentorshipSeed !== 'undefined'){
-    const seeded = MentorshipSeed.seedInitialMentorshipNotes(faithStore);
-    if(seeded.created) await faithStore.save();
-  }
   // Ignore the echo emitted by faithStore.save() inside save() itself —
   // otherwise every save marks dirty again and the app saves in a loop,
   // perpetually resetting the cloud-push debounce.
