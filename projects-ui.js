@@ -102,6 +102,8 @@
       renderProjects();
       if(typeof renderCalendar === 'function') renderCalendar();
       showProjToast('Archived “'+title+'”.');
+      // A finished project is exactly what a Marker is for — offer once, gently.
+      offerMarker(title);
       markDirty?.();
     });
     document.getElementById('projAddTaskBtn')?.addEventListener('click', addTaskToProject);
@@ -174,6 +176,28 @@
     clearTimeout(showProjToast._t);
     showProjToast._t = setTimeout(()=> t.classList.remove('show'), 3200);
   }
+
+  // Offer — once, quietly, dismissible — to keep a finished project as a Marker.
+  // Nothing is written unless the person taps to confirm.
+  function offerMarker(title){
+    const host = document.getElementById('projMarkerOffer');
+    if(!host || !title || !root.StonesStore) return;
+    host.hidden = false;
+    host.innerHTML =
+      '<p class="stone-offer-q">Set this down as a marker? Evidence you finished something.</p>'+
+      '<p class="stone-offer-text serif">'+esc(title)+'</p>'+
+      '<div class="stone-offer-actions">'+
+        '<button type="button" class="stone-offer-yes" id="projMarkerYes">Set it down</button>'+
+        '<button type="button" class="stone-offer-no" id="projMarkerNo">Not now</button>'+
+      '</div>';
+    host.querySelector('#projMarkerYes').onclick = ()=>{
+      root.StonesStore.add({ type: 'marker', text: title, source: 'A finished project' });
+      host.hidden = true; host.innerHTML = '';
+      showProjToast('Set down as a marker.');
+    };
+    host.querySelector('#projMarkerNo').onclick = ()=>{ host.hidden = true; host.innerHTML = ''; };
+  }
+  function esc(s){ return typeof root.esc === 'function' ? root.esc(s) : String(s ?? ''); }
 
   function loadProjects(){
     renderProjects();

@@ -926,7 +926,8 @@
     el.innerHTML =
       '<div class="home-greeting"><h2 class="serif">'+esc(homeDisplayName() ? timeGreeting()+', '+homeDisplayName() : timeGreeting())+'</h2>'+
       '<p id="homeSummary">'+esc(summaryText)+'</p>'+
-      '<div id="dashFocus"></div></div>';
+      '<div id="dashFocus"></div></div>'+
+      (typeof root.renderStoneCard === 'function' ? root.renderStoneCard() : '');
     root.renderProfileNudge?.();
     root.updateDashIntakeUI?.();
   }

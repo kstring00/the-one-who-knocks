@@ -14,7 +14,8 @@
   const ACTION_LABELS = {
     must_do: 'Add to Must-Dos',
     growth_rep: 'Add as Growth Rep',
-    journal: 'Save to Journal'
+    journal: 'Save to Journal',
+    stone: 'Set down as a stone.'
   };
 
   const ERR_UNAVAILABLE = "I can't reach you right now. What's the one thing you already know you should do next?";
@@ -220,7 +221,7 @@
       return '<span class="mentor-action-chip done">Added ✓</span>';
     }
     const label = ACTION_LABELS[action.type] || 'Apply';
-    return '<button type="button" class="mentor-action-chip" data-mentor-action="'+esc(key)+'" data-action-type="'+esc(action.type)+'" data-action-text="'+esc(action.text||'')+'">'+esc(label)+'</button>';
+    return '<button type="button" class="mentor-action-chip" data-mentor-action="'+esc(key)+'" data-action-type="'+esc(action.type)+'" data-action-text="'+esc(action.text||'')+'" data-stone-type="'+esc(action.stone_type||'')+'">'+esc(label)+'</button>';
   }
 
   function appendStreamingBubble(){
@@ -441,7 +442,7 @@
     root.refreshDailyUI?.();
   }
 
-  function handleAction(type, text, msgIdx, actIdx){
+  function handleAction(type, text, msgIdx, actIdx, stoneType){
     const t = (text || '').trim();
     if(!t) return;
 
@@ -455,6 +456,10 @@
       applyGrowthRep(t);
     } else if(type === 'journal'){
       applyJournal(t);
+    } else if(type === 'stone'){
+      // Only writes on this tap — never before.
+      root.StonesStore?.add({ type: stoneType === 'marker' ? 'marker' : 'truth', text: t, source: 'Mentor' });
+      if(typeof root.renderStonesPanel === 'function' && root.isStones?.()) root.renderStonesPanel();
     }
 
     const msg = history[msgIdx];
@@ -484,7 +489,7 @@
         const parts = act.dataset.mentorAction.split('-');
         const msgIdx = +parts[0];
         const actIdx = +parts[1];
-        handleAction(act.dataset.actionType, act.dataset.actionText, msgIdx, actIdx);
+        handleAction(act.dataset.actionType, act.dataset.actionText, msgIdx, actIdx, act.dataset.stoneType);
         return;
       }
       const rep = e.target.closest('[data-replace-idx]');
