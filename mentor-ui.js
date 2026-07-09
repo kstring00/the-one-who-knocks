@@ -276,8 +276,7 @@
           history: history.slice(0, -1),
           context: root.buildMentorContext?.(source || pendingSource) || '',
           source: source || pendingSource,
-          userName: profileName(),
-          tzOffset: new Date().getTimezoneOffset()
+          userName: profileName()
         }),
         signal: abortCtrl.signal
       });
