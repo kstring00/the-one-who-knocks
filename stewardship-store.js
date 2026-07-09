@@ -43,7 +43,13 @@
   }
   function dowOf(dateStr){ return new Date(dateStr+'T12:00:00').getDay(); }
 
-  let data = null;
+  // Start with an empty document, never null, so any accessor that runs
+  // before load() resolves (e.g. a first render racing init) reads empty
+  // arrays instead of throwing "Cannot read properties of null". load()
+  // replaces this with the persisted data; `loaded` gates persistence so a
+  // pre-load render can't save the blank over real data.
+  let data = blankData();
+  let loaded = false;
   let saveTimer = null;
   let readyPromise = null;
 
@@ -129,6 +135,7 @@
     // New accounts start empty — no sample data. meta.seeded is kept so
     // existing stores keep their flag, but nothing is planted anymore.
     if(!data.meta.seeded) data.meta.seeded = true;
+    loaded = true;
     return data;
   }
   function init(){
@@ -136,7 +143,7 @@
     return readyPromise;
   }
   async function persistNow(){
-    if(!data) return;
+    if(!data || !loaded) return;   // never write the blank placeholder over persisted data
     try{ await root.storage?.set(STORAGE_KEY, JSON.stringify(data)); }
     catch(e){ console.warn('[StewStore] save failed', e); }
     if(typeof root.scheduleCloudPush === 'function') root.scheduleCloudPush([STORAGE_KEY]);

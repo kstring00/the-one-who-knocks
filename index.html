@@ -112,6 +112,7 @@ html,body{margin:0;background:var(--bg-page);color:var(--ink);
 #saveState.synced{color:var(--green);font-weight:600}
 #saveState.sync-pending{color:var(--gold-text);font-style:italic}
 .auth-signed-in{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--mist);max-width:160px}
+.auth-signed-in[hidden]{display:none!important}   /* author display:flex above would otherwise override [hidden] and pin "Sign out" on regardless of auth state */
 .auth-signed-in .auth-email{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--navy);font-weight:500}
 .auth-signout{border:none;background:none;padding:0;font-size:10px;color:var(--mist);cursor:pointer;text-decoration:underline;font-family:inherit;flex:none}
 .auth-signout:hover{color:var(--navy)}
@@ -2437,6 +2438,7 @@ body.intake-open{overflow:hidden}
       <span class="auth-email" id="authEmailDisplay"></span>
       <button type="button" class="auth-signout" id="authSignOut">Sign out</button>
     </div>
+    <button type="button" class="auth-signout" id="authSignInTop" hidden>Sign in</button>
     <span id="saveState">Saved</span>
     <button type="button" id="saveBtn">Save</button>
     <button type="button" class="btn-mentor" id="btnAskMentor">Ask Mentor</button>
@@ -3027,10 +3029,25 @@ function isEmptyPayload(v){
 }
 
 function initSupabaseClient(){
+  if(sb) return sb;                       // singleton — one client for the page's life
   if(!window.supabase?.createClient) return null;
-  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+      persistSession: true,        // write the session to localStorage (sb-*)
+      detectSessionInUrl: true,    // consume #access_token on return from a magic link
+      autoRefreshToken: true,
+      flowType: 'implicit'         // the magic link returns #access_token=… (implicit flow)
+    }
+  });
   window.sb = sb;
   return sb;
+}
+/** Strip the #access_token fragment after Supabase consumes it, so the token
+ *  isn't left in the address bar or browser history. */
+function clearAuthHash(){
+  if(/[#&](access_token|refresh_token|error_description)=/.test(location.hash)){
+    try{ history.replaceState(null, '', location.pathname + location.search); }catch(e){}
+  }
 }
 function isSyncableKey(key){
   if(key.startsWith('fs:ideas-attach:')) return false;   // large data-URLs stay on-device
@@ -3083,14 +3100,17 @@ function updateAuthUI(){
   window.isSignedIn = () => !!authUser;
   const card = document.getElementById('authCard');
   const signedIn = document.getElementById('authSignedIn');
+  const signInTop = document.getElementById('authSignInTop');
   const emailEl = document.getElementById('authEmailDisplay');
   if(authUser){
     if(card) card.hidden = true;
     if(signedIn) signedIn.hidden = false;
+    if(signInTop) signInTop.hidden = true;
     if(emailEl) emailEl.textContent = authUser.email || '';
   } else {
     if(card) card.hidden = false;
     if(signedIn) signedIn.hidden = true;
+    if(signInTop) signInTop.hidden = false;
   }
 }
 function syncKeysForView(){
@@ -3352,6 +3372,7 @@ async function initAuth(){
   sb.auth.onAuthStateChange(async (event, session)=>{
     authUser = session?.user || null;
     updateAuthUI();
+    clearAuthHash();   // token has been consumed into the session; drop it from the URL
     if(event === 'SIGNED_IN' && authUser){
       await migrateLocalToCloud();
       await ensureFaithStore().catch(()=>{});
@@ -3381,6 +3402,7 @@ async function initAuth(){
     authUser = null;
   }
   updateAuthUI();
+  clearAuthHash();   // in case the fragment was consumed before the listener attached
   if(authUser){
     await withTimeout(migrateLocalToCloud(), 15000, 'Cloud migrate').catch(e=> console.warn('[auth] migrate failed', e));
     await withTimeout(syncPullForView(), 12000, 'Cloud sync pull').catch(e=> console.warn('[auth] sync pull failed', e));
@@ -5039,6 +5061,11 @@ function bindFFAccordion(){
   }, true);
 }
 function renderDaily(){
+  // Guard against a first render that races init: dayData is null until
+  // loadCurrent() runs. Fall back to a blank day so the ledger (and its
+  // sub-renderers like the growth rep) never deref null. loadCurrent()
+  // replaces this with the persisted day and re-renders.
+  if(!dayData) dayData = blankDaily();
   if(typeof renderDailyLedger === 'function' && renderDailyLedger()){
     restoreWeekdayPageHead?.();
     applyDailyPhase();
@@ -5694,6 +5721,7 @@ function bindEvents(){
     if(e.key==='Enter'){ e.preventDefault(); sendMagicLink(); }
   });
   document.getElementById('authSignOut')?.addEventListener('click', signOut);
+  document.getElementById('authSignInTop')?.addEventListener('click', ()=> setMode('settings'));
   document.getElementById('clearPeriod')?.addEventListener('click', clearCurrent);
   document.getElementById('clearJournal')?.addEventListener('click', clearJournalEntry);
   document.getElementById('resetAll')?.addEventListener('click', resetAll);
@@ -5945,6 +5973,11 @@ async function resetAll(){
 
 (async function init(){
   try{
+    // Create the Supabase client FIRST, before any render, so detectSessionInUrl
+    // consumes the #access_token fragment on return from a magic link even if a
+    // later step throws. Singleton — initAuth() reuses this same instance.
+    initSupabaseClient();
+    updateAuthUI();   // honest top bar from the start (Sign in until a session loads)
     renderDaily(); renderWeekly(); renderMonthly();
     try{ bindEvents(); }catch(e){ console.warn('[bindEvents] failed — nav will still bind', e); }
     const vm = await window.storage.get('view-mode');
