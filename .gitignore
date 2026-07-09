@@ -1,5 +1,8 @@
 .DS_Store
 .localized
 *.png
+.env
+.env.local
+.env.*.local
 Common Ground/
 cornerstone/

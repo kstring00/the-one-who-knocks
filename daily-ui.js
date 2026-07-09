@@ -267,7 +267,7 @@
       '<button type="button" class="dl-growth-cat'+(sel===c.id?' on':'')+'" data-dl-rep-cat="'+c.id+'">'+esc(c.label)+'</button>'
     ).join('');
     return '<section class="gr-card dl-cc-card" id="sec-growth" data-dl-sec="growth">'+
-      '<h3 class="dl-cc-title serif">1% Growth Rep</h3>'+
+      '<div class="dl-cc-head-row"><h3 class="dl-cc-title serif">1% Growth Rep</h3>'+mentorBtn('Help me pick a growth rep', 'Help me pick a growth rep', 'daily-growth')+'</div>'+
       '<p class="dl-cc-q">What is today\u2019s rep?</p>'+
       '<div class="dl-growth-cats">'+cats+'</div>'+
       '<input type="text" class="dl-hairline" data-field="growthRep.text" placeholder="e.g. 30-min workout" aria-label="Growth rep">'+
@@ -292,8 +292,13 @@
       '<div class="dl-window-row"><span class="dl-window-label">Evening</span><input type="text" class="dl-hairline" data-field="execute.eveningShutdown" placeholder="Shutdown\u2026"></div></section>';
   }
 
+  function mentorBtn(label, prompt, source){
+    return '<button type="button" class="dl-mentor-chip" data-mentor-open data-mentor-prompt="'+esc(prompt)+'" data-mentor-source="'+esc(source)+'">'+esc(label)+'</button>';
+  }
+
   function renderMorningDashboard(){
     return '<div class="dl-phase-view" id="dl-phase-morning">'+
+      '<div class="dl-mentor-row">'+mentorBtn('Help me plan today', 'Help me plan today', 'daily-plan')+'</div>'+
       renderMorningStatRow()+
       '<div class="dl-grid-2">'+renderTodayAimCompact()+renderTop3Compact()+'</div>'+
       renderFirstFruitsCompact()+
@@ -375,7 +380,7 @@
 
   function renderTodayAimCompact(){
     return '<section class="gr-card dl-cc-card" id="sec-daily-aim" data-dl-sec="aim">'+
-      '<h3 class="dl-cc-title serif">Today\u2019s Aim</h3>'+
+      '<div class="dl-cc-head-row"><h3 class="dl-cc-title serif">Today\u2019s Aim</h3></div>'+
       '<p class="dl-cc-q">Today, I want to be faithful in\u2026</p>'+
       '<input type="text" class="dl-hairline" data-field="posture.aim" placeholder="patience, focus, courage, order, serving well\u2026" aria-label="Today\u2019s aim">'+
       '<p class="dl-cc-hint">Name the direction before you name the tasks.</p></section>';
@@ -391,7 +396,7 @@
         '<div class="dl-list">'+more.map(it=> renderMustDoRow(it)).join('')+'</div></details>'
       : '';
     return '<section class="gr-card dl-cc-card" id="sec-non-neg" data-dl-sec="mustdos">'+
-      '<h3 class="dl-cc-title serif">Top 3 Must-Dos</h3>'+
+      '<div class="dl-cc-head-row"><h3 class="dl-cc-title serif">Top 3 Must-Dos</h3>'+mentorBtn('Help me choose my Top 3', 'Help me choose my Top 3', 'daily-top3')+'</div>'+
       '<p class="dl-cc-q">What three things would make today faithful?</p>'+
       '<div class="dl-list" id="dlNonNegList">'+topList+'</div>'+moreBlock+
       '<div class="dl-add-row">'+
