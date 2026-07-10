@@ -101,11 +101,34 @@ html,body{margin:0;background:var(--bg-page);color:var(--ink);
 *{scrollbar-width:thin;scrollbar-color:var(--scroll-thumb) var(--scroll-track)}
 .serif{font-family:"Cormorant Garamond",Georgia,serif}
 
-.navrow{display:flex;align-items:center;gap:8px}
-.navrow button{border:1.5px solid var(--navy);background:transparent;border-radius:6px;
-  width:34px;height:34px;font-size:16px;cursor:pointer;color:var(--navy);transition:background .15s}
+/* Day toggle — the one control that decides which day you're editing.
+   Prominent pill, but calm: card background, real borders, readable label. */
+.navrow{display:flex;align-items:center;gap:4px;background:var(--bg-card,transparent);
+  border:1px solid var(--navy);border-radius:999px;padding:3px 4px}
+.navrow button{border:1.5px solid var(--navy);background:transparent;border-radius:999px;
+  width:36px;height:36px;font-size:17px;cursor:pointer;color:var(--navy);transition:background .15s;flex:none}
 .navrow button:hover{background:var(--gold-bg)}
-#periodLabel{font-size:13px;color:var(--mist);min-width:180px;text-align:center}
+#periodLabel{font-size:15px;font-weight:600;color:var(--navy);min-width:200px;text-align:center;padding:0 6px}
+/* Off-today: the pill itself changes character so the state is unmissable */
+body.day-off-today .navrow{border-color:var(--gold,#b8892a);background:color-mix(in srgb,#b8892a 10%,transparent)}
+body.day-off-today #periodLabel{color:var(--gold-text,#8a661c)}
+body.day-off-today.day-past .navrow{border-color:#5f7a99;background:color-mix(in srgb,#5f7a99 10%,transparent)}
+body.day-off-today.day-past #periodLabel{color:#4a6076}
+/* Banner: shown under the topbar on day-scoped views whenever you're not on today */
+.day-banner{display:flex;align-items:center;justify-content:center;gap:8px;padding:7px 16px;
+  font-size:13.5px;font-weight:600;letter-spacing:.2px;text-align:center;
+  background:color-mix(in srgb,#b8892a 14%,#fffcf7);color:#8a661c;
+  border-bottom:1px solid color-mix(in srgb,#b8892a 30%,transparent)}
+.day-banner.past{background:color-mix(in srgb,#5f7a99 12%,#fffcf7);color:#3f5872;
+  border-bottom-color:color-mix(in srgb,#5f7a99 30%,transparent)}
+.day-banner[hidden]{display:none!important}
+.day-banner .day-banner-dot{width:7px;height:7px;border-radius:50%;background:currentColor;flex:none;opacity:.7}
+/* Scope chip: sits beside section titles wherever day-keyed content is edited */
+.day-scope-chip{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+  padding:3px 10px;border-radius:999px;margin-left:10px;vertical-align:middle;
+  background:color-mix(in srgb,#427a52 12%,transparent);color:#427a52}
+.day-scope-chip.future{background:color-mix(in srgb,#b8892a 15%,transparent);color:#8a661c}
+.day-scope-chip.past{background:color-mix(in srgb,#5f7a99 14%,transparent);color:#3f5872}
 #saveState{font-size:11px;color:var(--mist);min-width:72px;text-align:right}
 #saveState.dirty{color:var(--danger);font-weight:600}
 #saveState.saving{color:var(--gold-text)}
@@ -1624,9 +1647,14 @@ body.faithfulness-app input,body.faithfulness-app textarea,body.faithfulness-app
 body.faithfulness-app .site-foot{border-color:var(--border)}
 body.faithfulness-app .score{background:var(--bg-card);color:var(--gold-text);border-color:var(--border)}
 body.faithfulness-app #saveBtn{background:var(--green);border-color:var(--green);color:var(--text-on-green)}
+body.faithfulness-app .navrow{background:var(--bg-card);border-color:var(--border)}
 body.faithfulness-app .navrow button{border-color:var(--border);color:var(--text-secondary)}
 body.faithfulness-app .navrow button:hover{background:var(--gold-dim);color:var(--gold-text)}
-body.faithfulness-app #periodLabel{color:var(--text-primary);font-weight:500;min-width:220px}
+body.faithfulness-app #periodLabel{color:var(--text-primary);font-weight:600;min-width:220px}
+body.faithfulness-app.day-off-today .navrow{border-color:var(--gold-border);background:var(--gold-fill-06)}
+body.faithfulness-app.day-off-today #periodLabel{color:var(--gold-text)}
+body.faithfulness-app.day-off-today.day-past .navrow{border-color:color-mix(in srgb,#5f7a99 45%,transparent);background:color-mix(in srgb,#5f7a99 9%,transparent)}
+body.faithfulness-app.day-off-today.day-past #periodLabel{color:#4a6076}
 .home-band{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)}
 .home-greeting{flex:1;min-width:min(100%,220px)}
 .home-greeting h2{font-family:"Cormorant Garamond",serif;font-size:22px;font-weight:600;margin:0 0 2px;color:var(--text-primary)}
@@ -2536,6 +2564,7 @@ body.intake-open{overflow:hidden}
 <div class="sidebar-backdrop" id="sidebarBackdrop" hidden></div>
 
 <div class="app-content">
+<div class="day-banner" id="dayScopeBanner" hidden role="status" aria-live="polite"><span class="day-banner-dot" aria-hidden="true"></span><span id="dayScopeBannerText"></span></div>
 <div id="contextHintBar" hidden></div>
 
 <section id="calendarPanel" aria-label="Dashboard">
@@ -2705,7 +2734,7 @@ body.intake-open{overflow:hidden}
 <div class="board guided-daily" id="dailyBoard" data-phase="morning" hidden>
   <div class="page-head daily-head">
     <div class="daily-head-title">
-      <h2>Daily Ledger</h2>
+      <h2>Daily Ledger<span class="day-scope-chip" data-day-scope-chip>Planning Today</span></h2>
       <p class="daily-tagline">Here is the faithful next version of today. Let’s build it quickly.</p>
     </div>
     <div class="phase-tabs weekday-phase-tabs" role="tablist" aria-label="Daily rhythm">
@@ -4093,8 +4122,59 @@ function monthKeyFor(off){ return 'fs-month:'+monthKey(off); }
 function journalKeyFor(off){ return 'journal:'+iso(dayOf(off)); }
 function dayLabelFor(off){
   const d = dayOf(off);
-  return (iso(dayOf(0))===iso(d)?'Today — ':'')+d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+  const date = d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+  // "Today" is always the device's real current date, resolved at call time.
+  const today = iso(dayOf(0));
+  if(iso(d)===today) return 'Today — '+date;
+  if(iso(d)===iso(dayOf(1))) return 'Tomorrow — '+date;
+  if(iso(d)===iso(dayOf(-1))) return 'Yesterday — '+date;
+  return date;
 }
+/** Everything the UI needs to say which day is being worked on.
+ *  Derived from dayOffset + the device clock at call time — never cached. */
+function dayScopeInfo(){
+  const d = dayOf(dayOffset);
+  const cur = iso(d), today = iso(dayOf(0));
+  const nice = d.toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'});
+  if(cur === today)         return { state:'today',  cls:'',       chip:'Planning Today',     banner:'' };
+  if(cur === iso(dayOf(1))) return { state:'future', cls:'future', chip:'Planning Tomorrow',  banner:'You are planning Tomorrow — '+nice };
+  if(cur > today)           return { state:'future', cls:'future', chip:'Planning Ahead',     banner:'You are planning ahead — '+nice };
+  if(cur === iso(dayOf(-1)))return { state:'past',   cls:'past',   chip:'Reviewing Yesterday',banner:'You are looking back at Yesterday — '+nice };
+  return                           { state:'past',   cls:'past',   chip:'Reviewing '+nice,    banner:'You are looking back at '+nice };
+}
+/** Paint the day-scope indicators: body classes, the banner, and any
+ *  [data-day-scope-chip] hosts on screen. Runs on every view change. */
+function refreshDayScopeUI(){
+  const dayScoped = isDaily() || isJournal();
+  const info = dayScopeInfo();
+  const off = dayScoped && info.state !== 'today';
+  document.body.classList.toggle('day-off-today', off);
+  document.body.classList.toggle('day-past', off && info.state === 'past');
+  const banner = document.getElementById('dayScopeBanner');
+  if(banner){
+    banner.hidden = !off;
+    banner.classList.toggle('past', info.state === 'past');
+    const txt = document.getElementById('dayScopeBannerText');
+    if(txt) txt.textContent = info.banner;
+  }
+  document.querySelectorAll('[data-day-scope-chip]').forEach(el=>{
+    el.textContent = info.chip;
+    el.className = 'day-scope-chip' + (info.cls ? ' ' + info.cls : '');
+  });
+}
+/* Keep "today" honest across midnight: if the device date rolls over while the
+   app is open, re-derive every label from the real clock. */
+(function(){
+  let seen = iso(dayOf(0));
+  setInterval(()=>{
+    const now = iso(dayOf(0));
+    if(now !== seen){
+      seen = now;
+      try{ updateViewUI(); }catch(e){}
+      try{ refreshDayScopeUI(); }catch(e){}
+    }
+  }, 30000);
+})();
 function weekLabelFor(off){
   const m = mondayOf(off), s = new Date(m); s.setDate(m.getDate()+6);
   const f = d=>d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
@@ -5018,10 +5098,21 @@ function loadThoughtJournal(){
     document.getElementById('thoughtJournalToggle')?.setAttribute('aria-expanded', collapsed?'false':'true');
   }
 }
-function restoreWeekdayPageHead(){
+/** Rewrite the Daily Ledger heading, keeping the day-scope chip alive.
+ *  Every writer of this h2 must go through here or the chip is lost. */
+function setDailyHeadTitle(title){
   const h2 = document.querySelector('#dailyBoard .page-head h2');
+  if(!h2) return;
+  h2.textContent = title;
+  const chip = document.createElement('span');
+  chip.className = 'day-scope-chip';
+  chip.setAttribute('data-day-scope-chip', '');
+  h2.appendChild(chip);
+  if(typeof refreshDayScopeUI === 'function') refreshDayScopeUI();
+}
+function restoreWeekdayPageHead(){
+  setDailyHeadTitle('Daily Ledger');
   const tag = document.querySelector('#dailyBoard .daily-tagline');
-  if(h2) h2.textContent = 'Daily Ledger';
   if(tag) tag.textContent = 'Here is the faithful next version of today. Let\u2019s build it quickly.';
 }
 function satGetCheck(path){
@@ -5124,9 +5215,8 @@ function updateSatRhythm(){
   }
 }
 function updateSaturdayRecoveryUI(){
-  const h2 = document.querySelector('#dailyBoard .page-head h2');
   const p = document.querySelector('#dailyBoard .page-head p');
-  if(h2) h2.textContent = 'Daily Ledger';
+  setDailyHeadTitle('Daily Ledger');
   if(p) p.textContent = 'Saturday Recovery — weekday rhythm below, time blocks at the bottom.';
   renderSatBlockTabs();
   const blocks = renderSatMorningBlock()+renderSatMiddayBlock()+renderSatAfternoonBlock()+renderSatEveningBlock();
@@ -5946,6 +6036,7 @@ function updateViewUI(){
   }
   if(typeof renderViewHint === 'function') renderViewHint();
   if(typeof updateGuideHelpButton === 'function') updateGuideHelpButton();
+  refreshDayScopeUI();
 }
 async function loadCurrent(){
   updateViewUI();
