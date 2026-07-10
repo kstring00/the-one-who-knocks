@@ -204,12 +204,18 @@
   function updateJournalEntryHead(dateStr){
     const h = document.querySelector('.journal-entry-head h3');
     if(!h) return;
-    const today = iso(dayOf(0));
+    const today = iso(dayOf(0));   // device clock, resolved now
     if(dateStr === today){
       h.textContent = "Today's entry";
     } else {
       h.textContent = formatJournalListDate(dateStr);
     }
+    // Day-scope chip so it's obvious which day this entry belongs to.
+    const chip = document.createElement('span');
+    chip.className = 'day-scope-chip';
+    chip.setAttribute('data-day-scope-chip', '');
+    h.appendChild(chip);
+    if(typeof root.refreshDayScopeUI === 'function') root.refreshDayScopeUI();
   }
 
   function syncJournalFromDom(){
