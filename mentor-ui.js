@@ -386,7 +386,7 @@
     const itemId = (typeof root.uid === 'function' ? root.uid() : 'id-' + Date.now());
     root.dayData.faithfulFew.mustDo.items.push({ id: itemId, text: text.trim(), done: false });
     if(root.faithStore){
-      root.faithStore.createTask({ title: text.trim(), date: root.iso?.(root.dayOf?.(root.dayOffset || 0)), timeSlot: 'beforeWork', tag: 'stewardship', legacyMustDoId: itemId });
+      root.faithStore.createTask({ title: text.trim(), date: root.iso?.(root.dayOf?.(root.dayOffset || 0)), tag: 'stewardship', legacyMustDoId: itemId });
       root.faithStore.save();
     }
     root.refreshDailyUI?.();

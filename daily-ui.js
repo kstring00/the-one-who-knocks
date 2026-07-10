@@ -264,7 +264,6 @@
     const src = fromDay || dayData;
     if(!src?.faithfulFew?.mustDo?.items) return;
     const unfinished = src.faithfulFew.mustDo.items.filter(it=> !it.done && !it.released);
-    if(!unfinished.length) return;
 
     const tomorrowOff = 1;
     const tomorrowDate = iso(dayOf(tomorrowOff));
@@ -296,6 +295,20 @@
     if(root.faithStore){
       root.faithStore.syncMustDosFromDay(tomorrowDate, tom);
       await root.faithStore.save();
+    }
+    const S = stew();
+    if(S?.getTasks){
+      S.getTasks({status:'todo'}).forEach(t=>{
+        const due = t.dueDate || t.originalDate || null;
+        if(due !== todayDate) return;
+        if(t.carriedFrom === todayDate && t.dueDate === tomorrowDate) return;
+        S.updateTask(t.id, {
+          dueDate: tomorrowDate,
+          originalDate: t.originalDate || todayDate,
+          carriedFrom: todayDate,
+          carryCount: (t.carryCount || 0) + 1
+        });
+      });
     }
   }
 
@@ -996,18 +1009,35 @@
     const tomorrowKey = dayKeyFor(tomorrowOff);
     let tom = normalizeDaily(await getJSON(tomorrowKey));
     if(!tom.faithfulFew.mustDo.items) tom.faithfulFew.mustDo.items = [];
-    tom.faithfulFew.mustDo.items.push({
-      id: uid(),
-      text: it.text,
-      done: false,
-      carryCount: (it.carryCount || 0) + 1,
-      carryPlan: plan.trim(),
-      carriedFrom: dateStr()
-    });
+    const exists = tom.faithfulFew.mustDo.items.some(x=>
+      (x.text || '').trim().toLowerCase() === (it.text || '').trim().toLowerCase() &&
+      x.carriedFrom === dateStr()
+    );
+    if(!exists){
+      tom.faithfulFew.mustDo.items.push({
+        id: uid(),
+        text: it.text,
+        done: false,
+        carryCount: (it.carryCount || 0) + 1,
+        carryPlan: plan.trim(),
+        carriedFrom: dateStr(),
+        carriedOver: true
+      });
+    }
     if(typeof saveDayDataByDate === 'function') await saveDayDataByDate(iso(dayOf(tomorrowOff)), tom);
     if(faithStore){
       faithStore.syncMustDosFromDay(iso(dayOf(tomorrowOff)), tom);
       await faithStore.save();
+    }
+    const S = stew();
+    const t = S?.getTasks?.().find(x=>x.legacyMustDoId === itemId);
+    if(t){
+      S.updateTask(t.id, {
+        dueDate: iso(dayOf(tomorrowOff)),
+        originalDate: t.originalDate || dateStr(),
+        carriedFrom: dateStr(),
+        carryCount: (t.carryCount || 0) + 1
+      });
     }
     refreshDailyUI();
     markDirty?.();
@@ -1091,11 +1121,16 @@
       window.faithStore.createTask({
         title: text.trim(),
         date: dateStr(),
-        timeSlot: 'beforeWork',
         tag: 'stewardship',
         legacyMustDoId: itemId
       });
       window.faithStore.save();
+    }
+    if(stew()?.createTask){
+      const S = stew();
+      if(!S.getTasks().some(t=>t.legacyMustDoId === itemId)){
+        S.createTask({ title:text.trim(), dueDate:dateStr(), urgency:'today', legacyMustDoId:itemId });
+      }
     }
     refreshDailyUI();
     markDirty?.();
@@ -1407,6 +1442,9 @@
             if(task) window.faithStore.updateTask(task.id, { completed: !!it.done, completedAt: it.done ? new Date().toISOString() : null });
             window.faithStore.save();
           }
+          const S = stew();
+          const stewTask = S?.getTasks?.().find(t=>t.legacyMustDoId === it.id);
+          if(stewTask) S.updateTask(stewTask.id, { status: it.done ? 'done' : 'todo' });
           const row = nn.closest('.dl-must-row');
           if(row){
             row.classList.toggle('done', it.done);

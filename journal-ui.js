@@ -265,6 +265,42 @@
     }).join('') || '<li class="hint">No past entries</li>';
   }
 
+  function previewForMatch(text, q){
+    const raw = String(text || '').replace(/\s+/g, ' ').trim();
+    if(!raw) return '';
+    const i = raw.toLowerCase().indexOf(q.toLowerCase());
+    const start = i < 0 ? 0 : Math.max(0, i - 40);
+    const snip = raw.slice(start, start + 140);
+    if(i < 0) return esc(snip);
+    const rel = i - start;
+    return esc(snip.slice(0, rel)) + '<mark>' + esc(snip.slice(rel, rel + q.length)) + '</mark>' + esc(snip.slice(rel + q.length));
+  }
+
+  async function searchJournalEntries(query){
+    const host = document.getElementById('journalSearchResults');
+    if(!host) return;
+    const q = String(query || '').trim();
+    if(!q){
+      host.innerHTML = '';
+      return;
+    }
+    const r = await window.storage.list('journal:');
+    const keys = (r?.keys || []).sort().reverse();
+    const rows = [];
+    for(const k of keys){
+      const j = normalizeJournal(await getJSON(k));
+      const d = k.slice(8);
+      const hay = [d, formatJournalListDate(d), j.body, ...(j.gratitude || [])].join('\n');
+      if(!hay.toLowerCase().includes(q.toLowerCase())) continue;
+      rows.push({ date:d, body:j.body || (j.gratitude || []).join(' ') });
+      if(rows.length >= 30) break;
+    }
+    host.innerHTML = rows.length ? rows.map(r=>
+      '<button type="button" class="journal-search-result" data-jdate="'+esc(r.date)+'">'+
+      '<strong>'+esc(formatJournalListDate(r.date))+'</strong><span>'+previewForMatch(r.body, q)+'</span></button>'
+    ).join('') : '<p class="app-empty-state">An honest line is enough to begin.</p>';
+  }
+
   function insertAtCursor(ta, before, after){
     if(!ta) return;
     const s = ta.selectionStart, e = ta.selectionEnd;
@@ -277,6 +313,62 @@
     ta.dispatchEvent(new Event('input', { bubbles: true }));
   }
 
+  function lineBounds(ta){
+    const s = ta.selectionStart, e = ta.selectionEnd;
+    const val = ta.value;
+    const start = val.lastIndexOf('\n', Math.max(0, s - 1)) + 1;
+    const end = val.indexOf('\n', e);
+    return { start, end: end === -1 ? val.length : end };
+  }
+
+  function prefixSelectionLines(ta, prefix){
+    if(!ta) return;
+    const b = lineBounds(ta);
+    const val = ta.value;
+    const block = val.slice(b.start, b.end);
+    const next = block.split('\n').map(line=> line.startsWith(prefix) ? line : prefix + line).join('\n');
+    ta.value = val.slice(0, b.start) + next + val.slice(b.end);
+    ta.selectionStart = b.start + prefix.length;
+    ta.selectionEnd = b.start + next.length;
+    ta.focus();
+    ta.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+
+  function setHeading(ta, level){
+    if(!ta) return;
+    const b = lineBounds(ta);
+    const val = ta.value;
+    const line = val.slice(b.start, b.end).replace(/^#{1,6}\s+/, '');
+    const prefix = '#'.repeat(level) + ' ';
+    ta.value = val.slice(0, b.start) + prefix + line + val.slice(b.end);
+    ta.selectionStart = ta.selectionEnd = b.start + prefix.length + line.length;
+    ta.focus();
+    ta.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+
+  function toggleChecklistLine(ta){
+    if(!ta) return;
+    const b = lineBounds(ta);
+    const val = ta.value;
+    let line = val.slice(b.start, b.end);
+    if(/^- \[ \] /.test(line)) line = line.replace(/^- \[ \] /, '- [x] ');
+    else if(/^- \[x\] /i.test(line)) line = line.replace(/^- \[x\] /i, '- [ ] ');
+    else line = '- [ ] ' + line.replace(/^[-*]\s+/, '');
+    ta.value = val.slice(0, b.start) + line + val.slice(b.end);
+    ta.selectionStart = ta.selectionEnd = b.start + line.length;
+    ta.focus();
+    ta.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+
+  function applyTypingShortcut(ta){
+    const b = lineBounds(ta);
+    const before = ta.value.slice(b.start, ta.selectionStart);
+    if(before === '[] '){
+      ta.setRangeText('- [ ] ', b.start, ta.selectionStart, 'end');
+      ta.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  }
+
   function bindJournalEvents(){
     if(document.body.dataset.journalBound) return;
     document.body.dataset.journalBound = '1';
@@ -286,10 +378,15 @@
       if(!btn) return;
       const ta = document.getElementById('journalBody');
       const t = btn.dataset.jtool;
-      if(t === 'bold') insertAtCursor(ta, '**', '**');
+      if(t === 'h1') setHeading(ta, 1);
+      else if(t === 'h2') setHeading(ta, 2);
+      else if(t === 'h3') setHeading(ta, 3);
+      else if(t === 'bold') insertAtCursor(ta, '**', '**');
       else if(t === 'italic') insertAtCursor(ta, '_', '_');
-      else if(t === 'bullet') insertAtCursor(ta, '\n• ', '');
-      else if(t === 'num') insertAtCursor(ta, '\n1. ', '');
+      else if(t === 'bullet') prefixSelectionLines(ta, '- ');
+      else if(t === 'num') prefixSelectionLines(ta, '1. ');
+      else if(t === 'check') toggleChecklistLine(ta);
+      else if(t === 'quote') prefixSelectionLines(ta, '> ');
     });
 
     document.getElementById('journalPromptsList')?.addEventListener('click', e=>{
@@ -335,6 +432,20 @@
       e.preventDefault();
       await navigateToJournalDate(btn.dataset.jdate);
     });
+
+    document.getElementById('journalSearch')?.addEventListener('input', e=>{
+      clearTimeout(bindJournalEvents._searchT);
+      bindJournalEvents._searchT = setTimeout(()=> searchJournalEntries(e.target.value), 180);
+    });
+    document.getElementById('journalSearchResults')?.addEventListener('click', async e=>{
+      const btn = e.target.closest('[data-jdate]');
+      if(!btn) return;
+      e.preventDefault();
+      await navigateToJournalDate(btn.dataset.jdate);
+    });
+    document.getElementById('journalBody')?.addEventListener('keyup', e=>{
+      if(e.key === ' ') applyTypingShortcut(e.target);
+    });
   }
 
   function journalPromptForDay(){
@@ -352,6 +463,7 @@
   root.getAllJournalPrompts = getAllPrompts;
   root.verseForDate = verseForDate;
   root.renderJournalList = renderJournalList;
+  root.searchJournalEntries = searchJournalEntries;
   root.navigateToJournalDate = navigateToJournalDate;
   root.updateJournalEntryHead = updateJournalEntryHead;
   root.flushJournalEntry = flushJournalEntry;

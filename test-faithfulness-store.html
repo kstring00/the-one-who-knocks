@@ -2,37 +2,36 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Faithfulness Store — Phase 1 Tests</title>
+<title>With Little — Store Tests</title>
 <style>
-  :root{
-    --bg-page:#1c2129;--text-primary:#f4efe4;--text-secondary:#b5ad9e;
-    --gold:#dbb256;--green:#52966a;--red:#d47878;
-  }
-  body{font:15px/1.5 system-ui,sans-serif;max-width:640px;margin:40px auto;padding:0 20px;background:var(--bg-page);color:var(--text-primary)}
+  :root{--bg-page:#1c2129;--text-primary:#f4efe4;--text-secondary:#b5ad9e;--gold:#dbb256;--green:#52966a;--red:#d47878}
+  body{font:15px/1.5 system-ui,sans-serif;max-width:760px;margin:40px auto;padding:0 20px;background:var(--bg-page);color:var(--text-primary)}
   h1{font-family:Georgia,serif;color:var(--gold)}
   .pass{color:var(--green)}.fail{color:var(--red)}
   li{margin:6px 0}
 </style>
 </head>
 <body>
-<h1>Phase 1 — Data Layer Tests</h1>
+<h1>With Little — Data Layer Tests</h1>
 <p id="status">Running…</p>
 <ul id="results"></ul>
-<script src="faithfulness-store.js"></script>
+<script src="faithfulness-store.js?v=2"></script>
+<script src="stewardship-store.js?v=2"></script>
 <script>
 (async function(){
-  const ul=document.getElementById('results');
-  const status=document.getElementById('status');
-  function assert(name,cond){ ul.innerHTML+='<li class="'+(cond?'pass':'fail')+'">'+(cond?'PASS':'FAIL')+': '+name+'</li>'; return cond; }
+  const ul = document.getElementById('results');
+  const status = document.getElementById('status');
+  function row(r){ ul.innerHTML += '<li class="'+(r.pass?'pass':'fail')+'">'+(r.pass?'PASS':'FAIL')+': '+r.name+(r.detail?' — '+r.detail:'')+'</li>'; }
   try{
-    const s=new FaithfulnessStore();
-    s.data={version:1,tasks:[],scheduleBlocks:[],seeds:[],waterings:[],projects:[],journalEntries:[],quickNotes:[],dailyAnchors:null,createdAt:'',updatedAt:''};
-    const d='2026-07-06';
-    s.ensureDailyAnchors(d);
-    assert('anchors seed', s.getAnchorTasksForDate(d).length===2);
-    assert('priorities exclude anchors', s.getPriorityTasksForDate(d).length===0);
-    status.textContent='Done.';
-  }catch(e){ status.textContent='Error: '+e.message; }
+    window.storage = createMemoryStorage();
+    const faith = await runFaithfulnessStoreTests(()=> new FaithfulnessStore(createMemoryStorage()));
+    const stew = await runStewardshipStoreTests();
+    faith.results.forEach(row);
+    stew.results.forEach(row);
+    status.textContent = faith.pass && stew.pass ? 'Done.' : 'Failed.';
+  }catch(e){
+    status.textContent = 'Error: '+e.message;
+  }
 })();
 </script>
 </body>

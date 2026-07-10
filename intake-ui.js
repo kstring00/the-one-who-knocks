@@ -488,7 +488,7 @@
         .slice(0,3).forEach(it=> out.push({ title: it.text, source:'Yesterday, unfinished' }));
     }catch(e){}
     (S()?.overflowTasks()||[]).slice(0,4).forEach(t=>
-      out.push({ title: t.title, source:'Still Entrusted', stewTaskId: t.id, min: t.durationMin||undefined }));
+      out.push({ title: t.title, source:'Task Shelf', stewTaskId: t.id, min: t.durationMin||undefined }));
     (S()?.getTasks({status:'todo'})||[]).filter(t=>t.projectId && !out.some(o=>o.stewTaskId===t.id))
       .slice(0,3).forEach(t=> out.push({ title: t.title, source: S().getProject(t.projectId)?.title || 'Project', stewTaskId: t.id, min: t.durationMin||undefined }));
     st.b3own = out.slice(0,8);

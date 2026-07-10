@@ -54,7 +54,9 @@
       activityLog: Array.isArray(r.activityLog) ? r.activityLog : [],
       legacyFlow: r.flow || null,
       legacyMustDoId: r.flow?.mustDoId || null,
-      seedId: r.seedId || null
+      seedId: r.seedId || null,
+      convertedTaskId: r.convertedTaskId || null,
+      convertedProjectId: r.convertedProjectId || null
     };
   }
 
@@ -460,35 +462,6 @@
       '</div>';
   }
 
-  function renderQuickCapture(){
-    return '<div class="ih-card ih-quick">'+
-      '<h3 class="ih-card-title">Quick Capture</h3>'+
-      '<div class="ih-quick-grid">'+
-      '<button type="button" class="ih-quick-btn" id="ihQuickVoice"><span class="ih-quick-ico">🎤</span><strong>Voice Note</strong><em>Tap to record</em></button>'+
-      '<button type="button" class="ih-quick-btn" id="ihQuickCamera"><span class="ih-quick-ico">📷</span><strong>Camera Capture</strong><em>Take a photo</em></button>'+
-      '<button type="button" class="ih-quick-btn" id="ihQuickNote"><span class="ih-quick-ico">✎</span><strong>Quick Note</strong><em>Jot it down</em></button>'+
-      '</div></div>';
-  }
-
-  function renderSparkBoard(){
-    const notes = IdeasStore.getIdeas().filter(i=> i.status==='captured').slice(0,6);
-    const boardH = 168;
-    const html = notes.map((idea,idx)=>{
-      const x = idea.position?.x ?? (14 + (idx%3)*94);
-      const y = idea.position?.y ?? (14 + Math.floor(idx/3)*58);
-      const color = STICKY_COLORS[idx % STICKY_COLORS.length];
-      const rot = [-2, 1, -1, 2, 0, -3][idx % 6];
-      const text = (idea.title||idea.description||'Note').slice(0,48);
-      return '<div class="ih-sticky" data-ih-sticky="'+idea.id+'" style="left:'+x+'px;top:'+y+'px;background:'+color+';transform:rotate('+rot+'deg)">'+
-        esc(text)+'</div>';
-    }).join('');
-    return '<div class="ih-card ih-spark">'+
-      '<h3 class="ih-card-title">Spark Board</h3>'+
-      '<p class="ih-card-hint">A free-thinking space</p>'+
-      '<div class="ih-spark-board" id="ihSparkBoard" style="min-height:'+boardH+'px">'+html+'</div>'+
-      '<button type="button" class="ih-btn-ghost ih-add-sticky" id="ihAddSticky">+ Add note</button></div>';
-  }
-
   function renderVault(){
     const statuses = (typeof IDEA_STATUSES !== 'undefined' && Array.isArray(IDEA_STATUSES))
       ? IDEA_STATUSES : ['captured','clarified','planned','in_progress','completed'];
@@ -522,6 +495,11 @@
       '<button type="button" class="ih-star'+(idea.favorite?' on':'')+'" data-ih-fav="'+idea.id+'" aria-label="Favorite">'+(idea.favorite?'★':'☆')+'</button>'+
       '<details class="ih-more"><summary>⋯</summary>'+
       '<button type="button" data-ih-open="'+idea.id+'">Open workspace</button>'+
+      (idea.status === 'completed'
+        ? '<button type="button" data-ih-reopen="'+idea.id+'">Reopen</button>'
+        : '<button type="button" data-ih-complete="'+idea.id+'">Complete</button>')+
+      '<button type="button" data-ih-convert-task="'+idea.id+'">Convert to task</button>'+
+      '<button type="button" data-ih-convert-project="'+idea.id+'">Convert to project</button>'+
       '<button type="button" data-ih-pin="'+idea.id+'">Pin as focus</button>'+
       '<button type="button" class="ih-danger" data-ih-del="'+idea.id+'">Delete</button>'+
       '</details></div></article>';
@@ -579,7 +557,7 @@
       return;
     }
     try{
-      left.innerHTML = renderInbox()+renderQuickCapture()+renderSparkBoard();
+      left.innerHTML = renderInbox();
       center.innerHTML = renderVault();
       right.innerHTML = renderFocusCard()+renderInsights()+renderStreak();
       renderPipeline();
@@ -804,10 +782,8 @@
       const stop = ()=>{
         if(hub.mediaRecorder?.state === 'recording') hub.mediaRecorder.stop();
         document.getElementById('ihVoiceBtn')?.removeEventListener('click', stop);
-        document.getElementById('ihQuickVoice')?.removeEventListener('click', stop);
       };
       document.getElementById('ihVoiceBtn')?.addEventListener('click', stop);
-      document.getElementById('ihQuickVoice')?.addEventListener('click', stop);
     }catch(e){
       showToast('Microphone access denied.');
     }
@@ -827,15 +803,6 @@
     reader.readAsDataURL(file);
   }
 
-  function addSparkNote(){
-    const idx = IdeasStore.getIdeas().filter(i=> i.position).length;
-    IdeasStore.createIdea({
-      title:'New note', description:'', sourceType:'quick',
-      position:{ x: 12 + (idx%3)*88, y: 12 + Math.floor(idx/3)*52 }
-    });
-    markDirty(); renderHub();
-  }
-
   async function plantIdea(){
     readDraftFromDom();
     const d = hub.draft;
@@ -852,14 +819,14 @@
     IdeasStore.moveIdeaStatus(idea.id, newStatus);
     IdeasStore.addActivity(idea.id, 'Planted on calendar', 'plant');
 
-    const slot = WINDOW_TO_SLOT[idea.schedule?.window] || 'beforeWork';
+    const slot = WINDOW_TO_SLOT[idea.schedule?.window] || null;
     const dateStr = idea.schedule.date;
 
     if(typeof root.getDayDataByDate === 'function' && typeof root.saveDayDataByDate === 'function'){
       const PIPE_SLOT_FIELDS = root.PIPE_SLOT_FIELDS || { beforeWork:'beforeWork', duringWork:'duringWork', afterWork:'afterWork', eveningShutdown:'eveningShutdown' };
-      const field = PIPE_SLOT_FIELDS[slot] || 'beforeWork';
+      const field = slot ? PIPE_SLOT_FIELDS[slot] : null;
       const data = await root.getDayDataByDate(dateStr);
-      data.execute[field] = idea.steps.step1;
+      if(field) data.execute[field] = idea.steps.step1;
       let mustDoId = null;
       if(idea.mustDoToday){
         if(!data.faithfulFew.mustDo.items) data.faithfulFew.mustDo.items = [];
@@ -891,38 +858,57 @@
     renderHub();
   }
 
-  function bindSparkDrag(){
-    const board = document.getElementById('ihSparkBoard');
-    if(!board || board.dataset.dragBound) return;
-    board.dataset.dragBound = '1';
-    let drag = null;
-    board.addEventListener('mousedown', e=>{
-      const note = e.target.closest('[data-ih-sticky]');
-      if(!note) return;
-      e.preventDefault();
-      const rect = board.getBoundingClientRect();
-      drag = {
-        id: note.dataset.ihSticky,
-        ox: e.clientX - note.offsetLeft,
-        oy: e.clientY - note.offsetTop,
-        board, note
-      };
+  function completeIdea(id){
+    if(!id) return;
+    IdeasStore.moveIdeaStatus(id, 'completed');
+    markDirty(); showToast('Idea completed.'); renderHub();
+  }
+
+  function reopenIdea(id){
+    if(!id) return;
+    IdeasStore.moveIdeaStatus(id, 'captured');
+    markDirty(); showToast('Idea reopened.'); renderHub();
+  }
+
+  function convertIdeaToTask(id){
+    const idea = IdeasStore.getIdea(id);
+    const S = root.StewStore;
+    if(!idea || !S?.createTask) return;
+    if(idea.convertedTaskId && S.getTask?.(idea.convertedTaskId)){
+      showToast('This idea already has a task.');
+      return;
+    }
+    const task = S.createTask({
+      title: idea.firstAction || idea.title || 'Untitled task',
+      notes: idea.description || '',
+      relatedIdeaId: idea.id,
+      urgency: 'week',
+      tags: ['idea']
     });
-    document.addEventListener('mousemove', e=>{
-      if(!drag) return;
-      const x = Math.max(0, Math.min(e.clientX - drag.board.getBoundingClientRect().left - drag.ox, drag.board.clientWidth - 80));
-      const y = Math.max(0, Math.min(e.clientY - drag.board.getBoundingClientRect().top - drag.oy, drag.board.clientHeight - 40));
-      drag.note.style.left = x+'px';
-      drag.note.style.top = y+'px';
+    IdeasStore.updateIdea(id, { convertedTaskId: task.id, status: idea.status === 'completed' ? 'completed' : 'planned' });
+    markDirty(); showToast('Converted to Task Shelf.'); renderHub();
+    root.renderCalendar?.();
+  }
+
+  function convertIdeaToProject(id){
+    const idea = IdeasStore.getIdea(id);
+    const S = root.StewStore;
+    if(!idea || !S?.createProject) return;
+    if(idea.convertedProjectId && S.getProject?.(idea.convertedProjectId)){
+      showToast('This idea already has a project.');
+      return;
+    }
+    const p = S.createProject({
+      title: idea.title || 'Untitled project',
+      definedOutcome: idea.steps?.doneLooksLike || '',
+      whyItMatters: idea.clarification?.whyItMatters || '',
+      lifeArea: idea.lifeArea || '',
+      notes: idea.description || '',
+      relatedIdeaId: idea.id
     });
-    document.addEventListener('mouseup', ()=>{
-      if(!drag) return;
-      IdeasStore.updateIdea(drag.id, {
-        position:{ x: parseFloat(drag.note.style.left), y: parseFloat(drag.note.style.top) }
-      });
-      markDirty();
-      drag = null;
-    });
+    IdeasStore.updateIdea(id, { convertedProjectId: p.id, status: idea.status === 'completed' ? 'completed' : 'planned' });
+    markDirty(); showToast('Converted to project.'); renderHub();
+    root.renderProjects?.(); root.renderCalendar?.();
   }
 
   function bindHubEvents(){
@@ -937,12 +923,9 @@
       if(e.target.id === 'ihCaptureBtn' || e.target.closest('#ihCaptureBtn')){
         captureInbox('text'); return;
       }
-      if(e.target.closest('#ihVoiceBtn') || e.target.closest('#ihQuickVoice')){ startVoiceCapture(); return; }
-      if(e.target.closest('#ihCameraBtn') || e.target.closest('#ihQuickCamera')){
+      if(e.target.closest('#ihVoiceBtn')){ startVoiceCapture(); return; }
+      if(e.target.closest('#ihCameraBtn')){
         document.getElementById('ihCameraInput')?.click(); return;
-      }
-      if(e.target.closest('#ihQuickNote')){
-        document.getElementById('ihInboxText')?.focus(); return;
       }
       if(e.target.closest('#ihLinkBtn')){
         const url = prompt('Paste a link URL:');
@@ -952,17 +935,16 @@
       if(e.target.closest('#ihAttachBtn')){
         document.getElementById('ihAttachInput')?.click(); return;
       }
-      if(e.target.closest('#ihAddSticky')){ addSparkNote(); return; }
       if(e.target.closest('#ihNewIdea')){ openWorkspace(null); return; }
       if(e.target.closest('#ihSearchToggle')){
-        hub.searchOpen = !hub.searchOpen; renderHub(); bindSparkDrag();
+        hub.searchOpen = !hub.searchOpen; renderHub();
         if(hub.searchOpen) document.getElementById('ihSearchInput')?.focus();
         return;
       }
       const tab = e.target.closest('[data-ih-tab]');
-      if(tab){ hub.tab = tab.dataset.ihTab; renderHub(); bindSparkDrag(); return; }
+      if(tab){ hub.tab = tab.dataset.ihTab; renderHub(); return; }
       const pipe = e.target.closest('[data-ih-pipe]');
-      if(pipe){ hub.tab = pipe.dataset.ihPipe; renderHub(); bindSparkDrag(); return; }
+      if(pipe){ hub.tab = pipe.dataset.ihPipe; renderHub(); return; }
       const row = e.target.closest('[data-ih-idea]');
       if(row && !e.target.closest('.ih-star') && !e.target.closest('.ih-more')){
         openWorkspace(row.dataset.ihIdea); return;
@@ -970,13 +952,21 @@
       const open = e.target.closest('[data-ih-open]');
       if(open){ openWorkspace(open.dataset.ihOpen); return; }
       const fav = e.target.closest('[data-ih-fav]');
-      if(fav){ e.stopPropagation(); IdeasStore.toggleFavorite(fav.dataset.ihFav); markDirty(); renderHub(); bindSparkDrag(); return; }
+      if(fav){ e.stopPropagation(); IdeasStore.toggleFavorite(fav.dataset.ihFav); markDirty(); renderHub(); return; }
+      const complete = e.target.closest('[data-ih-complete]');
+      if(complete){ completeIdea(complete.dataset.ihComplete); return; }
+      const reopen = e.target.closest('[data-ih-reopen]');
+      if(reopen){ reopenIdea(reopen.dataset.ihReopen); return; }
+      const toTask = e.target.closest('[data-ih-convert-task]');
+      if(toTask){ convertIdeaToTask(toTask.dataset.ihConvertTask); return; }
+      const toProject = e.target.closest('[data-ih-convert-project]');
+      if(toProject){ convertIdeaToProject(toProject.dataset.ihConvertProject); return; }
       const pin = e.target.closest('[data-ih-pin]');
-      if(pin){ IdeasStore.pinIdea(pin.dataset.ihPin); markDirty(); renderHub(); bindSparkDrag(); return; }
+      if(pin){ IdeasStore.pinIdea(pin.dataset.ihPin); markDirty(); renderHub(); return; }
       const del = e.target.closest('[data-ih-del]');
       if(del){
         if(confirm('Delete this idea?')){
-          IdeasStore.deleteIdea(del.dataset.ihDel); markDirty(); renderHub(); bindSparkDrag();
+          IdeasStore.deleteIdea(del.dataset.ihDel); markDirty(); renderHub();
         }
         return;
       }
@@ -1090,7 +1080,6 @@
       IdeasStore.init(Array.isArray(legacy) ? legacy : []);
       renderHub();
       bindHubEvents();
-      bindSparkDrag();
     }catch(e){
       console.error('[Ideas Hub] load failed', e);
       showError('Ideas Hub could not start: '+(e.message||'unknown error'));

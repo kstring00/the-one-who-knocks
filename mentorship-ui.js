@@ -130,7 +130,7 @@
   }
 
   function renderWorkForm(p){
-    const f = activeForms['work-'+p.id] || { title: p.title, date: todayIso(), slot:'beforeWork' };
+    const f = activeForms['work-'+p.id] || { title: p.title, date: todayIso(), slot:'' };
     return '<div class="ms-inline-form" data-ms-work-form="'+p.id+'">'+
       '<input type="text" data-ms-work-title value="'+esc(f.title)+'" placeholder="Task title">'+
       '<input type="date" data-ms-work-date value="'+esc(f.date)+'">'+
@@ -556,7 +556,7 @@
       const title = form?.querySelector('[data-ms-work-title]')?.value.trim();
       const date = form?.querySelector('[data-ms-work-date]')?.value;
       const slotBtn = form?.querySelector('.ms-slot-chip.on');
-      const slot = slotBtn?.dataset.msWorkSlot || 'beforeWork';
+      const slot = slotBtn?.dataset.msWorkSlot || null;
       window.faithStore.putPrincipleToWork(pid, { title, date, timeSlot: slot });
       await window.faithStore.save();
       delete activeForms[pid];

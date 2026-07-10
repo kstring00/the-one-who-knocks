@@ -42,6 +42,21 @@
     return d.toISOString().slice(0,10);
   }
   function dowOf(dateStr){ return new Date(dateStr+'T12:00:00').getDay(); }
+  function normalizeTags(arr){
+    if(!Array.isArray(arr)) return [];
+    return [...new Set(arr.map(t=>String(t||'').trim()).filter(Boolean))];
+  }
+  function parseClockToMin(t){
+    const p = String(t||'').match(/^(\d{1,2}):(\d{2})/);
+    if(!p) return null;
+    const h = Math.max(0, Math.min(23, +p[1]));
+    const m = Math.max(0, Math.min(59, +p[2]));
+    return h*60+m;
+  }
+  function minsToClock(m){
+    if(typeof m !== 'number') return null;
+    return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
+  }
 
   // Start with an empty document, never null, so any accessor that runs
   // before load() resolves (e.g. a first render racing init) reads empty
@@ -58,12 +73,13 @@
       version: 1,
       goals: [], projects: [], tasks: [], habits: [], events: [], templates: [],
       days: {},          // date → { theme, prayer, bigThree:[taskId], reflection, scripture }
-      meta: { seeded: false }
+      meta: { seeded: false, migrations: {} }
     };
   }
 
   /* ── normalization ─────────────────────────────────────────── */
   function normTask(t){
+    const scheduledEventId = t.scheduledEventId || null;
     return {
       id: t.id || uid(), title: t.title || '', notes: t.notes || '',
       priority: PRIORITIES.includes(t.priority) ? t.priority : 'medium',
@@ -73,8 +89,48 @@
       goalId: t.goalId || null, projectId: t.projectId || null,
       status: t.status === 'done' || t.status === 'archived' ? t.status : 'todo',
       subtasks: Array.isArray(t.subtasks) ? t.subtasks.map(s=>({ id:s.id||uid(), text:s.text||'', done:!!s.done })) : [],
-      scheduledEventId: t.scheduledEventId || null,
-      createdAt: t.createdAt || nowIso(), completedAt: t.completedAt || null
+      scheduled: !!(t.scheduled || scheduledEventId),
+      startTime: t.startTime || null,
+      timeSlot: t.timeSlot || null,
+      scheduledEventId,
+      tags: normalizeTags(t.tags),
+      legacyCoreId: t.legacyCoreId || null,
+      legacyMustDoId: t.legacyMustDoId || null,
+      relatedIdeaId: t.relatedIdeaId || t.seedId || null,
+      originalDate: t.originalDate || null,
+      carriedFrom: t.carriedFrom || null,
+      carryCount: t.carryCount || 0,
+      createdAt: t.createdAt || nowIso(), updatedAt: t.updatedAt || null,
+      completedAt: t.completedAt || null
+    };
+  }
+  function normProject(p){
+    const status = p.status === 'done' || p.status === 'completed' ? 'done'
+      : (p.status === 'archived' || p.archived ? 'archived' : 'active');
+    return {
+      id: p.id || uid(),
+      title: String(p.title || '').trim(),
+      vision: p.vision || '',
+      definedOutcome: p.definedOutcome || '',
+      whyItMatters: p.whyItMatters || '',
+      goalId: p.goalId || null,
+      lifeArea: p.lifeArea || '',
+      status,
+      milestones: Array.isArray(p.milestones) ? p.milestones.map((m,i)=>({
+        id: m.id || uid(),
+        title: String(m.title || '').trim(),
+        done: !!m.done,
+        dueDate: m.dueDate || '',
+        sortOrder: typeof m.sortOrder === 'number' ? m.sortOrder : i
+      })) : [],
+      notes: p.notes || '',
+      targetDate: p.targetDate || p.dueDate || '',
+      relatedIdeaId: p.relatedIdeaId || p.linkedSeedId || null,
+      archived: status === 'archived',
+      legacyCoreId: p.legacyCoreId || null,
+      createdAt: p.createdAt || nowIso(),
+      updatedAt: p.updatedAt || p.createdAt || nowIso(),
+      completedAt: p.completedAt || null
     };
   }
   function normEvent(e){
@@ -88,6 +144,7 @@
       goalId: e.goalId || null, projectId: e.projectId || null,
       taskIds: Array.isArray(e.taskIds) ? e.taskIds.slice() : [],
       habitIds: Array.isArray(e.habitIds) ? e.habitIds.slice() : [],
+      legacyCoreTaskId: e.legacyCoreTaskId || null,
       notes: e.notes || '', reflection: e.reflection || '',
       done: !!e.done, completedAt: e.completedAt || null,
       createdAt: e.createdAt || nowIso(), updatedAt: e.updatedAt || null
@@ -111,15 +168,14 @@
       deadline:g.deadline||'', milestones:(g.milestones||[]).map(m=>({id:m.id||uid(),title:m.title||'',done:!!m.done})),
       createdAt:g.createdAt||nowIso()
     }));
-    d.projects = (d.projects||[]).map(p=>({
-      id:p.id||uid(), goalId:p.goalId||null, title:p.title||'',
-      status:p.status==='done'?'done':'active', createdAt:p.createdAt||nowIso()
-    }));
+    d.projects = (d.projects||[]).map(normProject);
     d.tasks = (d.tasks||[]).map(normTask);
     d.habits = (d.habits||[]).map(normHabit);
     d.events = (d.events||[]).map(normEvent);
     d.templates = (d.templates||[]).map(t=>Object.assign(normEvent(t), { id:t.id||uid(), date:'', done:false }));
     if(!d.days || typeof d.days !== 'object') d.days = {};
+    if(!d.meta || typeof d.meta !== 'object') d.meta = {};
+    if(!d.meta.migrations || typeof d.meta.migrations !== 'object') d.meta.migrations = {};
     return d;
   }
 
@@ -173,17 +229,145 @@
       (g ? g.milestones.filter(m=>m.done).length : 0);
     return Math.round(done/parts*100);
   }
-  function getProjects(goalId){
-    return goalId ? data.projects.filter(p=>p.goalId===goalId) : data.projects;
+  function getProjects(goalId, opts){
+    let list = goalId ? data.projects.filter(p=>p.goalId===goalId) : data.projects;
+    if(!opts?.includeArchived) list = list.filter(p=>p.status!=='archived' && !p.archived);
+    return list;
   }
   function getProject(id){ return data.projects.find(p=>p.id===id) || null; }
-  function createProject(p){ const o = normalize({projects:[p]}).projects[0]; data.projects.push(o); save(); return o; }
-  function updateProject(id,p){ const o = getProject(id); if(o){ Object.assign(o,p); save(); } return o; }
+  function createProject(p){ const o = normProject(p||{}); data.projects.push(o); save(); return o; }
+  function updateProject(id,p){
+    const o = getProject(id);
+    if(o){ Object.assign(o,p); const n = normProject(o); Object.assign(o,n); save(); }
+    return o;
+  }
   function deleteProject(id){
     data.projects = data.projects.filter(p=>p.id!==id);
     data.tasks.forEach(t=>{ if(t.projectId===id) t.projectId=null; });
     data.events.forEach(e=>{ if(e.projectId===id) e.projectId=null; });
     save();
+  }
+  function archiveProject(id){ return updateProject(id, { status:'archived', archived:true }); }
+  function restoreProject(id){ return updateProject(id, { status:'active', archived:false, completedAt:null }); }
+  function completeProject(id){ return updateProject(id, { status:'done', archived:false, completedAt:nowIso() }); }
+  function addProjectMilestone(projectId, title, dueDate){
+    const p = getProject(projectId); if(!p || !String(title||'').trim()) return null;
+    const m = { id: uid(), title: String(title).trim(), done:false, dueDate: dueDate || '', sortOrder:p.milestones.length };
+    p.milestones.push(m); touch(p); return m;
+  }
+  function toggleProjectMilestone(projectId, milestoneId){
+    const p = getProject(projectId); if(!p) return null;
+    const m = p.milestones.find(x=>x.id===milestoneId); if(!m) return null;
+    m.done = !m.done; touch(p); return m;
+  }
+  function projectProgress(projectId){
+    const p = getProject(projectId); if(!p) return null;
+    if(p.status === 'done') return { percent:100, done:1, total:1, label:'Complete' };
+    const tasks = data.tasks.filter(t=>t.projectId===projectId && t.status!=='archived');
+    const milestones = p.milestones || [];
+    const total = tasks.length + milestones.length;
+    if(!total) return { percent:null, done:0, total:0, label:'Not started' };
+    const done = tasks.filter(t=>t.status==='done').length + milestones.filter(m=>m.done).length;
+    return { percent:Math.round(done/total*100), done, total, label:Math.round(done/total*100)+'%' };
+  }
+
+  function migrateLegacyProjectTasks(core){
+    if(!core || typeof core !== 'object') return { changed:false, skipped:true };
+    const migrationKey = 'legacyProjectsToStewStore';
+    if(data.meta.migrations[migrationKey]?.version === 1) return { changed:false, alreadyRan:true };
+    const legacyProjects = Array.isArray(core.projects) ? core.projects : [];
+    const legacyTasks = Array.isArray(core.tasks) ? core.tasks : [];
+    const legacyProjectIds = new Set(legacyProjects.map(p=>p.id).filter(Boolean));
+    const legacySeedIds = new Map((core.seeds||[]).map(s=>[s.id, s.legacyIdeaId || s.id]));
+    let changed = false, projectCount = 0, taskCount = 0, eventCount = 0;
+
+    legacyProjects.forEach(p=>{
+      if(!p?.id && !p?.title) return;
+      const existing = data.projects.find(x=>x.id===p.id || x.legacyCoreId===p.id);
+      if(existing) return;
+      data.projects.push(normProject({
+        id: p.id,
+        title: p.title,
+        relatedIdeaId: legacySeedIds.get(p.linkedSeedId) || p.linkedSeedId || null,
+        tags: p.tags,
+        status: p.archived ? 'archived' : 'active',
+        archived: !!p.archived,
+        legacyCoreId: p.id,
+        createdAt: p.createdAt,
+        updatedAt: p.updatedAt
+      }));
+      changed = true; projectCount++;
+    });
+
+    legacyTasks
+      .filter(t=>t && (t.projectId || legacyProjectIds.has(t.projectId)))
+      .forEach(t=>{
+        const project = data.projects.find(p=>p.id===t.projectId || p.legacyCoreId===t.projectId);
+        if(!project) return;
+        let task = data.tasks.find(x=>x.id===t.id || x.legacyCoreId===t.id);
+        if(!task){
+          task = normTask({
+            id: t.id,
+            title: t.title,
+            notes: t.notes || '',
+            projectId: project.id,
+            status: t.completed ? 'done' : (t.archived ? 'archived' : 'todo'),
+            completedAt: t.completedAt || null,
+            dueDate: t.date || '',
+            durationMin: t.durationMin || null,
+            tags: t.tags || (t.tag && t.tag !== 'none' ? [t.tag] : []),
+            relatedIdeaId: legacySeedIds.get(t.seedId) || t.seedId || null,
+            legacyCoreId: t.id,
+            legacyMustDoId: t.legacyMustDoId || null,
+            originalDate: t.date || null,
+            scheduled:false,
+            startTime:null,
+            timeSlot:null,
+            scheduledEventId:null,
+            createdAt: t.createdAt,
+            updatedAt: t.updatedAt
+          });
+          data.tasks.push(task);
+          changed = true; taskCount++;
+        }
+
+        const startMin = t.timeSlot === 'timed' ? parseClockToMin(t.startTime) : null;
+        if(startMin != null && t.date && !data.events.some(e=>e.legacyCoreTaskId===t.id)){
+          const dur = t.durationMin || 45;
+          const ev = normEvent({
+            title: t.title,
+            date: t.date,
+            startMin,
+            endMin: startMin + dur,
+            category:'work',
+            projectId: project.id,
+            taskIds:[task.id],
+            legacyCoreTaskId:t.id,
+            createdAt:t.createdAt,
+            updatedAt:t.updatedAt,
+            done: !!t.completed,
+            completedAt:t.completedAt || null
+          });
+          data.events.push(ev);
+          task.scheduled = true;
+          task.scheduledEventId = ev.id;
+          task.startTime = t.startTime || null;
+          task.timeSlot = 'timed';
+          changed = true; eventCount++;
+        }
+      });
+
+    data.meta.migrations[migrationKey] = {
+      version: 1,
+      migratedAt: nowIso(),
+      projects: projectCount,
+      tasks: taskCount,
+      scheduledEvents: eventCount,
+      schedulingRepair: 'Legacy project tasks with beforeWork/duringWork/afterWork/eveningShutdown but no explicit startTime were treated as old automatic time-window defaults and migrated as unscheduled Task Shelf tasks. Only timeSlot=timed with a startTime was converted into a calendar event.'
+    };
+    if(changed || projectCount || taskCount || eventCount) persistNow();
+    else save();
+    return { changed, projects:projectCount, tasks:taskCount, scheduledEvents:eventCount };
   }
 
   /* ── tasks & subtasks ──────────────────────────────────────── */
@@ -284,7 +468,15 @@
   function createEvent(p){
     const e = normEvent(p||{});
     data.events.push(e);
-    e.taskIds.forEach(tid=>{ const t = getTask(tid); if(t) t.scheduledEventId = e.id; });
+    e.taskIds.forEach(tid=>{
+      const t = getTask(tid);
+      if(t){
+        t.scheduled = true;
+        t.scheduledEventId = e.id;
+        t.startTime = minsToClock(e.startMin);
+        t.timeSlot = 'timed';
+      }
+    });
     save(); return e;
   }
   function updateEvent(id,p){
@@ -295,15 +487,36 @@
     if(p.done===false) e.completedAt = null;
     if(p.taskIds){
       oldTasks.filter(t=>!p.taskIds.includes(t)).forEach(tid=>{
-        const t = getTask(tid); if(t && t.scheduledEventId===id) t.scheduledEventId = null;
+        const t = getTask(tid);
+        if(t && t.scheduledEventId===id){
+          t.scheduled = false; t.scheduledEventId = null; t.startTime = null; t.timeSlot = null;
+        }
       });
-      p.taskIds.forEach(tid=>{ const t = getTask(tid); if(t) t.scheduledEventId = id; });
+      p.taskIds.forEach(tid=>{
+        const t = getTask(tid);
+        if(t){ t.scheduled = true; t.scheduledEventId = id; t.startTime = minsToClock(e.startMin); t.timeSlot = 'timed'; }
+      });
+    }
+    if(p.startMin != null || p.date != null){
+      e.taskIds.forEach(tid=>{
+        const t = getTask(tid);
+        if(t && t.scheduledEventId===id){
+          t.scheduled = true;
+          t.startTime = minsToClock(e.startMin);
+          t.timeSlot = 'timed';
+        }
+      });
     }
     touch(e); return e;
   }
   function deleteEvent(id){
     const e = getEvent(id); if(!e) return;
-    e.taskIds.forEach(tid=>{ const t = getTask(tid); if(t && t.scheduledEventId===id) t.scheduledEventId = null; });
+    e.taskIds.forEach(tid=>{
+      const t = getTask(tid);
+      if(t && t.scheduledEventId===id){
+        t.scheduled = false; t.scheduledEventId = null; t.startTime = null; t.timeSlot = null;
+      }
+    });
     data.events = data.events.filter(x=>x.id!==id);
     save();
   }
@@ -342,6 +555,7 @@
   /** Schedule an unscheduled task as a calendar block. */
   function scheduleTask(taskId, dateStr, startMin){
     const t = getTask(taskId); if(!t) return null;
+    if(typeof startMin !== 'number') return null;
     const goal = t.goalId ? getGoal(t.goalId) : null;
     const catByArea = { Faith:'spiritual', Health:'health', Leadership:'leadership', Work:'work',
       Relationships:'relationships', Finances:'admin', Learning:'learning', Home:'personal' };
@@ -420,6 +634,8 @@
     CATEGORIES, LIFE_AREAS, PRIORITIES, URGENCIES, ENERGIES,
     getGoals, getGoal, createGoal, updateGoal, deleteGoal, goalProgress,
     getProjects, getProject, createProject, updateProject, deleteProject,
+    archiveProject, restoreProject, completeProject, projectProgress,
+    addProjectMilestone, toggleProjectMilestone,
     getTasks, getTask, createTask, updateTask, deleteTask, toggleSubtask, addSubtask,
     overflowTasks, moveTask, scheduleTask,
     getHabits, getHabit, createHabit, updateHabit, deleteHabit,
@@ -427,7 +643,47 @@
     getEvents, getEvent, eventsForDate, createEvent, updateEvent, deleteEvent,
     duplicateEvent, completeEvent,
     getTemplates, saveTemplate, deleteTemplate, createEventFromTemplate,
-    getDayMeta, setDayMeta, toggleBigThree, ringForDate
+    getDayMeta, setDayMeta, toggleBigThree, ringForDate,
+    migrateLegacyProjectTasks
+  };
+
+  root.runStewardshipStoreTests = async function(){
+    const results = [];
+    function assert(name, cond, detail){
+      results.push({ name, pass: !!cond, detail: detail || '' });
+      if(!cond) throw new Error(name+(detail ? ': '+detail : ''));
+    }
+    try{
+      data = blankData();
+      loaded = true;
+      const legacy = {
+        projects:[{ id:'legacy-project-1', title:'Legacy Project', archived:false, tags:['home'], createdAt:'2026-07-01T00:00:00Z' }],
+        tasks:[
+          { id:'legacy-task-1', title:'Legacy open task', projectId:'legacy-project-1', completed:false, date:'2026-07-10', timeSlot:'beforeWork', tag:'project' },
+          { id:'legacy-task-2', title:'Legacy timed task', projectId:'legacy-project-1', completed:true, completedAt:'2026-07-09T12:00:00Z', date:'2026-07-11', timeSlot:'timed', startTime:'14:30', durationMin:30, tag:'project' }
+        ]
+      };
+      const first = migrateLegacyProjectTasks(legacy);
+      assert('legacy project migrates', first.projects === 1 && !!getProject('legacy-project-1'));
+      assert('legacy tasks migrate', first.tasks === 2 && getTasks({projectId:'legacy-project-1'}).length === 2);
+      assert('beforeWork legacy project task is unscheduled', !getTask('legacy-task-1').scheduledEventId && getTask('legacy-task-1').timeSlot == null);
+      assert('explicit timed legacy task becomes event', first.scheduledEvents === 1 && !!getTask('legacy-task-2').scheduledEventId);
+      migrateLegacyProjectTasks(legacy);
+      assert('migration is idempotent', getProjects(null,{includeArchived:true}).length === 1 && getTasks({projectId:'legacy-project-1'}).length === 2);
+      assert('completion state preserved', getTask('legacy-task-2').status === 'done');
+      const prog = projectProgress('legacy-project-1');
+      assert('progress counts tasks', prog.percent === 50, 'got '+prog.percent);
+      assert('scheduleTask requires explicit time', scheduleTask('legacy-task-1', '2026-07-12', null) === null);
+      const ev = scheduleTask('legacy-task-1', '2026-07-12', 10*60);
+      assert('explicit schedule creates event', !!ev && getTask('legacy-task-1').scheduledEventId === ev.id);
+      deleteEvent(ev.id);
+      assert('deleting event preserves task', !!getTask('legacy-task-1') && !getTask('legacy-task-1').scheduledEventId);
+      results.push({ name:'ALL STEWARDSHIP TESTS', pass:true, detail:results.length+' checks' });
+      return { pass:true, fail:0, results };
+    }catch(e){
+      results.push({ name:'FAILED', pass:false, detail:e.message });
+      return { pass:false, fail:1, results, error:e.message };
+    }
   };
 
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -48,16 +48,16 @@
       {
         id: 'dashboard',
         title: 'Dashboard',
-        for: 'Your home base — today\'s theme, schedule, habits, and what\'s still entrusted.',
+        for: 'Your home base — today\'s theme, schedule, habits, and the Task Shelf.',
         bullets: [
           'Start in Day view: name the day, crown your Big Three, and see your timeline.',
-          'Drag tasks from Still Entrusted onto an hour when you\'re ready.',
+          'Drag tasks from the Task Shelf onto an hour when you\'re ready.',
           'Use Planning for goals → projects → tasks; Week and Month for the wider picture.',
           'The Faithfulness Ring scores stewardship, not perfection — an empty day is an invitation.'
         ],
         tryView: 'dashboard',
         tryLabel: 'Open your dashboard',
-        hint: 'Today lives here — theme, time blocks, habits, and what\'s still waiting faithfully.'
+        hint: 'Today lives here — theme, time blocks, habits, and the Task Shelf.'
       },
       {
         id: 'rhythms',
@@ -375,27 +375,9 @@
 
   function renderViewHint(){
     const bar = document.getElementById('contextHintBar');
-    if(!bar || !root.guideData) return;
-    const areaId = hintAreaForView();
-    if(!areaId || root.guideData.hintsDismissed[areaId]){
-      bar.hidden = true;
-      bar.innerHTML = '';
-      return;
-    }
-    const area = GUIDE_CONTENT.areas.find(a => a.id === areaId);
-    if(!area?.hint){
-      bar.hidden = true;
-      bar.innerHTML = '';
-      return;
-    }
-    bar.hidden = false;
-    bar.innerHTML =
-      '<div class="guide-hint">'+
-      '<p>'+esc(area.hint)+'</p>'+
-      '<div class="guide-hint-actions">'+
-      '<button type="button" class="btn-ghost" data-guide-card="'+esc(areaId)+'">Learn more</button>'+
-      '<button type="button" class="guide-hint-dismiss" data-hint-dismiss="'+esc(areaId)+'" aria-label="Dismiss">Not now</button>'+
-      '</div></div>';
+    if(!bar) return;
+    bar.hidden = true;
+    bar.innerHTML = '';
   }
 
   function updateGuideHelpButton(){

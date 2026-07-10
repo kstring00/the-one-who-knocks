@@ -123,7 +123,7 @@
       id: t.id || uid(),
       title: String(t.title || '').trim(),
       date: t.date || todayIso(),
-      timeSlot: TIME_SLOTS.includes(t.timeSlot) ? t.timeSlot : 'beforeWork',
+      timeSlot: TIME_SLOTS.includes(t.timeSlot) ? t.timeSlot : null,
       durationMin: typeof t.durationMin === 'number' ? t.durationMin : null,
       tag: TASK_TAGS.includes(t.tag) ? t.tag : 'none',
       tags: normalizeTags(t.tags),
@@ -136,6 +136,7 @@
       updatedAt: t.updatedAt || t.createdAt || nowIso(),
       legacyMustDoId: t.legacyMustDoId || null,
       anchorId: t.anchorId || null,
+      scheduled: !!(t.scheduled || (TIME_SLOTS.includes(t.timeSlot) && (t.timeSlot !== 'timed' || t.startTime))),
       startTime: t.startTime || '',
       sortOrder: typeof t.sortOrder === 'number' ? t.sortOrder : null,
       principleId: t.principleId || null
@@ -505,7 +506,6 @@
           this.createTask({
             title: a.title,
             date: dateStr,
-            timeSlot: 'beforeWork',
             tag: 'stewardship',
             anchorId: a.id,
             durationMin: a.durationMin,
@@ -569,7 +569,6 @@
           this.createTask({
             title: it.text || '',
             date: dateStr,
-            timeSlot: 'beforeWork',
             tag: 'stewardship',
             legacyMustDoId: it.id,
             completed: !!it.done
@@ -922,7 +921,7 @@
       const task = this.createTask({
         title: title || principle.title,
         date: date || todayIso(),
-        timeSlot: timeSlot || 'beforeWork',
+        timeSlot: timeSlot || null,
         startTime: startTime || '',
         tag: 'stewardship',
         principleId
@@ -1325,7 +1324,6 @@
             this.createTask({
               title: it.text,
               date: dateStr,
-              timeSlot: 'beforeWork',
               tag: seed ? 'growth' : 'stewardship',
               seedId: seed?.id || null,
               completed: !!it.done,
@@ -1401,7 +1399,6 @@
           task = this.createTask({
             title: it.text,
             date,
-            timeSlot: 'beforeWork',
             tag: 'stewardship',
             legacyMustDoId: mustDoId,
             completed: !!done

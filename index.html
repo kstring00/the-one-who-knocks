@@ -98,6 +98,9 @@ button:disabled{cursor:not-allowed}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg-page);color:var(--ink);
   font:15px/1.55 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+body.theme-morning{--bg-page:#fbf3e7;--bg-card-2:#f5eadb;--nav-hover-bg:color-mix(in srgb,var(--gold) 10%,transparent)}
+body.theme-day{--bg-page:#f6f1e9;--bg-card-2:#f3ece2}
+body.theme-evening{--bg-page:#efe8df;--bg-sidebar:#e4dccf;--bg-card-2:#ebe2d7;--text-secondary:#665d53}
 *{scrollbar-width:thin;scrollbar-color:var(--scroll-thumb) var(--scroll-track)}
 .serif{font-family:"Cormorant Garamond",Georgia,serif}
 
@@ -169,6 +172,7 @@ body.day-off-today.day-past #periodLabel{color:#4a6076}
 .page-head{margin-bottom:16px;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px}
 .page-head h2{font-family:"Cormorant Garamond",serif;font-size:26px;font-weight:700;margin:0 0 2px;color:var(--navy)}
 .page-head p{margin:0;font-size:13px;color:var(--mist)}
+.app-empty-state{margin:8px 0;padding:10px 12px;border:1px dashed var(--line-soft);border-radius:8px;background:var(--bg-card-2);font-size:12.5px;color:var(--text-secondary);line-height:1.5}
 /* Daily Ledger head — title left, rhythm tabs centered at the same height, actions right */
 .daily-head{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px}
 .daily-head .weekday-phase-tabs{justify-self:center;position:relative;z-index:5}
@@ -178,6 +182,13 @@ body.day-off-today.day-past #periodLabel{color:#4a6076}
   .daily-head .page-head-actions{justify-self:center}
 }
 .page-head-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.daily-planning-date{margin:3px 0 2px;font-size:22px;line-height:1.1;color:var(--navy)}
+.day-seg{display:flex;align-items:center;border:1px solid var(--line-soft);border-radius:9px;padding:2px;background:var(--paper)}
+.day-seg button{border:none;background:transparent;color:var(--text-secondary);border-radius:7px;padding:6px 12px;font:600 11px/1 inherit;cursor:pointer}
+.day-seg button.on{background:var(--bg-card);color:var(--text-primary);box-shadow:0 1px 3px var(--shadow-elevated)}
+body.day-off-today:not(.day-past) #dailyBoard .daily-planning-date,
+body.day-off-today:not(.day-past) #dailyBoard .daily-tagline{color:var(--gold-text)}
+body.day-off-today:not(.day-past) #dailyBoard .daily-head{border-bottom:1px solid var(--gold-border-soft);padding-bottom:10px}
 
 .daily-toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:18px}
 .phase-tabs{display:flex;background:var(--line-soft);border-radius:10px;padding:3px;gap:2px}
@@ -591,6 +602,12 @@ body.mentor-open{overflow:hidden}
 .journal-past-btn:hover{color:var(--gold-text)}
 .journal-past-panel{display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
 .journal-past-panel.open{display:block}
+.journal-search{width:100%;box-sizing:border-box;border:1px solid var(--border);border-radius:9px;background:var(--bg-card);color:var(--text-primary);font:13px/1.4 inherit;padding:9px 10px;margin:0 0 8px}
+.journal-search-results{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.journal-search-result{border:1px solid var(--border);border-radius:8px;background:var(--bg-card);padding:8px 10px;text-align:left;color:var(--text-primary);font-family:inherit;cursor:pointer}
+.journal-search-result strong{display:block;font-size:12px;color:var(--gold-text);margin-bottom:3px}
+.journal-search-result span{display:block;font-size:12px;line-height:1.45;color:var(--text-secondary)}
+.journal-search-result mark{background:var(--gold-fill-18);color:var(--text-primary);border-radius:3px;padding:0 2px}
 .journal-list{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
 .journal-list button{border:1px solid var(--border);background:var(--bg-card-2);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:inherit;color:var(--text-secondary)}
 .journal-list button.on{background:var(--gold-dim);color:var(--gold-text);border-color:var(--gold-border-soft)}
@@ -811,17 +828,6 @@ body.view-prayer .daily-layout,body.view-prayer .weekly-board,body.view-prayer .
 .ih-btn-gold:hover{filter:brightness(1.06)}
 .ih-btn-ghost{border:1px solid var(--border);background:transparent;color:var(--text-secondary);border-radius:12px;padding:10px 14px;font-size:12px;cursor:pointer;font-family:inherit;width:100%}
 .ih-btn-ghost:hover{color:var(--gold-text);border-color:var(--gold-border-soft)}
-.ih-add-sticky{margin-top:8px}
-.ih-quick-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.ih-quick-btn{display:flex;flex-direction:column;align-items:center;gap:4px;border:1px solid var(--border);background:var(--bg-card-2);
-  border-radius:var(--radius-xl);padding:16px 10px;cursor:pointer;font-family:inherit;color:var(--text-secondary);min-height:108px;justify-content:center;text-align:center}
-.ih-quick-btn strong{font-size:11px;font-weight:600;color:var(--text-primary)}
-.ih-quick-btn em{font-size:9px;font-style:normal;color:var(--text-muted);line-height:1.3}
-.ih-quick-ico{font-size:26px;line-height:1;margin-bottom:4px}
-.ih-quick-btn:hover{border-color:var(--gold-border-soft);background:var(--gold-fill-06)}
-.ih-spark-board{position:relative;border-radius:14px;background:var(--bg-card-2);min-height:120px;margin-bottom:4px;overflow:hidden;border:1px dashed var(--border)}
-.ih-sticky{position:absolute;width:84px;padding:10px 8px;border-radius:6px;font-size:10px;line-height:1.35;color:#fff;cursor:grab;
-  box-shadow:0 4px 12px rgba(0,0,0,.35);user-select:none;word-break:break-word;font-family:"Cormorant Garamond",Georgia,serif}
 .ih-vault-title{margin-bottom:12px}
 .ih-vault-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;flex-wrap:wrap}
 .ih-tabs{display:flex;gap:2px;flex-wrap:wrap;flex:1;min-width:0}
@@ -1053,6 +1059,7 @@ body.view-ideas .app-content{padding-top:8px}
   padding:8px 20px;cursor:pointer;transition:background .15s,color .15s}
 .stone-seg.on{background:var(--gold-fill-20);color:var(--gold-text);font-weight:600}
 .stone-form-hint{color:var(--text-muted);font-size:12.5px;margin:0 0 12px;line-height:1.5}
+.stones-origin{margin:10px 0 0;font-size:12px;line-height:1.55;color:var(--text-secondary);max-width:760px}
 .stone-textarea,.stone-source-input{width:100%;box-sizing:border-box;border:1px solid var(--border);border-radius:var(--radius-md);
   background:var(--bg-page);color:var(--text-primary);font-family:inherit;font-size:15px;padding:11px 13px}
 .stone-textarea{resize:vertical;line-height:1.55;margin-bottom:10px}
@@ -1789,6 +1796,23 @@ body.faithfulness-app.day-off-today.day-past #periodLabel{color:#4a6076}
 #projectsPanel .proj-rename-inp{flex:1;font-size:16px;font-family:"Cormorant Garamond",serif;padding:8px 10px;border-radius:8px;border:1px solid var(--border-subtle)}
 #projectsPanel .proj-task-group{margin:12px 0}
 #projectsPanel .proj-task-group h5{margin:0 0 6px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-secondary)}
+.proj-definition{font-size:13px;line-height:1.55;color:var(--text-secondary);padding:10px 12px;border:1px solid var(--gold-border-soft);border-radius:8px;background:var(--gold-fill-06);margin-bottom:12px}
+.proj-preview{font-size:12px;line-height:1.45;color:var(--text-secondary);margin:8px 0 0}
+.proj-progress-row{display:flex;align-items:center;gap:10px;margin:8px 0 12px;font-size:12px;color:var(--text-secondary)}
+.proj-progress-row .dash-proj-bar{flex:1;margin:0}
+.proj-detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0}
+.proj-detail-grid label,.proj-notes-label{display:flex;flex-direction:column;gap:5px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--text-secondary)}
+.proj-detail-grid textarea,.proj-detail-grid input,.proj-detail-grid select,.proj-notes-label textarea{border:1px solid var(--border);border-radius:8px;background:var(--bg-card);color:var(--text-primary);font:13px/1.45 inherit;padding:8px 10px;text-transform:none;letter-spacing:0;font-weight:400}
+.proj-milestone{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:13px;color:var(--text-primary)}
+.proj-milestone.done span{text-decoration:line-through;color:var(--text-secondary)}
+.proj-milestone small{font-size:11px;color:var(--text-muted);margin-left:auto}
+.proj-task-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center}
+.proj-task-row label{display:flex;gap:8px;align-items:center;min-width:0}
+.proj-mini{padding:4px 8px;font-size:11px}
+.proj-subtasks{grid-column:1/-1;margin-left:22px}
+.proj-subtasks summary{font-size:11px;color:var(--text-muted);cursor:pointer}
+.proj-event-row{font-size:12px;color:var(--text-secondary);padding:5px 0;border-bottom:1px solid color-mix(in srgb,var(--border) 45%,transparent)}
+@media(max-width:760px){.proj-detail-grid{grid-template-columns:1fr}.proj-task-row{grid-template-columns:minmax(0,1fr);align-items:start}.proj-mini{justify-self:start}}
 .settings-card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);padding:20px;max-width:560px}
 #settingsPanel .settings-card{margin-bottom:16px}
 #dailyBoard[hidden],#weeklyBoard[hidden],#monthlyBoard[hidden],#journalPanel[hidden],#ideasPanel[hidden],#prayerPanel[hidden],#calendarPanel[hidden],#tagLensPanel[hidden]{display:none!important}
@@ -2563,7 +2587,6 @@ body.intake-open{overflow:hidden}
     </div>
     <button type="button" class="auth-signout" id="authSignInTop" hidden>Sign in</button>
     <span id="saveState">Saved</span>
-    <button type="button" id="saveBtn">Save</button>
     <button type="button" class="btn-mentor" id="btnAskMentor">Ask Mentor</button>
     <button type="button" class="btn-gold" id="btnIdeasTop">✦ Ideas</button>
     <details class="save-menu">
@@ -2588,7 +2611,7 @@ body.intake-open{overflow:hidden}
 </section>
 
 <section id="projectsPanel" hidden aria-label="Projects">
-  <div class="page-head"><div><h2 class="serif">Projects</h2><p>Faithful work over time — progress from linked tasks.</p></div></div>
+  <div class="page-head"><div><h2 class="serif">Projects</h2><p>A project is a connected body of work with a defined outcome. It is larger than a task and more concrete than a goal.</p></div></div>
   <div id="projMarkerOffer" class="stone-offer" hidden></div>
   <div class="settings-card" id="projNewForm">
     <h4 class="serif" style="margin:0 0 10px">New Project</h4>
@@ -2746,6 +2769,7 @@ body.intake-open{overflow:hidden}
   <div class="page-head daily-head">
     <div class="daily-head-title">
       <h2>Daily Ledger<span class="day-scope-chip" data-day-scope-chip>Planning Today</span></h2>
+      <p class="daily-planning-date serif" id="dailyPlanningDate">Planning: Today</p>
       <p class="daily-tagline">Here is the faithful next version of today. Let’s build it quickly.</p>
     </div>
     <div class="phase-tabs weekday-phase-tabs" role="tablist" aria-label="Daily rhythm">
@@ -2754,6 +2778,10 @@ body.intake-open{overflow:hidden}
       <button type="button" class="phase-tab" data-phase="evening" role="tab">Evening Review</button>
     </div>
     <div class="page-head-actions">
+      <div class="day-seg" role="group" aria-label="Planning day">
+        <button type="button" data-day-scope-set="0">Today</button>
+        <button type="button" data-day-scope-set="1">Tomorrow</button>
+      </div>
       <button type="button" class="why-btn" id="whyWorksBtn">Why This Works</button>
     </div>
   </div>
@@ -2821,7 +2849,8 @@ body.intake-open{overflow:hidden}
   <header class="stones-hero" role="banner">
     <div class="stones-hero-inner">
       <h2 class="stones-hero-title serif">Stones</h2>
-      <p class="stones-hero-sub">What you believe. What you've survived. Kept where you can reach it.</p>
+      <p class="stones-hero-sub">Stones are truths and remembered victories you return to when emotions lie, motivation disappears, or life becomes chaotic. When you cannot trust the moment, return to what you already know God has taught you and what He has already carried you through.</p>
+      <p class="stones-origin">The name comes from Joshua 4, where Israel carried stones from the Jordan so they would remember what God had done when future generations asked.</p>
     </div>
   </header>
   <div class="stones-body" id="stonesBody"></div>
@@ -2846,10 +2875,15 @@ body.intake-open{overflow:hidden}
     <section class="journal-entry-card" aria-label="Today's entry">
       <div class="journal-entry-head"><span class="journal-entry-dot"></span><h3 class="serif">Today's entry</h3></div>
       <div class="journal-toolbar" id="journalToolbar" role="toolbar" aria-label="Formatting">
+        <button type="button" class="journal-tool" data-jtool="h1" title="Heading 1">H1</button>
+        <button type="button" class="journal-tool" data-jtool="h2" title="Heading 2">H2</button>
+        <button type="button" class="journal-tool" data-jtool="h3" title="Heading 3">H3</button>
         <button type="button" class="journal-tool" data-jtool="bold" title="Bold">B</button>
         <button type="button" class="journal-tool" data-jtool="italic" title="Italic"><em>I</em></button>
-        <button type="button" class="journal-tool" data-jtool="bullet" title="Bullet list">≡</button>
-        <button type="button" class="journal-tool" data-jtool="num" title="Numbered list">#</button>
+        <button type="button" class="journal-tool" data-jtool="bullet" title="Bullet list">•</button>
+        <button type="button" class="journal-tool" data-jtool="num" title="Numbered list">1.</button>
+        <button type="button" class="journal-tool" data-jtool="check" title="Checklist">☐</button>
+        <button type="button" class="journal-tool" data-jtool="quote" title="Quote">❝</button>
       </div>
       <textarea id="journalBody" class="journal-editor" placeholder="What's actually going on? What are you carrying?" aria-label="Journal entry"></textarea>
       <div class="journal-meta"><span id="journalWords">0 words</span><span id="journalUpdated"></span></div>
@@ -2858,6 +2892,8 @@ body.intake-open{overflow:hidden}
         <button type="button" class="danger" id="clearJournal">Clear this entry</button>
       </div>
       <div class="journal-past-panel" id="journalPastPanel">
+        <input type="search" id="journalSearch" class="journal-search" placeholder="Search journal entries…" aria-label="Search journal entries">
+        <div id="journalSearchResults" class="journal-search-results"></div>
         <ul class="journal-list" id="journalList"></ul>
       </div>
     </section>
@@ -3077,24 +3113,24 @@ body.intake-open{overflow:hidden}
 </div><!-- /.app-main -->
 </div><!-- /.app-shell -->
 
-<script src="faithfulness-store.js"></script>
-<script src="mentorship-ui.js?v=7"></script>
+<script src="faithfulness-store.js?v=2"></script>
+<script src="mentorship-ui.js?v=8"></script>
 <script src="tags-ui.js"></script>
-<script src="projects-ui.js"></script>
-<script src="journal-ui.js?v=2"></script>
-<script src="stones-ui.js?v=1"></script>
-<script src="ideas-hub.js?v=6" onerror="(function(){var p=document.getElementById('ihPipeline');if(p)p.innerHTML='<p class=&quot;ih-load-error&quot;>Failed to load ideas-hub.js — hard-refresh the page.</p>';})()"></script>
-<script src="stewardship-store.js?v=1"></script>
-<script src="calendar-ui.js?v=4"></script>
-<script src="daily-ui.js?v=9"></script>
+<script src="projects-ui.js?v=2"></script>
+<script src="journal-ui.js?v=3"></script>
+<script src="stones-ui.js?v=2"></script>
+<script src="ideas-hub.js?v=7" onerror="(function(){var p=document.getElementById('ihPipeline');if(p)p.innerHTML='<p class=&quot;ih-load-error&quot;>Failed to load ideas-hub.js — hard-refresh the page.</p>';})()"></script>
+<script src="stewardship-store.js?v=2"></script>
+<script src="calendar-ui.js?v=5"></script>
+<script src="daily-ui.js?v=10"></script>
 <script src="midday-ui.js?v=2"></script>
 <script src="evening-ui.js?v=1"></script>
 <script src="review-ui.js?v=2"></script>
 <script src="profile-ui.js?v=1"></script>
-<script src="guide-ui.js?v=2"></script>
-<script src="intake-ui.js?v=2"></script>
+<script src="guide-ui.js?v=3"></script>
+<script src="intake-ui.js?v=3"></script>
 <script src="mentor-context.js?v=1"></script>
-<script src="mentor-ui.js?v=1"></script>
+<script src="mentor-ui.js?v=2"></script>
 <script>
 
 if (!window.storage) {
@@ -3282,10 +3318,12 @@ async function applyPulledRow(key, dataObj, updatedAt){
   setLocalSyncAt(key, cloudAt);
   if(key === 'fs-core' && faithStore){
     await faithStore.load();
+    await runStewardshipMigrations?.();
     refreshGuideUI?.();
   }
   if(key === 'fs-stewardship' && window.StewStore){
     await window.StewStore.load();
+    await runStewardshipMigrations?.();
     refreshGuideUI?.();
   }
   if(key === 'fs-stones' && window.StonesStore){
@@ -3602,7 +3640,7 @@ const MY_WEEK_DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday
 let pipeStage = 1;
 let pipeEditingId = null;
 let pipeScheduleDate = null;
-let pipeScheduleSlot = 'beforeWork';
+let pipeScheduleSlot = '';
 let pipePlaceholderIdx = 0;
 let ideaCalDayCache = {};
 let seedbedListOpen = false;
@@ -3626,7 +3664,7 @@ function normalizeIdea(raw){
     snoozedUntil: raw.snoozedUntil||null, releaseNote: raw.releaseNote||'',
     flow: raw.flow ? {...raw.flow} : null
   };
-  if(!o.flow) o.flow = {stage:1,steps:['','',''],doneDef:'',scheduleDate:'',scheduleSlot:'beforeWork',firstAction:'',addMustDo:true,stepsDone:[false,false,false],mustDoId:null};
+  if(!o.flow) o.flow = {stage:1,steps:['','',''],doneDef:'',scheduleDate:'',scheduleSlot:'',firstAction:'',addMustDo:true,stepsDone:[false,false,false],mustDoId:null};
   if(!Array.isArray(o.flow.steps)) o.flow.steps = ['','',''];
   if(!Array.isArray(o.flow.stepsDone)) o.flow.stepsDone = [false,false,false];
   if(o.status==='resting' && o.snoozedUntil && o.snoozedUntil <= today){ o.status='seedbed'; o.snoozedUntil=null; }
@@ -3691,7 +3729,7 @@ function writePipeForm(idea){
   document.getElementById('pipeFirstAction').value = f.firstAction||'';
   document.getElementById('pipeMustDo').checked = f.addMustDo !== false;
   pipeScheduleDate = f.scheduleDate || iso(dayOf(0));
-  pipeScheduleSlot = f.scheduleSlot || 'beforeWork';
+  pipeScheduleSlot = f.scheduleSlot || '';
   pipeStage = Math.max(1, f.stage||inferPipeStage(f));
   pipeEditingId = idea?.id||null;
   renderPipeWeekStrip();
@@ -3708,7 +3746,7 @@ function inferPipeStage(f){
 }
 function resetPipeForm(){
   pipeEditingId=null; pipeStage=1;
-  pipeScheduleDate=iso(dayOf(0)); pipeScheduleSlot='beforeWork';
+  pipeScheduleDate=iso(dayOf(0)); pipeScheduleSlot='';
   document.getElementById('pipeIdeaText').value='';
   document.getElementById('pipeLifeArea').value='other';
   ['pipeStep1','pipeStep2','pipeStep3','pipeDoneDef','pipeFirstAction'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
@@ -3788,7 +3826,7 @@ function upsertPipeDraft(status){
   idea.text=f.text; idea.category=f.category;
   if(status) idea.status=status;
   idea.flow={...idea.flow, stage:pipeStage, steps:[...f.steps], doneDef:f.doneDef, scheduleDate:f.scheduleDate||'',
-    scheduleSlot:f.scheduleSlot||'beforeWork', firstAction:f.firstAction, addMustDo:f.addMustDo};
+    scheduleSlot:f.scheduleSlot||'', firstAction:f.firstAction, addMustDo:f.addMustDo};
   idea.updatedAt=new Date().toISOString();
   markDirty();
   return idea;
@@ -3836,9 +3874,9 @@ async function pipePlant(){
   if(!f.text||!f.steps[0]||!f.firstAction||!f.scheduleDate||pipeBlocked()) return;
   const idea=upsertPipeDraft('growing');
   if(!idea) return;
-  const field=PIPE_SLOT_FIELDS[f.scheduleSlot];
   const data=await getDayDataByDate(f.scheduleDate);
-  data.execute[field]=f.steps[0];
+  const field=PIPE_SLOT_FIELDS[f.scheduleSlot];
+  if(field) data.execute[field]=f.steps[0];
   let mustDoId=null;
   if(f.addMustDo){
     if(!data.faithfulFew.mustDo.items) data.faithfulFew.mustDo.items=[];
@@ -3912,10 +3950,16 @@ async function moveIdeaSchedule(ideaId,newDate){
     const idea=IdeasStore.getIdea(ideaId);
     if(idea?.schedule?.date){
       const oldDate=idea.schedule.date;
-      const slot=WINDOW_TO_SLOT[idea.schedule.window]||'beforeWork';
-      const field=PIPE_SLOT_FIELDS[slot];
+      const slot=WINDOW_TO_SLOT[idea.schedule.window]||'';
+      const field=slot ? PIPE_SLOT_FIELDS[slot] : '';
       const step=idea.steps?.step1;
       if(oldDate!==newDate && step){
+        if(!field){
+          IdeasStore.updateIdea(ideaId,{ schedule:{ ...idea.schedule, date:newDate } });
+          markDirty(); window.renderCalendar?.();
+          if(typeof loadIdeasHub==='function' && isIdeas()) loadIdeasHub();
+          return;
+        }
         const oldDay=await getDayDataByDate(oldDate);
         if(oldDay.execute[field]===step) oldDay.execute[field]='';
         await saveDayDataByDate(oldDate,oldDay);
@@ -3932,10 +3976,18 @@ async function moveIdeaSchedule(ideaId,newDate){
   const idea=globals.ideas.find(x=>x.id===ideaId);
   if(!idea?.flow?.scheduleDate) return;
   const oldDate=idea.flow.scheduleDate;
-  const slot=idea.flow.scheduleSlot||'beforeWork';
-  const field=PIPE_SLOT_FIELDS[slot];
+  const slot=idea.flow.scheduleSlot||'';
+  const field=slot ? PIPE_SLOT_FIELDS[slot] : '';
   const step=idea.flow.steps?.[0];
   if(oldDate!==newDate){
+    if(!field){
+      idea.flow.scheduleDate=newDate;
+      idea.updatedAt=new Date().toISOString();
+      markDirty();
+      window.renderCalendar?.();
+      renderSeedbed();
+      return;
+    }
     const oldDay=await getDayDataByDate(oldDate);
     if(oldDay.execute[field]===step) oldDay.execute[field]='';
     await saveDayDataByDate(oldDate,oldDay);
@@ -4113,6 +4165,10 @@ const SAT_EVENING_DONT = [
 ];
 
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function emptyState(kind, text){
+  return '<p class="app-empty-state app-empty-'+esc(kind||'general')+'">'+esc(text||'There is room to begin here.')+'</p>';
+}
+window.emptyState = emptyState;
 function uid(){return Math.random().toString(36).slice(2,10)}
 /* Numbered hover tooltip — hover or focus to see how a section works. */
 window.helpTip = function(num, text){
@@ -4146,12 +4202,13 @@ function dayLabelFor(off){
 function dayScopeInfo(){
   const d = dayOf(dayOffset);
   const cur = iso(d), today = iso(dayOf(0));
-  const nice = d.toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'});
-  if(cur === today)         return { state:'today',  cls:'',       chip:'Planning Today',     banner:'' };
-  if(cur === iso(dayOf(1))) return { state:'future', cls:'future', chip:'Planning Tomorrow',  banner:'You are planning Tomorrow — '+nice };
-  if(cur > today)           return { state:'future', cls:'future', chip:'Planning Ahead',     banner:'You are planning ahead — '+nice };
-  if(cur === iso(dayOf(-1)))return { state:'past',   cls:'past',   chip:'Reviewing Yesterday',banner:'You are looking back at Yesterday — '+nice };
-  return                           { state:'past',   cls:'past',   chip:'Reviewing '+nice,    banner:'You are looking back at '+nice };
+  const nice = d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  const planning = 'Planning: '+nice;
+  if(cur === today)         return { state:'today',  cls:'',       chip:'Planning Today',     label:planning, banner:'' };
+  if(cur === iso(dayOf(1))) return { state:'future', cls:'future', chip:'Planning Tomorrow',  label:planning, banner:'Planning Tomorrow — '+nice };
+  if(cur > today)           return { state:'future', cls:'future', chip:'Planning Ahead',     label:planning, banner:'You are planning ahead — '+nice };
+  if(cur === iso(dayOf(-1)))return { state:'past',   cls:'past',   chip:'Reviewing Yesterday',label:'Reviewing: '+nice, banner:'You are looking back at Yesterday — '+nice };
+  return                           { state:'past',   cls:'past',   chip:'Reviewing '+nice,    label:'Reviewing: '+nice, banner:'You are looking back at '+nice };
 }
 /** Paint the day-scope indicators: body classes, the banner, and any
  *  [data-day-scope-chip] hosts on screen. Runs on every view change. */
@@ -4172,6 +4229,13 @@ function refreshDayScopeUI(){
     el.textContent = info.chip;
     el.className = 'day-scope-chip' + (info.cls ? ' ' + info.cls : '');
   });
+  const planningDate = document.getElementById('dailyPlanningDate');
+  if(planningDate) planningDate.textContent = info.label || '';
+  document.querySelectorAll('[data-day-scope-set]').forEach(btn=>{
+    const on = String(dayOffset) === String(btn.dataset.dayScopeSet);
+    btn.classList.toggle('on', on);
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
 }
 /* Keep "today" honest across midnight: if the device date rolls over while the
    app is open, re-derive every label from the real clock. */
@@ -4186,6 +4250,19 @@ function refreshDayScopeUI(){
     }
   }, 30000);
 })();
+function timePeriodFor(date){
+  const h = (date || new Date()).getHours();
+  if(h < 11) return 'morning';
+  if(h < 18) return 'day';
+  return 'evening';
+}
+function applyTimeOfDayTheme(){
+  const p = timePeriodFor(new Date());
+  document.body.classList.toggle('theme-morning', p === 'morning');
+  document.body.classList.toggle('theme-day', p === 'day');
+  document.body.classList.toggle('theme-evening', p === 'evening');
+}
+setInterval(applyTimeOfDayTheme, 60000);
 function weekLabelFor(off){
   const m = mondayOf(off), s = new Date(m); s.setDate(m.getDate()+6);
   const f = d=>d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
@@ -4555,6 +4632,17 @@ async function ensureFaithStore(){
 }
 window.ensureFaithStore = ensureFaithStore;
 
+async function runStewardshipMigrations(){
+  if(!faithStore || !window.StewStore?.migrateLegacyProjectTasks) return null;
+  const result = window.StewStore.migrateLegacyProjectTasks(faithStore.data);
+  if(result?.changed || result?.projects || result?.tasks || result?.scheduledEvents){
+    setLocalSyncAt?.('fs-stewardship', Date.now());
+    scheduleCloudPush?.(['fs-stewardship']);
+  }
+  return result;
+}
+window.runStewardshipMigrations = runStewardshipMigrations;
+
 async function syncPlantToCore(idea, f, mustDoId){
   if(!faithStore) return;
   let seed = faithStore.getSeedByLegacyIdea(idea.id);
@@ -4566,7 +4654,7 @@ async function syncPlantToCore(idea, f, mustDoId){
   } else {
     faithStore.updateSeed(seed.id, { title: f.text, status: 'active', flow: idea.flow });
   }
-  const slot = f.scheduleSlot || 'beforeWork';
+  const slot = f.scheduleSlot || null;
   if(!faithStore.getTasksForDate(f.scheduleDate).some(t=> t.seedId===seed.id && t.stepNumber===1)){
     faithStore.createTask({
       title: f.steps[0], date: f.scheduleDate, timeSlot: slot,
@@ -4585,7 +4673,7 @@ async function syncPlantToCore(idea, f, mustDoId){
   if(f.addMustDo && mustDoId){
     if(!faithStore.findTaskByLegacyMustDo(mustDoId, f.scheduleDate)){
       faithStore.createTask({
-        title: f.firstAction, date: f.scheduleDate, timeSlot: 'beforeWork',
+        title: f.firstAction, date: f.scheduleDate,
         tag: 'growth', seedId: seed.id, legacyMustDoId: mustDoId
       });
     }
@@ -5226,7 +5314,7 @@ function updateSatRhythm(){
   }
 }
 function updateSaturdayRecoveryUI(){
-  const p = document.querySelector('#dailyBoard .page-head p');
+  const p = document.querySelector('#dailyBoard .daily-tagline');
   setDailyHeadTitle('Daily Ledger');
   if(p) p.textContent = 'Saturday Recovery — weekday rhythm below, time blocks at the bottom.';
   renderSatBlockTabs();
@@ -5527,6 +5615,15 @@ function bindNavEvents(){
   document.getElementById('btnSidebarToggle')?.addEventListener('click', ()=>
     setMobileSidebar(!document.body.classList.contains('sidebar-open')));
   document.getElementById('sidebarBackdrop')?.addEventListener('click', ()=> setMobileSidebar(false));
+  document.addEventListener('click', async e=>{
+    const scope = e.target.closest('[data-day-scope-set]');
+    if(!scope) return;
+    const next = Number(scope.dataset.dayScopeSet);
+    if(!Number.isFinite(next) || dayOffset === next) return;
+    if(dirty) await save();
+    dayOffset = next;
+    await loadCurrent();
+  });
   document.querySelector('.sidebar-nav')?.addEventListener('click', e=>{
     const navBtn = e.target.closest('[data-nav]');
     if(navBtn){
@@ -5863,7 +5960,10 @@ function bindEvents(){
       const itemId = uid();
       dayData.faithfulFew[key].items.push({id:itemId, text, done:false});
       if(key==='mustDo' && faithStore){
-        faithStore.createTask({ title:text, date:iso(dayOf(dayOffset)), timeSlot:'beforeWork', tag:'stewardship', legacyMustDoId:itemId });
+        faithStore.createTask({ title:text, date:iso(dayOf(dayOffset)), tag:'stewardship', legacyMustDoId:itemId });
+        if(window.StewStore?.createTask){
+          window.StewStore.createTask({ title:text, dueDate:iso(dayOf(dayOffset)), urgency:'today', legacyMustDoId:itemId });
+        }
         faithStore.save();
         if(typeof renderCalendar === 'function') renderCalendar();
       }
@@ -6207,12 +6307,19 @@ async function resetAll(){
     faithStoreInitPromise = initFaithStore();
     await faithStoreInitPromise;
     await window.StewStore?.init().catch(e=>console.warn('[StewStore] init failed', e));
+    await runStewardshipMigrations().catch(e=>console.warn('[migration] stewardship migration failed', e));
     await window.StonesStore?.init().catch(e=>console.warn('[StonesStore] init failed', e));
     await initAuth();
     if(new URLSearchParams(location.search).get('test')==='store' && typeof runFaithfulnessStoreTests === 'function'){
       const out = await runFaithfulnessStoreTests(()=> new FaithfulnessStore(createMemoryStorage()));
+      const stewOut = typeof runStewardshipStoreTests === 'function'
+        ? await runStewardshipStoreTests() : { pass:true, results:[] };
       console.log('[FaithfulnessStore tests]', out);
-      alert(out.pass ? 'FaithfulnessStore tests passed ('+out.results.length+' checks)' : 'Store tests FAILED: '+out.error);
+      console.log('[StewardshipStore tests]', stewOut);
+      const pass = out.pass && stewOut.pass;
+      alert(pass
+        ? 'Store tests passed ('+(out.results.length + stewOut.results.length)+' checks)'
+        : 'Store tests FAILED: '+(out.error || stewOut.error));
     }
     const rn = document.getElementById('researchNotes');
     if(rn) rn.value = globals.researchNotes||'';
@@ -6224,6 +6331,7 @@ async function resetAll(){
   }catch(e){
     console.error('[init] startup error — loading local view anyway', e);
   }finally{
+    applyTimeOfDayTheme();
     bindNavEvents();
     bindPanelEvents();
     await loadCurrent().catch(e=> console.warn('[init] loadCurrent failed', e));

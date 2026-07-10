@@ -247,8 +247,8 @@
     if(!stones.length && !formOpen){
       html += '<div class="stones-empty">'+
         '<div class="stones-empty-mark" aria-hidden="true">◈</div>'+
-        '<p class="stones-empty-lead serif">Nothing here yet.</p>'+
-        '<p class="stones-empty-body">When you learn something worth keeping, or make it through something hard, set it down here.</p>'+
+        '<p class="stones-empty-lead serif">Set down what you will need to remember later.</p>'+
+        '<p class="stones-empty-body">A stone can be a truth God taught you or a remembered victory He carried you through.</p>'+
       '</div>';
     } else if(stones.length){
       html += '<ul class="stones-list">'+ stones.map(renderStoneRow).join('') +'</ul>';

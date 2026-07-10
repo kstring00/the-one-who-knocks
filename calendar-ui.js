@@ -1,7 +1,7 @@
 /**
  * Stewardship Calendar — the signature surface of With Little.
  *
- * Five views (Day · Week · Month · Agenda · Planning) built on StewStore,
+ * Focused Day, Agenda, and Planning views built on StewStore,
  * with the existing data sources (Daily Ledger must-dos, Dashboard tasks,
  * scheduled Ideas, recurring blocks) merged into the same day so everything
  * connects back to one question: how do I faithfully steward today?
@@ -155,19 +155,26 @@
     const day = dayCache[dateStr];
     (day?.faithfulFew?.mustDo?.items||[]).forEach(it=>{
       mdIds.add(it.id);
-      const r = SLOT_RANGE.beforeWork;
-      push('mustdo', { id:'md-'+it.id, mustDoId:it.id, title:it.text, date:dateStr,
-        startMin:r.start, endMin:r.end, done:!!it.done, slot:'beforeWork' });
     });
     fs?.getTasksForDate?.(dateStr).forEach(t=>{
       if(!t.title) return;
       if(t.legacyMustDoId && mdIds.has(t.legacyMustDoId)) return;
+      if(t.projectId && S().getTask(t.id)) return;
       let start, end;
-      if(t.timeSlot==='timed' && t.startTime){ start = parseTime(t.startTime) ?? mins(12,0); end = start+(t.durationMin||30); }
-      else { const r = SLOT_RANGE[t.timeSlot]||SLOT_RANGE.beforeWork; start = r.start; end = r.end; }
+      if(t.timeSlot==='timed' && t.startTime){
+        start = parseTime(t.startTime);
+        if(start == null) return;
+        end = start+(t.durationMin||30);
+      }
+      else {
+        if(!t.timeSlot || (t.timeSlot === 'beforeWork' && !t.startTime)) return;
+        const r = SLOT_RANGE[t.timeSlot];
+        if(!r) return;
+        start = r.start; end = r.end;
+      }
       if(t.anchorId) end = start + (t.durationMin || 20);
       const ev = { id:'t-'+t.id, taskId:t.id, title:t.title, date:dateStr,
-        startMin:start, endMin:end, done:!!t.completed, slot:t.timeSlot||'beforeWork' };
+        startMin:start, endMin:end, done:!!t.completed, slot:t.timeSlot };
       push('task', ev);
       if(t.anchorId || t.tag==='first-fruits'){
         const last = out[out.length-1];
@@ -178,7 +185,8 @@
     (root.globals?.ideas||[]).forEach(raw=>{
       const n = typeof root.normalizeIdea === 'function' ? root.normalizeIdea(raw) : raw;
       if(n.status==='growing' && n.flow?.scheduleDate===dateStr && n.flow.steps?.[0]){
-        const r = SLOT_RANGE[n.flow.scheduleSlot]||SLOT_RANGE.beforeWork;
+        const r = SLOT_RANGE[n.flow.scheduleSlot];
+        if(!r) return;
         push('idea', { id:'idea-'+n.id, ideaId:n.id, title:n.flow.steps[0], date:dateStr,
           startMin:r.start, endMin:r.end, done:!!n.flow.stepsDone?.[0], slot:n.flow.scheduleSlot });
       }
@@ -224,7 +232,7 @@
 
   /* ── toolbar ───────────────────────────────────────────────── */
   function renderToolbar(){
-    const views = [['day','Day'],['week','Week'],['month','Month'],['agenda','Agenda'],['planning','Habit Library & Planning']];
+    const views = [['day','Day'],['agenda','Agenda'],['planning','Planning']];
     let label;
     if(view==='month'){
       label = new Date(anchor+'T12:00:00').toLocaleDateString('en-US',{month:'long',year:'numeric'});
@@ -329,7 +337,7 @@
     const empty = !dm.bigThree.length && !cands.length ?
       '<p class="stew-empty">Add tasks in Planning, then crown up to three here.</p>' : '';
     return '<div class="stew-card stew-b3"><div class="stew-card-kicker">✦ Today’s Big Three'+
-      (root.helpTip?.(3,'Choose up to three tasks that matter most today. Everything else waits in Still Entrusted.')||'')+'</div>'+
+      (root.helpTip?.(3,'Choose up to three tasks that matter most today. Everything else waits in the Task Shelf.')||'')+'</div>'+
       (rows||'')+picker+empty+
       '<p class="stew-b3-hint">Only three. The rest can wait faithfully.</p></div>';
   }
@@ -367,12 +375,12 @@
       }
     }
     if(!events.length && !allDay.length){
-      rows += '<div class="stew-empty stew-timeline-empty">Nothing planned yet. Click an hour or drag a task from Still Entrusted onto the timeline.</div>';
+      rows += '<div class="stew-empty stew-timeline-empty">Nothing planned yet. Click an hour or drag a task from the Task Shelf onto the timeline.</div>';
     }
     return '<div class="stew-card stew-timeline">'+
       '<div class="stew-timeline-head">'+
       '<div class="stew-card-kicker">Today\u2019s schedule'+
-      (root.helpTip?.(4,'Plan your day in time blocks. Click an empty hour to add one, or drag a task from Still Entrusted onto the timeline.')||'')+'</div>'+
+      (root.helpTip?.(4,'Plan your day in time blocks. Click an empty hour to add one, or drag a task from the Task Shelf onto the timeline.')||'')+'</div>'+
       '<button type="button" class="btn-ghost" data-act="new-event">+ Add time block</button>'+
       '</div><div class="stew-timeline-body" data-date="'+dateStr+'">'+rows+'</div></div>';
   }
@@ -424,14 +432,14 @@
         '<details class="stew-of-menu"><summary aria-label="Move task">→</summary><div class="stew-of-menu-list">'+
         [['later-today','Later today'],['tomorrow','Tomorrow'],['this-week','This week'],['someday','Someday'],['archive','Archive']]
           .map(m=>'<button type="button" data-act="move-task" data-id="'+t.id+'" data-dest="'+m[0]+'">'+m[1]+'</button>').join('')+
-        '<button type="button" data-act="schedule-task" data-id="'+t.id+'">Schedule today…</button>'+
+        '<button type="button" data-act="schedule-task" data-id="'+t.id+'">Schedule…</button>'+
         '</div></details></div>';
     }).join('');
-    return '<div class="stew-card"><div class="stew-card-head"><div class="stew-card-kicker">Still entrusted'+
+    return '<div class="stew-card"><div class="stew-card-head"><div class="stew-card-kicker">Task Shelf'+
       (root.helpTip?.(5,'Tasks waiting for their moment. Drag one onto the timeline, or use the arrow to move it to another day.')||'')+'</div>'+
       '<span class="stew-card-meta">'+(tasks.length? tasks.length+' waiting':'')+'</span></div>'+
       (rows || '<p class="stew-empty">Nothing waiting. Every task has its place.</p>')+
-      '<p class="stew-of-hint">Drag onto the timeline, or use → to move gently.</p></div>';
+      '<p class="stew-of-hint">Tasks here exist but have not been scheduled or selected for today.</p></div>';
   }
   function renderReflectionCard(dateStr, dm){
     const chips = REFLECTION_CHIPS.map(c=>
@@ -596,7 +604,7 @@
       '<span class="stew-ptask-actions">'+
       '<button type="button" class="stew-icon-act'+(isB3?' on':'')+'" data-act="b3-toggle" data-id="'+t.id+'" title="'+(isB3?'Remove from':'Add to')+' today’s Big Three" aria-label="Big Three toggle">✦</button>'+
       '<button type="button" class="stew-icon-act" data-act="task-edit" data-id="'+t.id+'" title="Details" aria-label="Task details">✎</button>'+
-      (t.scheduledEventId?'':'<button type="button" class="stew-icon-act" data-act="schedule-task" data-id="'+t.id+'" title="Schedule today" aria-label="Schedule">▦</button>')+
+      (t.scheduledEventId?'':'<button type="button" class="stew-icon-act" data-act="schedule-task" data-id="'+t.id+'" title="Schedule" aria-label="Schedule">▦</button>')+
       '</span></div>'+
       (t.subtasks.length ? '<div class="stew-subtasks">'+t.subtasks.map(s=>
         '<label class="stew-subtask'+(s.done?' done':'')+'"><input type="checkbox" data-act="subtask-toggle" data-id="'+t.id+'" data-sub="'+s.id+'"'+(s.done?' checked':'')+'>'+esc(s.text)+'</label>').join('')+'</div>' : '');
@@ -648,7 +656,7 @@
         '<details class="stew-of-menu"><summary aria-label="Move task">→</summary><div class="stew-of-menu-list">'+
         [['later-today','Later today'],['tomorrow','Tomorrow'],['this-week','This week'],['someday','Someday'],['archive','Archive']]
           .map(m=>'<button type="button" data-act="move-task" data-id="'+t.id+'" data-dest="'+m[0]+'">'+m[1]+'</button>').join('')+
-        '<button type="button" data-act="schedule-task" data-id="'+t.id+'">Schedule today…</button></div></details></div>';
+        '<button type="button" data-act="schedule-task" data-id="'+t.id+'">Schedule…</button></div></details></div>';
     }).join('');
     const tplRows = tpls.map(t=>
       '<div class="stew-tpl-row" style="--cat:'+catOf(t.category).color+'">'+
@@ -673,7 +681,7 @@
       '<div class="stew-plan-col">'+
       '<h3 class="stew-plan-title serif">Goals & projects</h3>'+goalCol+'</div>'+
       '<div class="stew-plan-col">'+
-      '<div class="stew-card"><div class="stew-card-head"><div class="stew-card-kicker">Still entrusted — task inbox</div>'+
+      '<div class="stew-card"><div class="stew-card-head"><div class="stew-card-kicker">Task Shelf</div>'+
       '<span class="stew-card-meta">'+overflow.length+' unscheduled</span></div>'+
       (ofRows||'<p class="stew-empty">Every task has a home.</p>')+
       '<div class="stew-add-row"><input type="text" class="stew-add-input" data-add-task data-project="" data-goal="" placeholder="Quick task — Enter to save"></div></div>'+
@@ -794,6 +802,22 @@
       taskIds:[], habitIds:[], notes:'', reflection:'', done:false
     };
   }
+  function openScheduleTask(taskId, dateStr){
+    const t = S().getTask(taskId);
+    if(!t) return;
+    const start = mins(9,0);
+    const dur = t.durationMin || 45;
+    openDrawer({ mode:'new', draft:Object.assign(newDraft(dateStr || t.dueDate || anchor, start), {
+      title:t.title,
+      goalId:t.goalId,
+      projectId:t.projectId,
+      priority:t.priority,
+      energy:t.energy,
+      taskIds:[t.id],
+      endMin:start + dur
+    })});
+    toast('Choose the date, start time, and duration, then create the block.');
+  }
   function openEvent(id, dateStr){
     const ev = S().getEvent(id);
     if(ev){ openDrawer({ mode:'edit', eventId:id, draft:JSON.parse(JSON.stringify(ev)) }); return; }
@@ -875,13 +899,13 @@
       S().createTask({ title:p.title, priority:p.priority||'medium',
         urgency: p.date===iso(dayOf(0)) ? 'today' : 'week',
         durationMin:p.durationMin||null, dueDate:p.date!==iso(dayOf(0))?p.date:'' });
-      toast('Task added to Still Entrusted.');
+      toast('Task added to Task Shelf.');
     }
     renderCalendar();
   }
 
   /* ── home band (greeting + quick capture) ─────────────────── */
-  const HOME_VIEWS = ['day','week','month','agenda','planning'];
+  const HOME_VIEWS = ['day','agenda','planning'];
   function timeGreeting(){
     const h = new Date().getHours();
     if(h < 12) return 'Good morning';
@@ -1028,12 +1052,9 @@
           if(!ok) toast('Three is enough. Release one first.');
           renderCalendar(); break;
         }
-        case 'move-task': S().moveTask(id, el.dataset.dest); toast('Moved — still entrusted.'); renderCalendar(); break;
+        case 'move-task': S().moveTask(id, el.dataset.dest); toast('Moved in the Task Shelf.'); renderCalendar(); break;
         case 'schedule-task': {
-          const t = S().getTask(id);
-          const start = nextFreeHour(anchor);
-          const ev = S().scheduleTask(id, view==='day'?anchor:iso(dayOf(0)), start);
-          if(ev){ toast('“'+(t?.title||'Task')+'” scheduled at '+fmtTime(start)+'.'); renderCalendar(); }
+          openScheduleTask(id, view==='day'?anchor:iso(dayOf(0)));
           break;
         }
         case 'task-edit': {
