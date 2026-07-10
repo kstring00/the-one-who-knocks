@@ -1085,7 +1085,7 @@
       const grAct = e.target.closest('[data-gr-act]');
       if(grAct && document.getElementById('dailyStickyBar')?.contains(grAct)){
         const act = grAct.dataset.grAct;
-        if(act === 'save-day'){ await save?.(); return; }
+        // (No manual save action: everything on this screen auto-saves on change.)
         if(act === 'mark-phase'){ markPhaseComplete(); await save?.(); return; }
         if(act === 'clear-day'){ clearCurrent?.(); return; }
       }

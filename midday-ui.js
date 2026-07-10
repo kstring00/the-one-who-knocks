@@ -332,7 +332,6 @@
     if(!bar) return;
     bar.hidden = false;
     const phase = typeof dailyPhase === 'string' ? dailyPhase : 'morning';
-    const save = bar.querySelector('[data-gr-act="save-day"]');
     const mark = bar.querySelector('[data-gr-act="mark-phase"]');
     const commit = bar.querySelector('[data-gr-act="commit-next-step"]');
     const clear = bar.querySelector('[data-gr-act="clear-day"]');
@@ -343,7 +342,6 @@
       if(mark) mark.textContent = phase === 'morning' ? 'Mark Morning Complete' : 'Mark Day Complete';
       if(commit) commit.hidden = true;
     }
-    if(save) save.hidden = false;
     if(clear) clear.hidden = false;
   }
 
