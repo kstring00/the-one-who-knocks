@@ -339,7 +339,7 @@
       if(mark) mark.textContent = 'Mark Midday Check-In Complete';
       if(commit) commit.hidden = false;
     } else {
-      if(mark) mark.textContent = phase === 'morning' ? 'Mark Morning Complete' : 'Mark Day Complete';
+      if(mark) mark.textContent = phase === 'morning' ? 'Mark Morning Complete' : 'Mark Evening Complete';
       if(commit) commit.hidden = true;
     }
     if(clear) clear.hidden = false;

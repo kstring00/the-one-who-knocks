@@ -222,6 +222,96 @@
     return typeof dailyPhase === 'string' ? dailyPhase : 'morning';
   }
 
+  function isPlanningTomorrow(){
+    return typeof dayOffset === 'number' && dayOffset === 1;
+  }
+
+  function tomorrowPromptKey(){
+    return 'wsr:tomorrow-prompt-dismissed:' + iso(dayOf(0));
+  }
+
+  function isTomorrowPromptDismissed(){
+    try{ return localStorage.getItem(tomorrowPromptKey()) === '1'; }catch(e){ return false; }
+  }
+
+  function dismissTomorrowPrompt(){
+    try{ localStorage.setItem(tomorrowPromptKey(), '1'); }catch(e){}
+    refreshTomorrowPrompt();
+  }
+
+  function shouldShowTomorrowPrompt(){
+    if(typeof dayOffset !== 'number' || dayOffset !== 0) return false;
+    if(!dayData?.phaseComplete?.evening) return false;
+    if(isTomorrowPromptDismissed()) return false;
+    return true;
+  }
+
+  function refreshTomorrowPrompt(){
+    const host = document.getElementById('dailyTomorrowPromptHost');
+    if(!host) return;
+    if(!isDaily?.() || document.getElementById('dailyBoard')?.hidden || !shouldShowTomorrowPrompt()){
+      host.innerHTML = '';
+      return;
+    }
+    host.innerHTML = '<div class="dl-tomorrow-prompt" role="dialog" aria-labelledby="dlTomorrowPromptTitle">'+
+      '<p class="dl-tomorrow-prompt-title" id="dlTomorrowPromptTitle">Want to set tomorrow up for success?</p>'+
+      '<div class="dl-tomorrow-prompt-actions">'+
+      '<button type="button" class="gr-btn-primary" data-dl-plan-tomorrow-yes>Yes, plan tomorrow</button>'+
+      '<button type="button" class="dl-tomorrow-prompt-no" data-dl-plan-tomorrow-no>Not tonight</button></div></div>';
+  }
+
+  async function carryUnfinishedToTomorrow(fromDay){
+    const src = fromDay || dayData;
+    if(!src?.faithfulFew?.mustDo?.items) return;
+    const unfinished = src.faithfulFew.mustDo.items.filter(it=> !it.done && !it.released);
+    if(!unfinished.length) return;
+
+    const tomorrowOff = 1;
+    const tomorrowDate = iso(dayOf(tomorrowOff));
+    let tom = typeof normalizeDaily === 'function'
+      ? normalizeDaily(await getJSON?.(dayKeyFor(tomorrowOff)))
+      : null;
+    if(!tom) return;
+    if(!tom.faithfulFew.mustDo.items) tom.faithfulFew.mustDo.items = [];
+
+    const todayDate = iso(dayOf(0));
+    unfinished.forEach(it=>{
+      const text = (it.text || '').trim();
+      if(!text) return;
+      const dup = tom.faithfulFew.mustDo.items.some(x=>
+        (x.text || '').trim().toLowerCase() === text.toLowerCase()
+      );
+      if(dup) return;
+      tom.faithfulFew.mustDo.items.push({
+        id: typeof uid === 'function' ? uid() : ('id-' + Date.now() + Math.random()),
+        text,
+        done: false,
+        carryCount: (it.carryCount || 0) + 1,
+        carriedFrom: todayDate,
+        carriedOver: true
+      });
+    });
+
+    if(typeof saveDayDataByDate === 'function') await saveDayDataByDate(tomorrowDate, tom);
+    if(root.faithStore){
+      root.faithStore.syncMustDosFromDay(tomorrowDate, tom);
+      await root.faithStore.save();
+    }
+  }
+
+  async function openTomorrowPlanning(opts){
+    opts = opts || {};
+    const todayData = opts.fromDay || dayData;
+    if(typeof save === 'function') await save();
+    if(opts.carry !== false) await carryUnfinishedToTomorrow(todayData);
+    dismissTomorrowPrompt();
+    dayOffset = 1;
+    if(typeof loadDaily === 'function') await loadDaily();
+    if(typeof setDailyPhase === 'function') setDailyPhase('morning');
+    if(typeof updateViewUI === 'function') updateViewUI();
+    else root.refreshDayScopeUI?.();
+  }
+
   const HOW_BY_PHASE = {
     morning: ['Name your aim','Choose top 3','Keep non-negotiables','Pick one growth rep','Prepare for friction','Map the day'],
     day: ['Check your aim','Review habits and must-dos','Notice what changed','Call an audible if needed','Choose the next faithful step'],
@@ -322,6 +412,7 @@
     populateFields?.(main, dayData);
     if(sidebar) sidebar.innerHTML = renderDailySidebar();
     if(typeof loadThoughtJournal === 'function') loadThoughtJournal();
+    refreshTomorrowPrompt();
     refreshProgressChrome();
     updateDailyScore();
   }
@@ -379,25 +470,27 @@
   }
 
   function renderTodayAimCompact(){
+    const tomorrow = isPlanningTomorrow();
     return '<section class="gr-card dl-cc-card" id="sec-daily-aim" data-dl-sec="aim">'+
-      '<div class="dl-cc-head-row"><h3 class="dl-cc-title serif">Today\u2019s Aim</h3></div>'+
-      '<p class="dl-cc-q">Today, I want to be faithful in\u2026</p>'+
-      '<input type="text" class="dl-hairline" data-field="posture.aim" placeholder="patience, focus, courage, order, serving well\u2026" aria-label="Today\u2019s aim">'+
+      '<div class="dl-cc-head-row"><h3 class="dl-cc-title serif">'+(tomorrow ? 'Tomorrow\u2019s Aim' : 'Today\u2019s Aim')+'</h3></div>'+
+      '<p class="dl-cc-q">'+(tomorrow ? 'Tomorrow, I want to be faithful in\u2026' : 'Today, I want to be faithful in\u2026')+'</p>'+
+      '<input type="text" class="dl-hairline" data-field="posture.aim" placeholder="patience, focus, courage, order, serving well\u2026" aria-label="'+(tomorrow ? 'Tomorrow\u2019s aim' : 'Today\u2019s aim')+'">'+
       '<p class="dl-cc-hint">Name the direction before you name the tasks.</p></section>';
   }
 
   function renderTop3Compact(){
+    const tomorrow = isPlanningTomorrow();
     const top = getTopMustDos();
     const more = getMoreMustDos();
     const topList = top.length ? top.map((it,i)=> renderMustDoRow(it, i+1)).join('')
-      : '<p class="dl-empty">What three things would make today faithful?</p>';
+      : '<p class="dl-empty">'+(tomorrow ? 'What three things would make tomorrow faithful?' : 'What three things would make today faithful?')+'</p>';
     const moreBlock = more.length
       ? '<details class="dl-more-tasks"><summary>More tasks ('+more.length+')</summary>'+
         '<div class="dl-list">'+more.map(it=> renderMustDoRow(it)).join('')+'</div></details>'
       : '';
     return '<section class="gr-card dl-cc-card" id="sec-non-neg" data-dl-sec="mustdos">'+
       '<div class="dl-cc-head-row"><h3 class="dl-cc-title serif">Top 3 Must-Dos</h3>'+mentorBtn('Help me choose my Top 3', 'Help me choose my Top 3', 'daily-top3')+'</div>'+
-      '<p class="dl-cc-q">What three things would make today faithful?</p>'+
+      '<p class="dl-cc-q">'+(tomorrow ? 'What three things would make tomorrow faithful?' : 'What three things would make today faithful?')+'</p>'+
       '<div class="dl-list" id="dlNonNegList">'+topList+'</div>'+moreBlock+
       '<div class="dl-add-row">'+
       '<input type="text" class="dl-hairline" id="dlNonNegAdd" placeholder="Add a must-do\u2026">'+
@@ -549,12 +642,14 @@
 
   function renderMustDoRow(it, priority){
     const done = !!it.done && !it.released;
+    const carried = !!(it.carriedOver || it.carriedFrom);
     const badge = it.carryCount ? '<span class="dl-carry-badge" title="Carried forward">\u21bb'+it.carryCount+'</span>' : '';
+    const fromBadge = carried ? '<span class="dl-from-yesterday">Carried over</span>' : '';
     const plan = it.carryPlan ? '<div class="dl-carry-plan">'+esc(it.carryPlan)+'</div>' : '';
     const pri = priority != null ? '<span class="dl-priority" aria-label="Priority '+priority+'">'+priority+'</span>' : '';
-    return '<div class="dl-must-row'+(done?' done':'')+(it.released?' released':'')+'" data-dl-nn="'+it.id+'">'+
+    return '<div class="dl-must-row'+(done?' done':'')+(it.released?' released':'')+(carried?' carried-over':'')+'" data-dl-nn="'+it.id+'">'+
       pri+'<span class="dl-grip" aria-hidden="true" title="Drag to reorder">\u2807</span>'+
-      badge+
+      fromBadge+badge+
       '<label class="dl-check-wrap">'+
       '<input type="checkbox" class="dl-check" data-dl-nn-check="'+it.id+'"'+(done?' checked':'')+(it.released?' disabled':'')+'>'+
       '<span class="dl-item-main dl-must-text">'+esc(it.text)+'</span></label>'+plan+
@@ -1055,6 +1150,7 @@
     }
     markDirty?.();
     refreshDailyUI();
+    refreshTomorrowPrompt();
   }
 
   function setNestedField(path, value){
@@ -1101,6 +1197,15 @@
       }
       if(e.target.closest('[data-dl-clear]')){
         clearCurrent?.();
+        return;
+      }
+
+      if(e.target.closest('[data-dl-plan-tomorrow-yes]')){
+        await openTomorrowPlanning({ fromDay: dayData, carry: true });
+        return;
+      }
+      if(e.target.closest('[data-dl-plan-tomorrow-no]')){
+        dismissTomorrowPrompt();
         return;
       }
 
@@ -1451,6 +1556,8 @@
   root.bindDailyEvents = bindDailyEvents;
   root.renderCategorySettings = renderCategorySettings;
   root.refreshDailyGuideChrome = refreshProgressChrome;
+  root.refreshTomorrowPrompt = refreshTomorrowPrompt;
+  root.openTomorrowPlanning = openTomorrowPlanning;
   root.loadDailyLedger = async function(){
     if(typeof isSaturdayRecovery === 'function' && isSaturdayRecovery()) return false;
     ensureGrowthRep();

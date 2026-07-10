@@ -537,6 +537,17 @@ body.mentor-open{overflow:hidden}
 .dl-mentor-chip:hover{border-color:var(--gold-border-soft);color:var(--gold-text)}
 .dl-cc-head-row{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:2px}
 .dl-cc-head-row .dl-cc-title{margin:0}
+/* Evening → tomorrow prompt + carried-over must-do styling */
+.dl-from-yesterday{display:inline-block;font-size:10px;font-weight:600;letter-spacing:.02em;text-transform:uppercase;color:var(--gold-text);background:var(--gold-fill-06);border:1px solid var(--gold-border-soft);border-radius:999px;padding:2px 8px;margin-right:6px;flex:none}
+.dl-must-row.carried-over{border-left:3px solid var(--gold-border-soft);padding-left:8px;background:color-mix(in srgb,var(--gold) 4%,var(--bg-card))}
+.dl-tomorrow-prompt-host{margin:0 auto 12px;max-width:1680px;padding:0 32px;box-sizing:border-box}
+.dl-tomorrow-prompt-host:empty{display:none}
+.dl-tomorrow-prompt{padding:14px 16px;border-radius:14px;border:1px solid var(--gold-border-soft);background:color-mix(in srgb,var(--gold) 8%,var(--bg-card));display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.dl-tomorrow-prompt-title{margin:0;font-size:14px;font-weight:600;color:var(--text-primary)}
+.dl-tomorrow-prompt-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.dl-tomorrow-prompt-no{border:none;background:none;font-size:12px;color:var(--text-muted);cursor:pointer;font-family:inherit;text-decoration:underline;padding:6px 8px}
+#dailyBoard.guided-daily .dl-tomorrow-prompt-host{max-width:1680px;padding-left:32px;padding-right:32px}
+@media(max-width:720px){#dailyBoard.guided-daily .dl-tomorrow-prompt-host{padding-left:16px;padding-right:16px}}
 @media(max-width:640px){
   .mentor-panel{top:auto;bottom:0;left:0;right:0;width:100%;height:min(88vh,640px);border-left:none;border-top:1px solid var(--border-subtle);
     border-radius:16px 16px 0 0;transform:translateY(100%)}
@@ -2747,6 +2758,7 @@ body.intake-open{overflow:hidden}
     </div>
   </div>
   <div id="dailyPhaseSuggestHost" class="dl-phase-suggest-host" aria-live="polite"></div>
+  <div id="dailyTomorrowPromptHost" class="dl-tomorrow-prompt-host" aria-live="polite"></div>
   <div class="daily-toolbar">
     <div class="phase-tabs sat-block-tabs" id="satBlockTabs" role="tablist" aria-label="Time blocks"></div>
   </div>
@@ -3074,7 +3086,7 @@ body.intake-open{overflow:hidden}
 <script src="ideas-hub.js?v=6" onerror="(function(){var p=document.getElementById('ihPipeline');if(p)p.innerHTML='<p class=&quot;ih-load-error&quot;>Failed to load ideas-hub.js — hard-refresh the page.</p>';})()"></script>
 <script src="stewardship-store.js?v=1"></script>
 <script src="calendar-ui.js?v=4"></script>
-<script src="daily-ui.js?v=8"></script>
+<script src="daily-ui.js?v=9"></script>
 <script src="midday-ui.js?v=2"></script>
 <script src="evening-ui.js?v=1"></script>
 <script src="review-ui.js?v=2"></script>
@@ -5294,6 +5306,7 @@ function applyDailyPhase(){
   board.dataset.phase = dailyPhase;
   document.querySelectorAll('.weekday-phase-tabs .phase-tab').forEach(t=> t.classList.toggle('on', t.dataset.phase===dailyPhase));
   refreshPhaseSuggestion();
+  refreshTomorrowPrompt?.();
 }
 function phaseSuggestStorageKey(phase){
   return 'wsr:phase-suggest:'+iso(dayOf(dayOffset))+':'+phase;
